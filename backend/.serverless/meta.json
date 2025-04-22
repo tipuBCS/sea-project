@@ -1,0 +1,119 @@
+{
+  "/Users/tipub/Desktop/workspace/university/Year2/SoftwareEngineeringAndAgile/sea-project/backend/serverless.yml": {
+    "versionFramework": "4.14.1",
+    "servicePath": "/Users/tipub/Desktop/workspace/university/Year2/SoftwareEngineeringAndAgile/sea-project/backend/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "sea-project-backend",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.10",
+        "region": "eu-west-2",
+        "stage": "dev",
+        "versionFunctions": true
+      },
+      "functions": {
+        "api": {
+          "handler": "app.main.handler",
+          "events": [
+            {
+              "http": {
+                "path": "/{proxy+}",
+                "method": "ANY",
+                "cors": true
+              }
+            }
+          ],
+          "name": "sea-project-backend-dev-api"
+        }
+      },
+      "package": {
+        "patterns": [
+          "!**/*.pyc",
+          "!.env/**",
+          "!node_modules/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/sea-project-backend/dev/code-artifacts"
+      },
+      "plugins": [
+        "serverless-python-requirements"
+      ],
+      "custom": {
+        "pythonRequirements": {
+          "layer": {
+            "name": "python-deps",
+            "description": "Python dependencies for API"
+          }
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "python3.10",
+      "region": "eu-west-2",
+      "stage": "dev",
+      "versionFunctions": true
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "serviceRawFile": "service: sea-project-backend\n\nprovider:\n  name: aws\n  runtime: python3.10\n  region: eu-west-2\n  stage: ${opt:stage, 'dev'}\n\nfunctions:\n  api:\n    handler: app.main.handler\n    events:\n      - http:\n          path: /{proxy+}\n          method: ANY\n          cors: true\n\npackage:\n  patterns:\n    - '!**/*.pyc'\n    - '!.env/**'\n    - '!node_modules/**'\n\nplugins:\n  - serverless-python-requirements\n\ncustom:\n  pythonRequirements:\n    layer:\n      name: python-deps\n      description: Python dependencies for API\n",
+    "command": [
+      "info"
+    ],
+    "options": {},
+    "orgId": "6458b831-a61d-4be4-aa92-0e5904658148",
+    "orgName": "seaproject",
+    "userId": "XpvttfpcyHGZjv1T06",
+    "userName": "seaproject",
+    "serviceProviderAwsAccountId": "092646077738",
+    "serviceProviderAwsCfStackName": "sea-project-backend-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:eu-west-2:092646077738:stack/sea-project-backend-dev/e8410f00-1f83-11f0-b636-023d1ab63889",
+    "serviceProviderAwsCfStackCreated": "2025-04-22T14:13:04.969Z",
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": "CREATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "PythonRequirementsLambdaLayerS3Key",
+        "OutputValue": "serverless/sea-project-backend/dev/1745331178130-2025-04-22T14:12:58.130Z/pythonRequirements.zip",
+        "Description": "Current Lambda layer S3Key",
+        "ExportName": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerS3Key"
+      },
+      {
+        "OutputKey": "PythonRequirementsLambdaLayerQualifiedArn",
+        "OutputValue": "arn:aws:lambda:eu-west-2:092646077738:layer:python-deps:1",
+        "Description": "Current Lambda layer version",
+        "ExportName": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerQualifiedArn"
+      },
+      {
+        "OutputKey": "ApiLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:eu-west-2:092646077738:function:sea-project-backend-dev-api:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-sea-project-backend-dev-ApiLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "PythonRequirementsLambdaLayerHash",
+        "OutputValue": "b263dd63aecd3525c7654f8ecabf87168cb534b2",
+        "Description": "Current Lambda layer hash",
+        "ExportName": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerHash"
+      },
+      {
+        "OutputKey": "ServiceEndpoint",
+        "OutputValue": "https://pwvok9yht1.execute-api.eu-west-2.amazonaws.com/dev",
+        "Description": "URL of the service endpoint",
+        "ExportName": "sls-sea-project-backend-dev-ServiceEndpoint"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-eu-west-2-893992a9-f870",
+        "ExportName": "sls-sea-project-backend-dev-ServerlessDeploymentBucketName"
+      }
+    ]
+  }
+}

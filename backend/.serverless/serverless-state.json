@@ -1,0 +1,483 @@
+{
+  "service": {
+    "service": "sea-project-backend",
+    "serviceObject": {
+      "name": "sea-project-backend"
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "python3.10",
+      "region": "eu-west-2",
+      "stage": "dev",
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ApiLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/sea-project-backend-dev-api"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "sea-project-backend",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sea-project-backend-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sea-project-backend-dev*:*:*"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "sea-project-backend",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "PythonRequirementsLambdaLayer": {
+            "Type": "AWS::Lambda::LayerVersion",
+            "Properties": {
+              "Content": {
+                "S3Bucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
+                "S3Key": "serverless/sea-project-backend/dev/1745331178130-2025-04-22T14:12:58.130Z/pythonRequirements.zip"
+              },
+              "LayerName": "python-deps",
+              "Description": "Python dependencies for API",
+              "CompatibleRuntimes": [
+                "python3.10"
+              ]
+            }
+          },
+          "ApiLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
+                "S3Key": "serverless/sea-project-backend/dev/1745331178130-2025-04-22T14:12:58.130Z/sea-project-backend.zip"
+              },
+              "Handler": "app.main.handler",
+              "Runtime": "python3.10",
+              "FunctionName": "sea-project-backend-dev-api",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ApiLogGroup"
+            ]
+          },
+          "ApiLambdaVersionJLFN51jODryq6Oxpy6f0Dyy8X9NjcGfm3As0op9lA8": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ApiLambdaFunction"
+              },
+              "CodeSha256": "maDUg5+lSWWBLhyKdvW5nNYykeBlUwjhnpzQXZBuFwM="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "dev-sea-project-backend",
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              },
+              "Policy": ""
+            }
+          },
+          "ApiGatewayResourceProxyVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodProxyVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": ""
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodProxyVarAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "ApiLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            },
+            "DependsOn": [
+              "ApiLambdaPermissionApiGateway"
+            ]
+          },
+          "ApiGatewayDeployment1745331104931": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "dev"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodProxyVarOptions",
+              "ApiGatewayMethodProxyVarAny"
+            ]
+          },
+          "ApiLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ApiLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-eu-west-2-893992a9-f870",
+            "Export": {
+              "Name": "sls-sea-project-backend-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "PythonRequirementsLambdaLayerQualifiedArn": {
+            "Description": "Current Lambda layer version",
+            "Value": {
+              "Ref": "PythonRequirementsLambdaLayer"
+            },
+            "Export": {
+              "Name": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerQualifiedArn"
+            }
+          },
+          "PythonRequirementsLambdaLayerHash": {
+            "Description": "Current Lambda layer hash",
+            "Value": "b263dd63aecd3525c7654f8ecabf87168cb534b2",
+            "Export": {
+              "Name": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerHash"
+            }
+          },
+          "PythonRequirementsLambdaLayerS3Key": {
+            "Description": "Current Lambda layer S3Key",
+            "Value": "serverless/sea-project-backend/dev/1745331178130-2025-04-22T14:12:58.130Z/pythonRequirements.zip",
+            "Export": {
+              "Name": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerS3Key"
+            }
+          },
+          "ApiLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ApiLambdaVersionJLFN51jODryq6Oxpy6f0Dyy8X9NjcGfm3As0op9lA8"
+            },
+            "Export": {
+              "Name": "sls-sea-project-backend-dev-ApiLambdaFunctionQualifiedArn"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/dev"
+                ]
+              ]
+            },
+            "Export": {
+              "Name": "sls-sea-project-backend-dev-ServiceEndpoint"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "pythonRequirements": {
+        "layer": {
+          "name": "python-deps",
+          "description": "Python dependencies for API"
+        }
+      }
+    },
+    "plugins": [
+      "serverless-python-requirements"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "api": {
+        "handler": "app.main.handler",
+        "events": [
+          {
+            "http": {
+              "path": "{proxy+}",
+              "method": "any",
+              "cors": {
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "ANY"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent",
+                  "X-Amzn-Trace-Id"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "sea-project-backend-dev-api",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "python3.10",
+        "vpc": {},
+        "versionLogicalId": "ApiLambdaVersionJLFN51jODryq6Oxpy6f0Dyy8X9NjcGfm3As0op9lA8"
+      }
+    },
+    "configValidationMode": "warn",
+    "serviceFilename": "serverless",
+    "initialServerlessConfig": {
+      "service": "sea-project-backend",
+      "provider": {
+        "$ref": "$[\"service\"][\"provider\"]"
+      },
+      "functions": {
+        "$ref": "$[\"service\"][\"functions\"]"
+      },
+      "package": {
+        "patterns": [
+          "!**/*.pyc",
+          "!.env/**",
+          "!node_modules/**"
+        ],
+        "artifactsS3KeyDirname": "serverless/sea-project-backend/dev/code-artifacts",
+        "deploymentBucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
+        "artifact": "/Users/tipub/Desktop/workspace/university/Year2/SoftwareEngineeringAndAgile/sea-project/backend/.serverless/sea-project-backend.zip",
+        "artifactDirectoryName": "serverless/sea-project-backend/dev/1745331178130-2025-04-22T14:12:58.130Z"
+      },
+      "plugins": {
+        "$ref": "$[\"service\"][\"plugins\"]"
+      },
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
+      }
+    },
+    "appId": null,
+    "orgId": null,
+    "layers": {
+      "pythonRequirements": {
+        "artifact": ".serverless/pythonRequirements.zip",
+        "name": "python-deps",
+        "description": "Python dependencies for API",
+        "compatibleRuntimes": {
+          "$ref": "$[\"service\"][\"provider\"][\"compiledCloudFormationTemplate\"][\"Resources\"][\"PythonRequirementsLambdaLayer\"][\"Properties\"][\"CompatibleRuntimes\"]"
+        },
+        "package": {}
+      }
+    },
+    "artifact": "/Users/tipub/Desktop/workspace/university/Year2/SoftwareEngineeringAndAgile/sea-project/backend/.serverless/sea-project-backend.zip"
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/sea-project-backend/dev/1745331178130-2025-04-22T14:12:58.130Z",
+    "artifact": "sea-project-backend.zip"
+  }
+}
