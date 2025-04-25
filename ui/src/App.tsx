@@ -10,13 +10,13 @@ async function fetchData() {
 function App() {
   useEffect(() => {
     const res = fetchData();
-    // console.log(res);
+    console.log(res);
   });
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>Testing Changes</p>
+        <p>Testing Changes 2</p>
         <a
           className="App-link"
           href="https://reactjs.org"

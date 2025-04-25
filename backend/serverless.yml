@@ -5,6 +5,8 @@ provider:
   runtime: python3.10
   region: eu-west-2
   stage: ${opt:stage, 'dev'}
+  httpApi:
+    cors: true
 
 functions:
   api:
@@ -13,10 +15,9 @@ functions:
     layers:
       - Ref: PythonRequirementsLambdaLayer
     events:
-      - http:
+      - httpApi:
           path: /{proxy+}
-          method: ANY
-          cors: true
+          method: '*'
 
 package:
   patterns:

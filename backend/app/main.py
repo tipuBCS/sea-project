@@ -4,6 +4,8 @@ from mangum import Mangum
 
 app = FastAPI()
 
+frontEnd_URL = ''
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Replace with your frontend URL in production
