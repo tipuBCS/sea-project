@@ -9,6 +9,9 @@ provider:
 functions:
   api:
     handler: app.main.handler
+    architecture: arm64
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
     events:
       - http:
           path: /{proxy+}
@@ -26,6 +29,7 @@ plugins:
 
 custom:
   pythonRequirements:
-    layer:
-      name: python-deps
-      description: Python dependencies for API
+    layer: true
+    pythonBin: python3
+    architectures:
+      - arm64
