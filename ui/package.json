@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cloudscape-design/board-components": "^3.0.101",
     "@cloudscape-design/components": "^3.0.950",
     "@cloudscape-design/global-styles": "^1.0.42",
     "@testing-library/dom": "^10.4.0",

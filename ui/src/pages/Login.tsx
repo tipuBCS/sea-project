@@ -25,7 +25,21 @@ function Login() {
   return (
     <FullPageCenteredBoxLayout>
       <Container
-        header={<Header actions={<Button onClick={() => {navigate('/register')}}>Register</Button>}>Login</Header>}
+        header={
+          <Header
+            actions={
+              <Button
+                onClick={() => {
+                  navigate("/register");
+                }}
+              >
+                Register
+              </Button>
+            }
+          >
+            Login
+          </Header>
+        }
       >
         <form
           onSubmit={(e) => {

@@ -1,13 +1,17 @@
 import { JSX } from "react";
 
-export const FullPageCenteredBoxLayout = ({ children }: { children: JSX.Element | JSX.Element[] }) => (
+export const FullPageCenteredBoxLayout = ({
+  children,
+}: {
+  children: JSX.Element | JSX.Element[];
+}) => (
   <div
     style={{
-      display: 'flex',
-      minHeight: '100vh',
-      alignContent: 'center',
-      justifyContent: 'center',
-      alignItems: 'center',
+      display: "flex",
+      minHeight: "100vh",
+      alignContent: "center",
+      justifyContent: "center",
+      alignItems: "center",
     }}
   >
     <div
