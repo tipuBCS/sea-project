@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import { getApiResult } from "./api/api";
+import "@cloudscape-design/global-styles/index.css"
+
 
 async function fetchData() {
   return await getApiResult();

@@ -121,7 +121,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
-                  "S3Key": "serverless/sea-project-backend/dev/1745579549054-2025-04-25T11:12:29.054Z/sea-project-backend.zip"
+                  "S3Key": "serverless/sea-project-backend/dev/1745593693657-2025-04-25T15:08:13.657Z/sea-project-backend.zip"
                 },
                 "Handler": "app.main.handler",
                 "Runtime": "python3.10",
@@ -147,14 +147,14 @@
                 "ApiLogGroup"
               ]
             },
-            "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus": {
+            "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ApiLambdaFunction"
                 },
-                "CodeSha256": "cJFOeNrSJrAVOjBJ6/06aZhtkRw8txShUU49oEQZ+rs="
+                "CodeSha256": "hRXxWzCdRlmX2fPmqReWYoyqf/bYXe0I2/7Xk3bULHw="
               }
             },
             "HttpApi": {
@@ -310,7 +310,7 @@
             "ApiLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus"
+                "Ref": "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw"
               },
               "Export": {
                 "Name": "sls-sea-project-backend-dev-ApiLambdaFunctionQualifiedArn"
@@ -379,7 +379,7 @@
           "timeout": 6,
           "runtime": "python3.10",
           "vpc": {},
-          "versionLogicalId": "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus"
+          "versionLogicalId": "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw"
         }
       },
       "package": {
@@ -391,7 +391,7 @@
         "artifactsS3KeyDirname": "serverless/sea-project-backend/dev/code-artifacts",
         "deploymentBucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
         "artifact": "/Users/tipub/Desktop/workspace/university/Year2/SoftwareEngineeringAndAgile/sea-project/backend/.serverless/sea-project-backend.zip",
-        "artifactDirectoryName": "serverless/sea-project-backend/dev/1745579549054-2025-04-25T11:12:29.054Z"
+        "artifactDirectoryName": "serverless/sea-project-backend/dev/1745593693657-2025-04-25T15:08:13.657Z"
       },
       "plugins": [
         "serverless-python-requirements"
@@ -522,7 +522,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
-                "S3Key": "serverless/sea-project-backend/dev/1745579549054-2025-04-25T11:12:29.054Z/sea-project-backend.zip"
+                "S3Key": "serverless/sea-project-backend/dev/1745593693657-2025-04-25T15:08:13.657Z/sea-project-backend.zip"
               },
               "Handler": "app.main.handler",
               "Runtime": "python3.10",
@@ -548,14 +548,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus": {
+          "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "cJFOeNrSJrAVOjBJ6/06aZhtkRw8txShUU49oEQZ+rs="
+              "CodeSha256": "hRXxWzCdRlmX2fPmqReWYoyqf/bYXe0I2/7Xk3bULHw="
             }
           },
           "HttpApi": {
@@ -711,7 +711,7 @@
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus"
+              "Ref": "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw"
             },
             "Export": {
               "Name": "sls-sea-project-backend-dev-ApiLambdaFunctionQualifiedArn"
@@ -777,7 +777,7 @@
     "serviceProviderAwsCfStackName": "sea-project-backend-dev",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:eu-west-2:092646077738:stack/sea-project-backend-dev/e8410f00-1f83-11f0-b636-023d1ab63889",
     "serviceProviderAwsCfStackCreated": "2025-04-22T14:13:04.969Z",
-    "serviceProviderAwsCfStackUpdated": "2025-04-25T11:05:14.059Z",
+    "serviceProviderAwsCfStackUpdated": "2025-04-25T14:59:59.015Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
@@ -794,9 +794,15 @@
       },
       {
         "OutputKey": "ApiLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:eu-west-2:092646077738:function:sea-project-backend-dev-api:17",
+        "OutputValue": "arn:aws:lambda:eu-west-2:092646077738:function:sea-project-backend-dev-api:19",
         "Description": "Current Lambda function version",
         "ExportName": "sls-sea-project-backend-dev-ApiLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "HttpApiId",
+        "OutputValue": "056sv4iaig",
+        "Description": "Id of the HTTP API",
+        "ExportName": "sls-sea-project-backend-dev-HttpApiId"
       },
       {
         "OutputKey": "PythonRequirementsLambdaLayerHash",
@@ -805,15 +811,15 @@
         "ExportName": "sls-sea-project-backend-dev-PythonRequirementsLambdaLayerHash"
       },
       {
-        "OutputKey": "ServiceEndpoint",
-        "OutputValue": "https://pwvok9yht1.execute-api.eu-west-2.amazonaws.com/dev",
-        "Description": "URL of the service endpoint",
-        "ExportName": "sls-sea-project-backend-dev-ServiceEndpoint"
-      },
-      {
         "OutputKey": "ServerlessDeploymentBucketName",
         "OutputValue": "serverless-framework-deployments-eu-west-2-893992a9-f870",
         "ExportName": "sls-sea-project-backend-dev-ServerlessDeploymentBucketName"
+      },
+      {
+        "OutputKey": "HttpApiUrl",
+        "OutputValue": "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com",
+        "Description": "URL of the HTTP API",
+        "ExportName": "sls-sea-project-backend-dev-HttpApiUrl"
       }
     ],
     "compiledCloudFormationTemplate": {
@@ -923,7 +929,7 @@
           "Properties": {
             "Code": {
               "S3Bucket": "serverless-framework-deployments-eu-west-2-893992a9-f870",
-              "S3Key": "serverless/sea-project-backend/dev/1745579549054-2025-04-25T11:12:29.054Z/sea-project-backend.zip"
+              "S3Key": "serverless/sea-project-backend/dev/1745593693657-2025-04-25T15:08:13.657Z/sea-project-backend.zip"
             },
             "Handler": "app.main.handler",
             "Runtime": "python3.10",
@@ -949,14 +955,14 @@
             "ApiLogGroup"
           ]
         },
-        "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus": {
+        "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw": {
           "Type": "AWS::Lambda::Version",
           "DeletionPolicy": "Retain",
           "Properties": {
             "FunctionName": {
               "Ref": "ApiLambdaFunction"
             },
-            "CodeSha256": "cJFOeNrSJrAVOjBJ6/06aZhtkRw8txShUU49oEQZ+rs="
+            "CodeSha256": "hRXxWzCdRlmX2fPmqReWYoyqf/bYXe0I2/7Xk3bULHw="
           }
         },
         "HttpApi": {
@@ -1111,7 +1117,7 @@
         "ApiLambdaFunctionQualifiedArn": {
           "Description": "Current Lambda function version",
           "Value": {
-            "Ref": "ApiLambdaVersionHCjVPsMMlnzChJrfqzvZg4JW2oBaH3qzVuK6cnE6eus"
+            "Ref": "ApiLambdaVersionGXruzSIQmYdDAfvc2zCZyv7VbGIIeyivrbLtidxbOw"
           },
           "Export": {
             "Name": "sls-sea-project-backend-dev-ApiLambdaFunctionQualifiedArn"
