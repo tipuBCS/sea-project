@@ -1,4 +1,10 @@
-const API_URL = "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com/";
+let API_URL = "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com/";
+
+const isLocal = false
+
+if (isLocal) {
+  API_URL = 'http://localhost:4000'
+}
 
 export async function getApiResult(): Promise<any> {
   const response = await fetch(API_URL);
@@ -6,8 +12,8 @@ export async function getApiResult(): Promise<any> {
 }
 
 export async function getLoginResponse(username: string, password: string): Promise<any> {
-    const loginUrl = API_URL + 'login'
-    const response = await fetch(API_URL, {
+    const loginUrl = `${API_URL}login`
+    const response = await fetch(loginUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -58,7 +58,6 @@ async def login(request: LoginRequest):
             detail=str(e)
         )
 
-
 # Handler for AWS Lambda
 handler = Mangum(app)
 print("Completed")
