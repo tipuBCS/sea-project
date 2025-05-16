@@ -30,17 +30,19 @@ function Login() {
       return;
     }
     setIsLoading(true);
-    const response = await getLoginResponse(username, password);
+    try {
+      const response = await getLoginResponse(username, password);
+      console.log(response);
+      if (response.isValid) {
+        navigate("/home");
+      } else {
+        setErrorMessage("Incorrect Username or passsord!");
+      }
+    } catch (error) {
+      console.log("error occured during login: ", error);
+    }
+
     setIsLoading(false);
-    console.log(response);
-    if (!response) {
-      return;
-    }
-    if (response.isValid) {
-      navigate("/home");
-    } else {
-      setErrorMessage("Username or password was Incorrect!");
-    }
   }
 
   return (
