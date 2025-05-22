@@ -64,7 +64,7 @@ class LoginResponse(BaseModel):
     isValid: bool
 
 
-@app.post("/login", response_model=LoginResponse)
+@app.post("/api/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     print("Recieved Login Request")
     print(request)

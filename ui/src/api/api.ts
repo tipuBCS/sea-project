@@ -35,7 +35,7 @@ export async function getLoginResponse(
     username,
     password,
   });
-  const response = await apiClient.default.loginLoginPost({
+  const response = await apiClient.default.loginApiLoginPost({
     username,
     password,
   });

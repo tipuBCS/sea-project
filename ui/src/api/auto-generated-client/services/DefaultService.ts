@@ -48,12 +48,12 @@ export class DefaultService {
      * @returns LoginResponse Successful Response
      * @throws ApiError
      */
-    public loginLoginPost(
+    public loginApiLoginPost(
         requestBody: LoginRequest,
     ): CancelablePromise<LoginResponse> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/login',
+            url: '/api/login',
             body: requestBody,
             mediaType: 'application/json',
             errors: {
