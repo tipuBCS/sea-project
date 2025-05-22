@@ -9,3 +9,7 @@ aws s3 sync build/ s3://sea-project
 
 # Invalidate CloudFront cache
 aws cloudfront create-invalidation --distribution-id E1A3KIDEFNLLCM --paths "/*"
+
+# Deploy Backend
+cd ../backend
+serverless deploy

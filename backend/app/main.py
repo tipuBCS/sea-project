@@ -35,7 +35,6 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     isValid: bool
 
-
 @app.post("/login")
 async def login(request: LoginRequest):
     print("Recieved Login Request")
@@ -47,7 +46,6 @@ async def login(request: LoginRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Handler for AWS Lambda
 handler = Mangum(app)

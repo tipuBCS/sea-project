@@ -14,3 +14,8 @@ Software Engineering and Agile (SEA) Project
    - Go to the Correct distribution (connected to the S3 bucket)
    - Read Distribution domain name e.g. (d39kticnloydq6.cloudfront.net)
    - Ender the domain name to login
+
+# Local Deployment Guide
+
+1. Run `cd ui`
+2. Run `pnpm start`

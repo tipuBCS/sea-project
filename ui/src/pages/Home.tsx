@@ -1,7 +1,5 @@
 import {
   AppLayout,
-  ColumnLayout,
-  Container,
   ContentLayout,
   Header,
   HelpPanel,
@@ -10,18 +8,44 @@ import {
 } from "@cloudscape-design/components";
 import { useEffect, useRef, useState } from "react";
 import { type Swapy, createSwapy } from "swapy";
-import { type TTask, getTasks } from "../api/task-data";
-import { Task } from "../helper/Task";
+import "../helper/mainContainer.css";
+import { TaskContainer } from "../helper/TaskContainer";
 
-export interface Data {
-  title: string;
-  content: string;
-}
+export type Task = {
+  id: string;
+  name: string;
+  description: string;
+  owner: string | null;
+  category: string;
+};
 
 function Home() {
-  const [tasks, setTasks] = useState<TTask[]>(() => getTasks());
+  const [tasks, setTasks] = useState<Task[]>([
+    {
+      id: "taskid1",
+      name: "First Task",
+      description: "lorem ipsum",
+      owner: null,
+      category: "Milestones",
+    },
+    {
+      id: "taskid2",
+      name: "Second Task",
+      description: "lorem ipsum",
+      owner: null,
+      category: "ProtoSec",
+    },
+  ]);
   const swapy = useRef<null | Swapy>(null);
   const container = useRef(null);
+  const enabled = true;
+
+  const [rows, setRows] = useState([
+    "Milestones",
+    "ProtoSec",
+    "Backlog",
+    "Prioritized Backlog",
+  ]);
 
   useEffect(() => {
     // If container element is loaded
@@ -65,21 +89,30 @@ function Home() {
           }
         >
           <div ref={container}>
-            <ColumnLayout columns={4}>
-              <Container>
-                {tasks.map((taskItem: TTask) => (
-                  <Task key={taskItem.id} task={taskItem} />
-                ))}
-              </Container>
-              <Container>
-                <Task key={"test"} task={{ content: "usefulness", id:'test1', status:'done' }} />
-                <Task key={"tes2"} task={{ content: "stuff and things", id:'test2', status:'done' }} />
-                <Task key={"tes3"} task={{ content: "value", id:'test3', status:'done' }} />
-                <Task key={"test4"} task={{ content: "abc", id:'test4', status:'done' }} />
-              </Container>
-              <Container>Test</Container>
-              <Container>Test</Container>
-            </ColumnLayout>
+            <div className="columns">
+              <div key={"Uncategorised"}>
+                <div key={"Uncategorised"} className="mainContainer">
+                  Uncategorised
+                  {tasks.map((taskItem) =>
+                    !rows.includes(taskItem.category) ? (
+                      <TaskContainer key={taskItem.id} TaskItem={taskItem} />
+                    ) : null
+                  )}
+                </div>
+              </div>
+              {rows.map((row) => (
+                <div key={row}>
+                  <div key={row} className="mainContainer">
+                    {row}
+                    {tasks.map((taskItem) =>
+                      taskItem.category === row ? (
+                        <TaskContainer key={taskItem.id} TaskItem={taskItem} />
+                      ) : null
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </ContentLayout>
       }
