@@ -1,9 +1,9 @@
 let API_URL = "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com/";
 
-const isLocal = false
+const isLocal = false;
 
 if (isLocal) {
-  API_URL = 'http://localhost:4000'
+  API_URL = "http://localhost:4000";
 }
 
 export async function getApiResult(): Promise<any> {
@@ -11,9 +11,12 @@ export async function getApiResult(): Promise<any> {
   return response;
 }
 
-export async function getLoginResponse(username: string, password: string): Promise<any> {
-    const loginUrl = `${API_URL}login`
-    const response = await fetch(loginUrl, {
+export async function getLoginResponse(
+  username: string,
+  password: string
+): Promise<any> {
+  const loginUrl = `${API_URL}login`;
+  const response = await fetch(loginUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -28,4 +31,23 @@ export async function getLoginResponse(username: string, password: string): Prom
   }
   const data = await response.json();
   return data;
+}
+
+export async function getTasks(username: string): Promise<any> {
+  return Promise.resolve([
+    {
+      id: "taskid1",
+      name: "First Task",
+      description: "lorem ipsum",
+      owner: null,
+      category: "Milestones",
+    },
+    {
+      id: "taskid2",
+      name: "Second Task",
+      description: "lorem ipsum",
+      owner: null,
+      category: "ProtoSec",
+    },
+  ]);
 }

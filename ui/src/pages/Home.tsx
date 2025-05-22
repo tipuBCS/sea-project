@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { type Swapy, createSwapy } from "swapy";
 import "../helper/mainContainer.css";
 import { TaskContainer } from "../helper/TaskContainer";
+import { getTasks } from "../api/api";
 
 export type Task = {
   id: string;
@@ -20,25 +21,32 @@ export type Task = {
 };
 
 function Home() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: "taskid1",
-      name: "First Task",
-      description: "lorem ipsum",
-      owner: null,
-      category: "Milestones",
-    },
-    {
-      id: "taskid2",
-      name: "Second Task",
-      description: "lorem ipsum",
-      owner: null,
-      category: "ProtoSec",
-    },
-  ]);
+  const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const swapy = useRef<null | Swapy>(null);
   const container = useRef(null);
   const enabled = true;
+
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      try {
+        const response = await getTasks("test");
+        // if (!response.ok) {
+        //   console.log('NOT OK')
+        //   throw new Error("Network response was not ok!");
+        // }
+        console.log(response);
+        // const jsonData = await response.json()
+        setTasks(response);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+        setError("An unknown error occured!");
+      }
+    };
+    fetchTaskData();
+  }, []);
 
   const [rows, setRows] = useState([
     "Milestones",
@@ -89,30 +97,37 @@ function Home() {
           }
         >
           <div ref={container}>
-            <div className="columns">
-              <div key={"Uncategorised"}>
-                <div key={"Uncategorised"} className="mainContainer">
-                  Uncategorised
-                  {tasks.map((taskItem) =>
-                    !rows.includes(taskItem.category) ? (
-                      <TaskContainer key={taskItem.id} TaskItem={taskItem} />
-                    ) : null
-                  )}
-                </div>
-              </div>
-              {rows.map((row) => (
-                <div key={row}>
-                  <div key={row} className="mainContainer">
-                    {row}
+            {tasks === null ? (
+              <div>Loading</div>
+            ) : (
+              <div className="columns">
+                <div key={"Uncategorised"}>
+                  <div key={"Uncategorised"} className="mainContainer">
+                    Uncategorised
                     {tasks.map((taskItem) =>
-                      taskItem.category === row ? (
+                      !rows.includes(taskItem.category) ? (
                         <TaskContainer key={taskItem.id} TaskItem={taskItem} />
                       ) : null
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
+                {rows.map((row) => (
+                  <div key={row}>
+                    <div key={row} className="mainContainer">
+                      {row}
+                      {tasks.map((taskItem) =>
+                        taskItem.category === row ? (
+                          <TaskContainer
+                            key={taskItem.id}
+                            TaskItem={taskItem}
+                          />
+                        ) : null
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </ContentLayout>
       }
