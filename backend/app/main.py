@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -15,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -24,6 +24,34 @@ async def root():
 @app.get("/api/items")
 async def get_items():
     return {"items": ["item1", "item2"]}
+
+
+class Task(BaseModel):
+    id: str
+    name: str
+    description: str
+    assignedTo: str | None
+    category: str
+
+
+@app.get("/api/tasks", response_model=List[Task])
+async def get_tasks():
+    return [
+        {
+            "id": "taskid1",
+            "name": "First Task",
+            "description": "lorem ipsum",
+            "assignedTo": None,
+            "category": "Milestones",
+        },
+        {
+            "id": "taskid2",
+            "name": "Second Task",
+            "description": "lorem ipsum",
+            "assignedTo": None,
+            "category": "ProtoSec",
+        },
+    ]
 
 
 class LoginRequest(BaseModel):
@@ -35,7 +63,8 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     isValid: bool
 
-@app.post("/login")
+
+@app.post("/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     print("Recieved Login Request")
     print(request)
@@ -47,6 +76,9 @@ async def login(request: LoginRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # Handler for AWS Lambda
 handler = Mangum(app)
 print("Started up Backend Server!")
+print(app)
+print(handler)

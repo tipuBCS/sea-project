@@ -18,6 +18,8 @@
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "adapter": "link:@atlaskit/pragmatic-drag-and-drop/element/adapter",
+    "axios": "^1.9.0",
+    "form-data": "^4.0.2",
     "lucide-react": "^0.509.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -33,7 +35,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-client": "openapi --input http://localhost:8000/openapi.json --output ./src/api/auto-generated-client --client axios --name MyApiClient"
   },
   "eslintConfig": {
     "extends": [
@@ -52,5 +55,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "openapi-typescript-codegen": "^0.29.0"
   }
 }

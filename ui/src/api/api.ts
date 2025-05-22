@@ -1,53 +1,42 @@
-let API_URL = "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com/";
+import axios from "axios";
+import {
+  type LoginResponse,
+  MyApiClient,
+  type Task,
+  type OpenAPIConfig,
+} from "./auto-generated-client";
 
-const isLocal = false;
+const API_URL = await axios
+  .get("config.json")
+  .then(async (response) => {
+    return response.data.API_URL;
+  })
+  .catch((error) => {
+    console.log("Error occurred retrieving config.json file!");
+    throw error;
+  });
 
-if (isLocal) {
-  API_URL = "http://localhost:4000";
-}
+const openAPIConfig: Partial<OpenAPIConfig> = {
+  BASE: API_URL,
+};
 
-export async function getApiResult(): Promise<any> {
-  const response = await fetch(API_URL);
-  return response;
-}
+const apiClient = await new MyApiClient(openAPIConfig);
 
 export async function getLoginResponse(
   username: string,
   password: string
-): Promise<any> {
-  const loginUrl = `${API_URL}login`;
-  const response = await fetch(loginUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username,
-      password,
-    }),
+): Promise<LoginResponse> {
+  const body = JSON.stringify({
+    username,
+    password,
   });
-  if (!response.ok) {
-    throw new Error(`HTTP Error! Status: ${response.status}`);
-  }
-  const data = await response.json();
-  return data;
+  const response = await apiClient.default.loginLoginPost({
+    username,
+    password,
+  });
+  return response;
 }
 
-export async function getTasks(username: string): Promise<any> {
-  return Promise.resolve([
-    {
-      id: "taskid1",
-      name: "First Task",
-      description: "lorem ipsum",
-      owner: null,
-      category: "Milestones",
-    },
-    {
-      id: "taskid2",
-      name: "Second Task",
-      description: "lorem ipsum",
-      owner: null,
-      category: "ProtoSec",
-    },
-  ]);
+export async function getTasks(username: string): Promise<Array<Task>> {
+  return await apiClient.default.getTasksApiTasksGet();
 }

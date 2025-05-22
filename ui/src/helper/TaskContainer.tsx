@@ -1,6 +1,6 @@
-import "./task.css";
 import type { JSX } from "react";
-import type { Task } from "../pages/Home";
+import type { Task } from "../api/auto-generated-client";
+import "./task.css";
 
 export const TaskContainer = ({
   TaskItem,

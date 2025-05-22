@@ -8,17 +8,10 @@ import {
 } from "@cloudscape-design/components";
 import { useEffect, useRef, useState } from "react";
 import { type Swapy, createSwapy } from "swapy";
+import { getTasks } from "../api/api";
+import type { Task } from "../api/auto-generated-client";
 import "../helper/mainContainer.css";
 import { TaskContainer } from "../helper/TaskContainer";
-import { getTasks } from "../api/api";
-
-export type Task = {
-  id: string;
-  name: string;
-  description: string;
-  owner: string | null;
-  category: string;
-};
 
 function Home() {
   const [tasks, setTasks] = useState<Task[] | null>(null);
@@ -31,12 +24,6 @@ function Home() {
     const fetchTaskData = async () => {
       try {
         const response = await getTasks("test");
-        // if (!response.ok) {
-        //   console.log('NOT OK')
-        //   throw new Error("Network response was not ok!");
-        // }
-        console.log(response);
-        // const jsonData = await response.json()
         setTasks(response);
       } catch (error) {
         if (error instanceof Error) {

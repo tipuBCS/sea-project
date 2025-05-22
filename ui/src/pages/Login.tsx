@@ -32,7 +32,6 @@ function Login() {
     setIsLoading(true);
     try {
       const response = await getLoginResponse(username, password);
-      console.log(response);
       if (response.isValid) {
         navigate("/home");
       } else {
