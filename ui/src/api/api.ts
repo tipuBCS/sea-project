@@ -6,10 +6,15 @@ import {
   type OpenAPIConfig,
 } from "./auto-generated-client";
 
+type Config = {
+  ApiUrl: string;
+};
+
 const API_URL = await axios
   .get("config.json")
   .then(async (response) => {
-    return response.data.API_URL;
+    const data: Config = response.data;
+    return data.ApiUrl;
   })
   .catch((error) => {
     console.log("Error occurred retrieving config.json file!");
