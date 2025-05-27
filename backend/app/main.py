@@ -51,6 +51,14 @@ async def get_tasks():
             "assignedTo": None,
             "category": "ProtoSec",
         },
+        
+        {
+            "id": "taskid3",
+            "name": "third Task",
+            "description": "lorem ipsum",
+            "assignedTo": None,
+            "category": "ProtoSec",
+        },
     ]
 
 

@@ -43,5 +43,37 @@ export async function getLoginResponse(
 }
 
 export async function getTasks(username: string): Promise<Array<Task>> {
-  return await apiClient.default.getTasksApiTasksGet();
+  return await [
+    {
+      id: "taskid1",
+      name: "First Task",
+      description: "lorem ipsum",
+      assignedTo: undefined,
+      category: "Milestones",
+    },
+    {
+      id: "taskid2",
+      name: "Second Task",
+      description: "lorem ipsum",
+      assignedTo: undefined,
+      category: "Milestones",
+    },
+
+    {
+      id: "taskid3",
+      name: "third Task",
+      description: "lorem ipsum",
+      assignedTo: undefined,
+      category: "ProtoSec",
+    },
+
+    {
+      id: "taskid4",
+      name: "Fouth Task",
+      description: "lorem ipsum",
+      assignedTo: undefined,
+      category: "ProtoSec",
+    },
+  ];
+  // return await apiClient.default.getTasksApiTasksGet();
 }

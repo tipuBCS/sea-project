@@ -1,62 +1,100 @@
 import {
   AppLayout,
+  Button,
   ContentLayout,
   Header,
   HelpPanel,
   Link,
   SideNavigation,
 } from "@cloudscape-design/components";
-import { useEffect, useRef, useState } from "react";
-import { type Swapy, createSwapy } from "swapy";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { type Swapy, createSwapy, utils } from "swapy";
 import { getTasks } from "../api/api";
 import type { Task } from "../api/auto-generated-client";
 import "../helper/mainContainer.css";
-import { TaskContainer } from "../helper/TaskContainer";
+import {
+  PlaceholderTaskContainer,
+  TaskContainer,
+} from "../helper/TaskContainer";
 
 function Home() {
-  const [tasks, setTasks] = useState<Task[] | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const [slotItemMap, setSlotItemMap] = useState(
+    utils.initSlotItemMap(tasks, "id")
+  );
+
+  const slottedItems = useMemo(
+    () => utils.toSlottedItems(tasks, "id", slotItemMap),
+    [tasks, slotItemMap]
+  );
+
+  useEffect(() => {
+    console.log("tasks:");
+    console.log(tasks);
+  }, [tasks]);
+
   const [error, setError] = useState<string | null>(null);
   const swapy = useRef<null | Swapy>(null);
   const container = useRef(null);
-  const enabled = true;
-
-  useEffect(() => {
-    const fetchTaskData = async () => {
-      try {
-        const response = await getTasks("test");
-        setTasks(response);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        }
-        setError("An unknown error occured!");
-      }
-    };
-    fetchTaskData();
-  }, []);
 
   const [rows, setRows] = useState([
+    "Uncategorised",
     "Milestones",
     "ProtoSec",
     "Backlog",
     "Prioritized Backlog",
   ]);
 
-  useEffect(() => {
-    // If container element is loaded
-    if (container.current) {
-      swapy.current = createSwapy(container.current);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(
+    () =>
+      utils.dynamicSwapy(
+        swapy.current,
+        tasks,
+        "id",
+        slotItemMap,
+        setSlotItemMap
+      ),
+    [tasks]
+  );
 
-      // Your event listeners
-      swapy.current.onSwap((event) => {
-        console.log("swap", event);
-      });
-    }
+  useEffect(() => {
+    // biome-ignore lint/style/noNonNullAssertion: <explanation>
+    swapy.current = createSwapy(container.current!, {
+      manualSwap: true,
+      // animation: 'dynamic'
+      // autoScrollOnDrag: true,
+      // swapMode: 'drop',
+      // enabled: true,
+      // dragAxis: 'x',
+      // dragOnHold: true
+    });
+
+    swapy.current.onSwap((event) => {
+      console.log(event);
+      setSlotItemMap(event.newSlotItemMap.asArray);
+    });
 
     return () => {
-      // Destroy the swapy instance on component destroy
       swapy.current?.destroy();
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      try {
+        const response = await getTasks("test");
+        console.log(response);
+        setTasks(response);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+        setError("An unknown error occurred!");
+      }
+    };
+    fetchTaskData();
   }, []);
 
   return (
@@ -84,37 +122,49 @@ function Home() {
           }
         >
           <div ref={container}>
-            {tasks === null ? (
-              <div>Loading</div>
-            ) : (
-              <div className="columns">
-                <div key={"Uncategorised"}>
-                  <div key={"Uncategorised"} className="mainContainer">
-                    Uncategorised
-                    {tasks.map((taskItem) =>
-                      !rows.includes(taskItem.category) ? (
-                        <TaskContainer key={taskItem.id} TaskItem={taskItem} />
-                      ) : null
-                    )}
-                  </div>
-                </div>
-                {rows.map((row) => (
-                  <div key={row}>
-                    <div key={row} className="mainContainer">
-                      {row}
-                      {tasks.map((taskItem) =>
-                        taskItem.category === row ? (
+            <div key="columns" className="columns">
+              {rows.map((row) => (
+                <div key={row}>
+                  <div key={row} className="mainContainer">
+                    {row}
+                    {slottedItems.map(({ slotId, itemId, item: taskItem }) => {
+                      if (!taskItem) {
+                        return;
+                      }
+                      if (taskItem.category === row) {
+                        console.log(
+                          `Rendering task in ${row} with slotId: ${slotId}`
+                        );
+                        return (
                           <TaskContainer
-                            key={taskItem.id}
+                            key={slotId}
+                            SlotId={slotId}
+                            ItemId={itemId}
                             TaskItem={taskItem}
                           />
-                        ) : null
-                      )}
-                    </div>
+                        );
+                      }
+                    })}
+                    {/* <PlaceholderTaskContainer key={row} id={row} /> */}
+                    <Button
+                      onClick={() => {
+                        setTasks((tasks) => {
+                          const newTask: Task = {
+                            id: "taskid5",
+                            name: "Task5",
+                            description: "",
+                            category: row,
+                          };
+                          return [...tasks, newTask];
+                        });
+                      }}
+                    >
+                      Add
+                    </Button>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         </ContentLayout>
       }
