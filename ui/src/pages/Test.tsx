@@ -20,11 +20,14 @@ type RowPlaceholder = {
 type Item = {
   type: "Task";
   id: string;
+  category: Category;
+  index: number;
   title: string;
-  isEmpty?: boolean;
 };
 
-const rows: RowPlaceholder[] = [
+type Category = "First" | "Second" | "Third" | "Fourth" | "Fifth"
+
+const rows: RowPlaceholder[] = [ 
   { type: "RowPlaceHolder", id: "row-1", name: "First" },
   { type: "RowPlaceHolder", id: "row-2", name: "Second" },
   { type: "RowPlaceHolder", id: "row-3", name: "Third" },
@@ -34,38 +37,53 @@ const rows: RowPlaceholder[] = [
 
 const initialItems: Item[] = [
   {
-    id: "0",
-    title: "0",
-    type: "Task",
+      id: "0",
+      title: "0",
+      type: "Task",
+      category: "First",
+      index: 0
   },
   {
-    id: "1",
-    title: "1",
-    type: "Task",
+      id: "1",
+      title: "1",
+      type: "Task",
+      category: "First",
+      index: 0
   },
   {
-    id: "2",
-    title: "2",
-    type: "Task",
+      id: "2",
+      title: "2",
+      type: "Task",
+      category: "Second",
+      index: 0
   },
   {
-    id: "3",
-    title: "3",
-    type: "Task",
+      id: "3",
+      title: "3",
+      type: "Task",
+      category: "Fifth",
+      index: 0
   },
   {
-    id: "5",
-    title: "5",
-    type: "Task",
+      id: "5",
+      title: "5",
+      type: "Task",
+      category: "Fifth",
+      index: 0
   },
   {
-    id: "6",
-    title: "6",
-    type: "Task",
+      id: "6",
+      title: "6",
+      type: "Task",
+      category: "Fourth",
+      index: 0
   },
 ];
 
-let id = 4;
+function itemToSwapySlots(items: Item[]) {
+    // For each 'category' make 5 swapy slots
+    
+}
 
 function Test() {
   const [items, setItems] = useState<Item[]>(initialItems);
@@ -99,16 +117,21 @@ function Test() {
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
     swapyRef.current = createSwapy(containerRef.current!, {
       manualSwap: true,
-      // animation: 'dynamic'
-      // autoScrollOnDrag: true,
-      // swapMode: 'drop',
+      //   animation: 'dynamic'
+      autoScrollOnDrag: true,
+      swapMode: "hover",
       // enabled: true,
       // dragAxis: 'x',
-      // dragOnHold: true
+      //   dragOnHold: true
+    });
+
+    swapyRef.current.onSwapStart((event) => {
+      console.log(event);
     });
 
     swapyRef.current.onSwap((event) => {
-      setSlotItemMap(event.newSlotItemMap.asArray);
+      //   setSlotItemMap(event.newSlotItemMap.asArray);
+      console.log(event);
     });
 
     return () => {
@@ -140,45 +163,35 @@ function Test() {
             </Header>
           }
         >
-          <div ref={containerRef}>
-            <div className="items">
-              {rows.map((row) => {
-                return <div key={row.id}>{row.name}</div>;
-              })}
+          <div ref={containerRef} className="kanban-board">
+            <div className="column" id="todo">
+              To Do
             </div>
-            <div className="items">
-              {slottedItems.map(({ slotId, itemId, item }) => (
+
+            <div className="column" id="Backlog">
+              Backlog
+            </div>
+
+            <div className="column" id="in-progress">
+              In Progress
+            </div>
+
+            <div className="column" id="in-progress2">
+              In Progress2
+            </div>
+
+            <div className="column" id="in-progress3">
+              In Progress3
+            </div>
+            {slottedItems.map(({ slotId, itemId, item: taskItem }) => {
+              return (
                 <div className="slot" key={slotId} data-swapy-slot={slotId}>
-                  {item && (
-                    <div className="item" data-swapy-item={itemId} key={itemId}>
-                      <span>{item.id}</span>
-                      {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-                      <span
-                        className="delete"
-                        data-swapy-no-drag
-                        onClick={() => {
-                          setItems(items.filter((i) => i.id !== item.id));
-                        }}
-                      />
-                    </div>
-                  )}
+                  <div className="item" data-swapy-item={itemId} key={itemId}>
+                    <span>Task3</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div
-              className="item item--add"
-              onClick={() => {
-                const newItem: Item = {
-                  id: `${id}`,
-                  title: `${id}`,
-                  type: "Task",
-                };
-                setItems([...items, newItem]);
-                id++;
-              }}
-            >
-              +
-            </div>
+              );
+            })}
           </div>
         </ContentLayout>
       }

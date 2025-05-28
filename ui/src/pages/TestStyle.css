@@ -108,3 +108,25 @@ body {
 .delete:hover {
   background-color: hsl(244.5, 57.9%, 40.6%);
 }
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
+
+.column {
+  /* Styles for each column */
+  min-height: 100px;
+  width: 200px;
+  padding: 1rem;
+  background: #f4f4f4;
+}
+
+.task {
+  /* Task card styles */
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background: white;
+  border-radius: 4px;
+}
