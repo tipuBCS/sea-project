@@ -6,8 +6,10 @@ import type { Transform } from "@dnd-kit/utilities";
 import { Handle, Remove } from "./components";
 
 import styles from "./Item.module.scss";
+import { ItemType } from "../../../../pages/Test";
 
 export interface Props {
+  item: ItemType;
   dragOverlay?: boolean;
   color?: string;
   disabled?: boolean;
@@ -44,6 +46,7 @@ export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        item,
         color,
         dragOverlay,
         dragging,
@@ -139,7 +142,7 @@ export const Item = React.memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            {value}
+            {item.name}
             <span className={styles.Actions}>
               {onRemove ? (
                 <Remove className={styles.Remove} onClick={onRemove} />

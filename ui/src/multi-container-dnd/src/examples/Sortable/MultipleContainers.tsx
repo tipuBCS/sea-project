@@ -206,6 +206,17 @@ export function MultipleContainers({
     return items.some((item) => item.id === searchId);
   };
 
+  const getItemFromId = (searchId: UniqueIdentifier) => {
+    const container = containers.find((container) =>
+      items[container.id].some((item) => item.id === searchId)
+    );
+
+    // If we found a container, then find the specific item in that container
+    if (container) {
+      return items[container.id].find((item) => item.id === searchId);
+    }
+  };
+
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
@@ -518,6 +529,7 @@ export function MultipleContainers({
                 {items[container.id].map((value, index) => {
                   return (
                     <SortableItem
+                      item={value}
                       disabled={isSortingContainer}
                       key={value.id}
                       id={value.id}
@@ -553,8 +565,13 @@ export function MultipleContainers({
   );
 
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
+    const item = getItemFromId(id);
+    if (!item) return;
+    console.log("Rendering sortable item drag overlay ..");
+    console.log(item);
     return (
       <Item
+        item={item}
         value={id}
         handle={handle}
         style={getItemStyles({
@@ -587,14 +604,15 @@ export function MultipleContainers({
       >
         {items[containerId].map((item, index) => (
           <Item
+            item={item}
             key={item.id}
-            value={item.id}
+            value={item.name}
             handle={handle}
             style={getItemStyles({
               containerId,
               overIndex: -1,
               index: getIndex(item.id),
-              value: item.name,
+              value: item.id,
               isDragging: false,
               isSorting: false,
               isDragOverlay: false,
@@ -660,6 +678,7 @@ function Trash({ id }: { id: UniqueIdentifier }) {
 }
 
 interface SortableItemProps {
+  item: ItemType;
   containerId: UniqueIdentifier;
   id: UniqueIdentifier;
   index: number;
@@ -672,6 +691,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({
+  item,
   disabled,
   id,
   index,
@@ -702,6 +722,7 @@ function SortableItem({
     <Item
       ref={disabled ? undefined : setNodeRef}
       value={id}
+      item={item}
       dragging={isDragging}
       sorting={isSorting}
       handle={handle}

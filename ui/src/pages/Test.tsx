@@ -104,30 +104,24 @@ export type ItemType = {
 
 function Test() {
   const [containers, setContainers] = useState<ContainerType[]>([
-    { id: "A", name: "First container" },
-    { id: "B", name: "First container" },
-    { id: "C", name: "First container" },
-    { id: "D", name: "First container" },
+    { id: "Uncategorised", name: "Uncategorised" },
+    { id: "PrioritizedBacklog", name: "Prioritized Backlog" },
+    { id: "Backlog", name: "Backlog" },
+    { id: "Doing", name: "Doing" },
+    { id: "Done", name: "Done" },
   ]);
+
   const [items, setItems] = useState<ContainerCollection>({
-    A: [
-      { id: "A1", name: "Item 1" },
+    Uncategorised: [
+      { id: "123", name: "Item 1" },
       { id: "A2", name: "Item 2" },
       { id: "A3", name: "Item 3" },
     ],
-    B: [
-    
-    ],
-    C: [],
-    D: []
+    PrioritizedBacklog: [],
+    Backlog: [],
+    Doing: [],
+    Done: [],
   });
-  // const [rows, setRows] = useState([
-  //   "Uncategorised",
-  //   "Milestones",
-  //   "ProtoSec",
-  //   "Backlog",
-  //   "Prioritized Backlog",
-  // ]);
   const [error, setError] = useState<string | null>(null);
 
   // useEffect(() => {
