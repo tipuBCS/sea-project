@@ -89,7 +89,19 @@ const initalTask: Tasks = {
   ],
 };
 
+export type ContainerType = {
+  id: UniqueIdentifier;
+  name: string;
+};
+
 function Test() {
+  const [containers, setContainers] = useState<ContainerType[]>([
+    { id: "A", name: "First container" },
+    { id: "B", name: "First container" },
+    { id: "C", name: "First container" },
+    { id: "D", name: "First container" },
+
+  ]);
   const [Tasks1, SetTasks1] = useState(["A2", "A1"]);
   const [Tasks2, SetTasks2] = useState(["B1", "B2"]);
 
@@ -126,34 +138,6 @@ function Test() {
   //   fetchTaskData();
   // }, []);
 
-  const containers = ["A", "B", "C"];
-  const [parent, setParent] = useState(null);
-  const draggableMarkup = <Draggable id="draggable">Drag me</Draggable>;
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    console.log(event);
-    console.log(`Active: ${active.id}`);
-    console.log(`Over: ${over?.id}`);
-    if (!over) {
-      return;
-    }
-    if (active.id !== over.id) {
-      // setTasks((tasks) => {
-      //   const oldIndex = items.indexOf(active.id);
-      //   const newIndex = items.indexOf(over.id);
-      //   return arrayMove(tasks, oldIndex, newIndex);
-      // });
-    }
-  }
-
-  function handleDragOver(event: DragOverEvent) {
-    const { active, over } = event;
-    console.log(event);
-    console.log(`Active: ${active.id}`);
-    console.log(`Over: ${over?.id}`);
-  }
-
   return (
     <AppLayout
       navigation={
@@ -180,9 +164,11 @@ function Test() {
         >
           <div className="App">
             <MultipleContainers
+              containers={containers}
+              setContainers={setContainers}
               itemCount={5}
               strategy={rectSortingStrategy}
-              vertical
+              vertical={false}
             />
           </div>
         </ContentLayout>
