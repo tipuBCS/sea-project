@@ -1,32 +1,33 @@
 import {
   AppLayout,
+  type AppLayoutProps,
+  Button,
+  ColumnLayout,
+  Container,
   ContentLayout,
+  Form,
+  FormField,
   Header,
-  HelpPanel,
+  Input,
   Link,
   SideNavigation,
+  SpaceBetween,
   SplitPanel,
+  Textarea,
+  ToggleButton,
 } from "@cloudscape-design/components";
 import {
-  type DragEndEvent,
-  type DragOverEvent,
-  KeyboardSensor,
   type MeasuringConfiguration,
   MeasuringStrategy,
-  PointerSensor,
   type UniqueIdentifier,
-  useSensor,
-  useSensors,
 } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
-import Draggable from "../helper/Draggable";
 import "../helper/mainContainer.css";
 
-import {
-  rectSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
+import type { NonCancelableEventHandler } from "@cloudscape-design/components/internal/events";
+import { BaseChangeDetail } from "@cloudscape-design/components/input/interfaces";
 
 const measuring: MeasuringConfiguration = {
   droppable: {
@@ -101,6 +102,9 @@ export type ContainerCollection = Record<UniqueIdentifier, ItemType[]>;
 export type ItemType = {
   id: UniqueIdentifier;
   name: string;
+  description: string;
+  completed: boolean;
+  assigned?: string;
 };
 
 function Test() {
@@ -114,9 +118,24 @@ function Test() {
 
   const [items, setItems] = useState<ContainerCollection>({
     Uncategorised: [
-      { id: "123", name: "Item 1" },
-      { id: "A2", name: "Item 2" },
-      { id: "A3", name: "Item 3" },
+      {
+        id: "123",
+        name: "Item 1",
+        description: "First item description",
+        completed: false,
+      },
+      {
+        id: "A2",
+        name: "Item 2",
+        description: "Second Item description",
+        completed: false,
+      },
+      {
+        id: "A3",
+        name: "Item 3",
+        description: "Third Item description",
+        completed: false,
+      },
     ],
     PrioritizedBacklog: [],
     Backlog: [],
@@ -124,21 +143,19 @@ function Test() {
     Done: [],
   });
 
-  useEffect(() => {
-    console.log("New Items: ");
-    console.log(items);
-  }, [items]);
-
+  function toggleSplitPanel() {
+    setSplitPanelOpen((enable) => !enable);
+  }
   const [error, setError] = useState<string | null>(null);
 
-  const [editTask, setEditTask] = useState<ItemType>({
-    id: "123",
-    name: "Make a game",
-  });
+  const [editTaskId, setEditTaskId] = useState<UniqueIdentifier>();
+
+  const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
   function startEditingTask(task: ItemType) {
-    console.log('Clicked edit!')
-    setEditTask(task);
+    console.log("Clicked edit!");
+    setEditTaskId(task.id);
+    setSplitPanelOpen(true);
   }
   // useEffect(() => {
   //   const fetchTaskData = async () => {
@@ -155,6 +172,52 @@ function Test() {
   //   fetchTaskData();
   // }, []);
 
+  function onChangeTask(updates: Partial<ItemType>) {
+    if (!editTaskId) {
+      return;
+    }
+    setItems((prevItems) => {
+      // Find which container has this item
+      const containerId = Object.keys(prevItems).find((containerId) =>
+        prevItems[containerId].some((item) => item.id === editTaskId)
+      );
+
+      if (!containerId) {
+        return prevItems; // Item not found in any container
+      }
+
+      // Update the item in the found container
+      return {
+        ...prevItems,
+        [containerId]: prevItems[containerId].map((item) =>
+          item.id === editTaskId ? { ...item, ...updates } : item
+        ),
+      };
+    });
+  }
+
+  function getTaskFromId(id: UniqueIdentifier): ItemType | undefined {
+    // Find which container has this item
+    const containerId = Object.keys(items).find((containerId) =>
+      items[containerId].some((item) => item.id === id)
+    );
+
+    if (!containerId) {
+      return undefined; // Item not found in any container
+    }
+    return items[containerId].find((item) => item.id === id);
+  }
+
+  // // Update The currently edited task
+  // useEffect(() => {
+  //   // Update the task
+  //   setEditTask((task) => {
+  //     if (!task) {
+  //       return;
+  //     }
+  //   });
+  // }, [items]);
+
   return (
     <AppLayout
       navigation={
@@ -170,8 +233,52 @@ function Test() {
           ]}
         />
       }
+      splitPanelOpen={splitPanelOpen}
+      onSplitPanelToggle={() => {
+        toggleSplitPanel();
+      }}
       splitPanel={
-        <SplitPanel header={editTask.name}>Task Description Field</SplitPanel>
+        editTaskId ? (
+          <SplitPanel header={"Edit Task"}>
+            <ColumnLayout columns={4}>
+              <Form
+                actions={
+                  <SpaceBetween size="xs" direction="horizontal">
+                    <Button>Submit</Button>
+                  </SpaceBetween>
+                }
+              >
+                <SpaceBetween size="l">
+                  <FormField
+                    description="Enter your task heading"
+                    label="Task Heading"
+                  >
+                    <Input
+                      onChange={({ detail }) =>
+                        onChangeTask({ name: detail.value })
+                      }
+                      value={getTaskFromId(editTaskId)?.name ?? ''}
+                    />
+                  </FormField>
+                  <FormField
+                    description="Enter your task description"
+                    label="Task Description"
+                  >
+                    <Textarea
+                      onChange={({ detail }) =>
+                        onChangeTask({ description: detail.value })
+                      }
+                      value={getTaskFromId(editTaskId)?.description ?? ''}
+                    />
+                  </FormField>
+                  <ToggleButton pressed={getTaskFromId(editTaskId)?.completed ?? false}>
+                    Mark as Complete
+                  </ToggleButton>
+                </SpaceBetween>
+              </Form>
+            </ColumnLayout>
+          </SplitPanel>
+        ) : undefined
       }
       content={
         <ContentLayout

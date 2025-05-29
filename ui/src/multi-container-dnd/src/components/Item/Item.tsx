@@ -136,7 +136,8 @@ export const Item = React.memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            {item.name}
+            <div className={classNames(styles.ItemText)}>{item.name}</div>
+
             {itemHovered ? (
               <span
                 className={styles.Actions}
