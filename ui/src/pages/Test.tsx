@@ -94,34 +94,41 @@ export type ContainerType = {
   name: string;
 };
 
+// {"container1": [{id: "1", name: "Task1 Title", {id: "2", name: "Task 2 Title"}}]}
+export type ContainerCollection = Record<UniqueIdentifier, ItemType[]>;
+
+export type ItemType = {
+  id: UniqueIdentifier;
+  name: string;
+};
+
 function Test() {
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: "A", name: "First container" },
     { id: "B", name: "First container" },
     { id: "C", name: "First container" },
     { id: "D", name: "First container" },
-
   ]);
-  const [Tasks1, SetTasks1] = useState(["A2", "A1"]);
-  const [Tasks2, SetTasks2] = useState(["B1", "B2"]);
-
-  const [items, setItems] = useState<UniqueIdentifier[]>([1, 2, 3]);
-  const [tasks, setTasks] = useState(initalTask);
-  const [rows, setRows] = useState([
-    "Uncategorised",
-    "Milestones",
-    "ProtoSec",
-    "Backlog",
-    "Prioritized Backlog",
-  ]);
+  const [items, setItems] = useState<ContainerCollection>({
+    A: [
+      { id: "A1", name: "Item 1" },
+      { id: "A2", name: "Item 2" },
+      { id: "A3", name: "Item 3" },
+    ],
+    B: [
+    
+    ],
+    C: [],
+    D: []
+  });
+  // const [rows, setRows] = useState([
+  //   "Uncategorised",
+  //   "Milestones",
+  //   "ProtoSec",
+  //   "Backlog",
+  //   "Prioritized Backlog",
+  // ]);
   const [error, setError] = useState<string | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
 
   // useEffect(() => {
   //   const fetchTaskData = async () => {
@@ -166,6 +173,8 @@ function Test() {
             <MultipleContainers
               containers={containers}
               setContainers={setContainers}
+              items={items}
+              setItems={setItems}
               itemCount={5}
               strategy={rectSortingStrategy}
               vertical={false}
