@@ -48,6 +48,7 @@ $focused-outline-color: #4c9ffe;
       0px 15px 15px 0 rgba(34, 33, 81, 0.25);
     z-index: 999;
   }
+  
 }
 
 .Item {
@@ -99,6 +100,7 @@ $focused-outline-color: #4c9ffe;
       box-shadow: 0 0px 4px 1px rgba(0, 0, 0, 0.1), $box-shadow;
     }
     cursor: not-allowed;
+
   }
 
   &.dragOverlay {

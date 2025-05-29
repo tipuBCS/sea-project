@@ -5,6 +5,7 @@ import {
   HelpPanel,
   Link,
   SideNavigation,
+  SplitPanel,
 } from "@cloudscape-design/components";
 import {
   type DragEndEvent,
@@ -17,7 +18,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Draggable from "../helper/Draggable";
 import "../helper/mainContainer.css";
 
@@ -122,8 +123,23 @@ function Test() {
     Doing: [],
     Done: [],
   });
+
+  useEffect(() => {
+    console.log("New Items: ");
+    console.log(items);
+  }, [items]);
+
   const [error, setError] = useState<string | null>(null);
 
+  const [editTask, setEditTask] = useState<ItemType>({
+    id: "123",
+    name: "Make a game",
+  });
+
+  function startEditingTask(task: ItemType) {
+    console.log('Clicked edit!')
+    setEditTask(task);
+  }
   // useEffect(() => {
   //   const fetchTaskData = async () => {
   //     try {
@@ -154,7 +170,9 @@ function Test() {
           ]}
         />
       }
-      tools={<HelpPanel header={<h2>Overview</h2>}>Help content</HelpPanel>}
+      splitPanel={
+        <SplitPanel header={editTask.name}>Task Description Field</SplitPanel>
+      }
       content={
         <ContentLayout
           header={
@@ -172,6 +190,7 @@ function Test() {
               itemCount={5}
               strategy={rectSortingStrategy}
               vertical={false}
+              startEditingTask={startEditingTask}
             />
           </div>
         </ContentLayout>
@@ -179,65 +198,5 @@ function Test() {
     />
   );
 }
-
-// <DndContext
-//   onDragEnd={handleDragEnd}
-//   onDragOver={handleDragOver}
-//   collisionDetection={closestCenter}
-//   measuring={measuring}
-// >
-//   <div className="columns">
-//     <SortableContext
-//       items={Tasks1}
-//       strategy={verticalListSortingStrategy}
-//     >
-//       <div className="mainContainer">
-//         Container 1
-//         <Droppable id={"Task1 Droppable"}>
-//           {Tasks1.map((task) => {
-//             return (
-//               <SortableItem key={task} id={task}>
-//                 <TaskContainer TaskItem={{ id: task, name: task }} />
-//               </SortableItem>
-//             );
-//           })}
-//         </Droppable>
-//       </div>
-//     </SortableContext>
-
-//     <div className="mainContainer">Container 2</div>
-//   </div>
-//   {/* <div key="columns" className="columns">
-//     {rows.map((row) => {
-//       const rowItems: Task[] = [];
-//       if (row in tasks) {
-//         tasks[row].map((task) => {
-//           rowItems.push(task);
-//         });
-//       }
-//       return (
-//         <div key={row}>
-//           <div key={row} className="mainContainer">
-//             {row}
-//             <SortableContext
-//               items={rowItems}
-//               strategy={verticalListSortingStrategy}
-//             >
-//               {rowItems.map((task) => {
-//                 return (
-//                   <SortableItem key={task.id} id={task.id}>
-//                     <TaskContainer TaskItem={task} />
-//                   </SortableItem>
-//                 );
-//               })}
-//             </SortableContext>
-
-//             <Button onClick={() => {}}>Add</Button>
-//           </div>
-//         </div>
-//       );
-//     })}
-//   </div> */}
-// </DndContext>
 
 export default Test;

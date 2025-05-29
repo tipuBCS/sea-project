@@ -1,3 +1,36 @@
+import {
+  type CancelDrop,
+  type CollisionDetection,
+  DndContext,
+  DragOverlay,
+  type DropAnimation,
+  type KeyboardCoordinateGetter,
+  KeyboardSensor,
+  MeasuringStrategy,
+  type Modifiers,
+  MouseSensor,
+  TouchSensor,
+  type UniqueIdentifier,
+  closestCenter,
+  defaultDropAnimationSideEffects,
+  getFirstCollision,
+  pointerWithin,
+  rectIntersection,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  type AnimateLayoutChanges,
+  SortableContext,
+  type SortingStrategy,
+  arrayMove,
+  defaultAnimateLayoutChanges,
+  horizontalListSortingStrategy,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import type React from "react";
 import {
   type Dispatch,
@@ -7,45 +40,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { createPortal, unstable_batchedUpdates } from "react-dom";
-import {
-  type CancelDrop,
-  closestCenter,
-  pointerWithin,
-  rectIntersection,
-  type CollisionDetection,
-  DndContext,
-  DragOverlay,
-  type DropAnimation,
-  getFirstCollision,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  type Modifiers,
-  useDroppable,
-  type UniqueIdentifier,
-  useSensors,
-  useSensor,
-  MeasuringStrategy,
-  type KeyboardCoordinateGetter,
-  defaultDropAnimationSideEffects,
-} from "@dnd-kit/core";
-import {
-  type AnimateLayoutChanges,
-  SortableContext,
-  useSortable,
-  arrayMove,
-  defaultAnimateLayoutChanges,
-  verticalListSortingStrategy,
-  type SortingStrategy,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { createPortal } from "react-dom";
 import { coordinateGetter as multipleContainersCoordinateGetter } from "./multipleContainersKeyboardCoordinates";
 
-import { Item, Container, type ContainerProps } from "../../components";
+import { Container, type ContainerProps, Item } from "../../components";
 
-import { createRange } from "../../utilities";
 import type {
   ContainerCollection,
   ContainerType,
@@ -128,6 +127,7 @@ type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
 interface Props {
   containers: ContainerType[];
   setContainers: Dispatch<SetStateAction<ContainerType[]>>;
+  startEditingTask: (task: ItemType) => void;
   items: ContainerCollection;
   setItems: Dispatch<SetStateAction<ContainerCollection>>;
   adjustScale?: boolean;
@@ -147,7 +147,6 @@ interface Props {
   wrapperStyle?(args: { index: number }): React.CSSProperties;
   itemCount?: number;
   handle?: boolean;
-  renderItem?: any;
   strategy?: SortingStrategy;
   modifiers?: Modifiers;
   minimal?: boolean;
@@ -163,6 +162,7 @@ const empty: UniqueIdentifier[] = [];
 export function MultipleContainers({
   containers,
   setContainers,
+  startEditingTask,
   items,
   setItems,
   adjustScale = false,
@@ -176,25 +176,11 @@ export function MultipleContainers({
   wrapperStyle = () => ({}),
   minimal = false,
   modifiers,
-  renderItem,
   strategy = verticalListSortingStrategy,
   trashable = false,
   vertical = false,
   scrollable,
 }: Props) {
-  // const [items, setItems] = useState<Items>(
-  //   () =>
-  //     initialItems ?? {
-  //       A: createRange(itemCount, (index) => `A${index + 1}`),
-  //       B: createRange(itemCount, (index) => `B${index + 1}`),
-  //       C: createRange(itemCount, (index) => `C${index + 1}`),
-  //       D: createRange(itemCount, (index) => `D${index + 1}`),
-  //     }
-  // );
-  // const [containers, setContainers] = useState(
-  //   Object.keys(items) as UniqueIdentifier[]
-  // );
-
   const checkIfContainerExists = (searchId: UniqueIdentifier) => {
     return containers.some((container) => container.id === searchId);
   };
@@ -529,6 +515,7 @@ export function MultipleContainers({
                 {items[container.id].map((value, index) => {
                   return (
                     <SortableItem
+                      startEditingTask={startEditingTask}
                       item={value}
                       disabled={isSortingContainer}
                       key={value.id}
@@ -537,7 +524,6 @@ export function MultipleContainers({
                       handle={handle}
                       style={getItemStyles}
                       wrapperStyle={wrapperStyle}
-                      renderItem={renderItem}
                       containerId={container.id}
                       getIndex={getIndex}
                     />
@@ -567,10 +553,9 @@ export function MultipleContainers({
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
     const item = getItemFromId(id);
     if (!item) return;
-    console.log("Rendering sortable item drag overlay ..");
-    console.log(item);
     return (
       <Item
+        startEditingTask={startEditingTask}
         item={item}
         value={id}
         handle={handle}
@@ -585,7 +570,6 @@ export function MultipleContainers({
         })}
         color={getColor(id)}
         wrapperStyle={wrapperStyle({ index: 0 })}
-        renderItem={renderItem}
         dragOverlay
       />
     );
@@ -604,6 +588,7 @@ export function MultipleContainers({
       >
         {items[containerId].map((item, index) => (
           <Item
+            startEditingTask={startEditingTask}
             item={item}
             key={item.id}
             value={item.name}
@@ -619,7 +604,6 @@ export function MultipleContainers({
             })}
             color={undefined}
             wrapperStyle={wrapperStyle({ index })}
-            renderItem={renderItem}
           />
         ))}
       </Container>
@@ -678,6 +662,7 @@ function Trash({ id }: { id: UniqueIdentifier }) {
 }
 
 interface SortableItemProps {
+  startEditingTask: (task: ItemType) => void;
   item: ItemType;
   containerId: UniqueIdentifier;
   id: UniqueIdentifier;
@@ -686,17 +671,16 @@ interface SortableItemProps {
   disabled?: boolean;
   style(args: any): React.CSSProperties;
   getIndex(id: UniqueIdentifier): number;
-  renderItem(): React.ReactElement;
   wrapperStyle({ index }: { index: number }): React.CSSProperties;
 }
 
 function SortableItem({
+  startEditingTask,
   item,
   disabled,
   id,
   index,
   handle,
-  renderItem,
   style,
   containerId,
   getIndex,
@@ -720,6 +704,7 @@ function SortableItem({
 
   return (
     <Item
+      startEditingTask={startEditingTask}
       ref={disabled ? undefined : setNodeRef}
       value={id}
       item={item}
@@ -742,7 +727,6 @@ function SortableItem({
       transform={transform}
       fadeIn={mountedWhileDragging}
       listeners={listeners}
-      renderItem={renderItem}
     />
   );
 }

@@ -1,14 +1,16 @@
-import React, { useEffect } from "react";
-import classNames from "classnames";
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
+import classNames from "classnames";
+import React, { useEffect, useState } from "react";
 
 import { Handle, Remove } from "./components";
 
+import { Button } from "@cloudscape-design/components";
+import type { ItemType } from "../../../../pages/Test";
 import styles from "./Item.module.scss";
-import { ItemType } from "../../../../pages/Test";
 
 export interface Props {
+  startEditingTask: (task: ItemType) => void;
   item: ItemType;
   dragOverlay?: boolean;
   color?: string;
@@ -46,6 +48,7 @@ export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        startEditingTask,
         item,
         color,
         dragOverlay,
@@ -69,6 +72,9 @@ export const Item = React.memo(
       },
       ref
     ) => {
+      const [itemHovered, setItemHovered] = useState(false);
+      const [buttonHovered, setButtonHovered] = useState(false);
+
       useEffect(() => {
         if (!dragOverlay) {
           return;
@@ -81,22 +87,10 @@ export const Item = React.memo(
         };
       }, [dragOverlay]);
 
-      return renderItem ? (
-        renderItem({
-          dragOverlay: Boolean(dragOverlay),
-          dragging: Boolean(dragging),
-          sorting: Boolean(sorting),
-          index,
-          fadeIn: Boolean(fadeIn),
-          listeners,
-          ref,
-          style,
-          transform,
-          transition,
-          value
-        })
-      ) : (
+      return (
         <li
+          onMouseEnter={() => setItemHovered(true)}
+          onMouseLeave={() => setItemHovered(false)}
           className={classNames(
             styles.Wrapper,
             fadeIn && styles.fadeIn,
@@ -122,7 +116,7 @@ export const Item = React.memo(
                 ? `${transform.scaleY}`
                 : undefined,
               "--index": index,
-              "--color": color
+              "--color": color,
             } as React.CSSProperties
           }
           ref={ref}
@@ -138,17 +132,37 @@ export const Item = React.memo(
             )}
             style={style}
             data-cypress="draggable-item"
-            {...(!handle ? listeners : undefined)}
+            {...(!buttonHovered ? listeners : undefined)}
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
             {item.name}
-            <span className={styles.Actions}>
-              {onRemove ? (
-                <Remove className={styles.Remove} onClick={onRemove} />
-              ) : null}
-              {handle ? <Handle {...handleProps} {...listeners} /> : null}
-            </span>
+            {itemHovered ? (
+              <span
+                className={styles.Actions}
+                onMouseEnter={() => setButtonHovered(true)}
+                onMouseLeave={() => setButtonHovered(false)}
+              >
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log("Clicked edit in button!");
+                    startEditingTask(item);
+                  }}
+                >
+                  Edit
+                </Button>
+                {
+                  <Remove
+                    className={styles.Remove}
+                    onClick={() => {
+                      console.log("clicked remove");
+                    }}
+                  />
+                }
+                {/* {handle ? <Handle {...handleProps} {...listeners} /> : null} */}
+              </span>
+            ) : null}
           </div>
         </li>
       );
