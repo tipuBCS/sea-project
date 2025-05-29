@@ -12,10 +12,9 @@ import { type Swapy, createSwapy, utils } from "swapy";
 import { getTasks } from "../api/api";
 import type { Task } from "../api/auto-generated-client";
 import "../helper/mainContainer.css";
-import {
-  PlaceholderTaskContainer,
-  TaskContainer,
-} from "../helper/TaskContainer";
+import { TaskContainer } from "../helper/TaskContainer";
+
+
 
 function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -81,21 +80,21 @@ function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchTaskData = async () => {
-      try {
-        const response = await getTasks("test");
-        console.log(response);
-        setTasks(response);
-      } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-        }
-        setError("An unknown error occurred!");
-      }
-    };
-    fetchTaskData();
-  }, []);
+  // useEffect(() => {
+  //   const fetchTaskData = async () => {
+  //     try {
+  //       const response = await getTasks("test");
+  //       console.log(response);
+  //       setTasks(response);
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         setError(error.message);
+  //       }
+  //       setError("An unknown error occurred!");
+  //     }
+  //   };
+  //   fetchTaskData();
+  // }, []);
 
   return (
     <AppLayout
@@ -114,59 +113,14 @@ function Home() {
       }
       tools={<HelpPanel header={<h2>Overview</h2>}>Help content</HelpPanel>}
       content={
+        // biome-ignore lint/style/useSelfClosingElements: <explanation>
         <ContentLayout
           header={
             <Header variant="h1" info={<Link variant="info">Info</Link>}>
               Kanban Board
             </Header>
           }
-        >
-          <div ref={container}>
-            <div key="columns" className="columns">
-              {rows.map((row) => (
-                <div key={row}>
-                  <div key={row} className="mainContainer">
-                    {row}
-                    {slottedItems.map(({ slotId, itemId, item: taskItem }) => {
-                      if (!taskItem) {
-                        return;
-                      }
-                      if (taskItem.category === row) {
-                        console.log(
-                          `Rendering task in ${row} with slotId: ${slotId}`
-                        );
-                        return (
-                          <TaskContainer
-                            key={slotId}
-                            SlotId={slotId}
-                            ItemId={itemId}
-                            TaskItem={taskItem}
-                          />
-                        );
-                      }
-                    })}
-                    {/* <PlaceholderTaskContainer key={row} id={row} /> */}
-                    <Button
-                      onClick={() => {
-                        setTasks((tasks) => {
-                          const newTask: Task = {
-                            id: "taskid5",
-                            name: "Task5",
-                            description: "",
-                            category: row,
-                          };
-                          return [...tasks, newTask];
-                        });
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </ContentLayout>
+        ></ContentLayout>
       }
     />
   );

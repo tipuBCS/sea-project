@@ -45,14 +45,14 @@ export async function getLoginResponse(
 export async function getTasks(username: string): Promise<Array<Task>> {
   return await [
     {
-      id: "taskid1",
+      id: "1",
       name: "First Task",
       description: "lorem ipsum",
       assignedTo: undefined,
       category: "Milestones",
     },
     {
-      id: "taskid2",
+      id: "2",
       name: "Second Task",
       description: "lorem ipsum",
       assignedTo: undefined,
@@ -60,7 +60,7 @@ export async function getTasks(username: string): Promise<Array<Task>> {
     },
 
     {
-      id: "taskid3",
+      id: "3",
       name: "third Task",
       description: "lorem ipsum",
       assignedTo: undefined,
@@ -68,7 +68,7 @@ export async function getTasks(username: string): Promise<Array<Task>> {
     },
 
     {
-      id: "taskid4",
+      id: "4",
       name: "Fouth Task",
       description: "lorem ipsum",
       assignedTo: undefined,

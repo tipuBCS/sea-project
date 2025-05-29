@@ -5,8 +5,8 @@
 export type Task = {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     assignedTo?: string;
-    category: string;
+    category?: string;
 };
 
