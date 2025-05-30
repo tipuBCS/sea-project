@@ -49,7 +49,8 @@ export async function updateTask(
   name?: string,
   description?: string,
   completed?: boolean,
-  assignedTo?: string
+  assignedTo?: string,
+  category?: string,
 ) {
   console.log("Updating Task ..");
   apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
@@ -58,5 +59,6 @@ export async function updateTask(
     description,
     completed,
     assignedTo,
+    category
   });
 }

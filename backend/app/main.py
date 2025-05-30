@@ -144,10 +144,11 @@ class UpdateTaskRequest(BaseModel):
     description: str | None
     completed: bool | None
     assignedTo: str | None
+    category: str | None
 
 
 async def updateTask(
-    userId, taskId, name=None, description=None, completed=None, assignedTo=None
+    userId, taskId, name=None, description=None, completed=None, assignedTo=None, category=None
 ):
     task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
     actions = []
@@ -160,8 +161,9 @@ async def updateTask(
         actions.append(TaskTableModel.completed.set(completed))
     if assignedTo:
         actions.append(TaskTableModel.assignedTo.set(assignedTo))
+    if category:
+        actions.append(TaskTableModel.category.set(category))
     task.update(actions)
-
 
 @app.patch("/api/tasks/{taskId}")
 async def update_task(taskId: str, request: UpdateTaskRequest):
@@ -174,6 +176,7 @@ async def update_task(taskId: str, request: UpdateTaskRequest):
         request.description,
         request.completed,
         request.assignedTo,
+        request.category
     )
 
 

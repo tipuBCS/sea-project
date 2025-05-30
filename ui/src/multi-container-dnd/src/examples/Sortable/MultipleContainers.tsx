@@ -289,12 +289,10 @@ export function MultipleContainers({
   );
   // id can be a container id or a task id?
   const findContainer = (id: UniqueIdentifier) => {
-    console.log(`Finding the container name for id: ${id}`);
     // Loop through containers
     for (const container of containers) {
       const containerId = container.id;
       if (containerId == id) {
-        console.log(`Container: ${containerId}`);
         return id;
       }
 
@@ -303,14 +301,12 @@ export function MultipleContainers({
         // Look for task with matching ID in this container
         const found = tasks[containerId].some((task) => task.id === id);
         if (found) {
-          console.log(`Container: ${containerId}`);
           return containerId;
         }
       }
     }
 
     // If no container found containing the task
-    console.log(`Container not fonnd`);
     return null;
   };
 
@@ -379,16 +375,18 @@ export function MultipleContainers({
           setTasks((tasks) => {
             const activeTasks = tasks[activeContainer];
             if (!(overContainer in tasks)) {
+              // Add an empty container is tasks
               setTasks((tasks) => {
                 return { ...tasks, [overContainer]: [] };
               });
             }
-            const overTasks = tasks[overContainer] ?? [];
+            const overTasks = tasks[overContainer];
 
             const overIndex = overTasks.findIndex((task) => task.id === overId);
             const activeIndex = activeTasks.findIndex(
               (task) => task.id === active.id
             );
+
 
             let newIndex: number;
 
@@ -427,7 +425,6 @@ export function MultipleContainers({
         }
       }}
       onDragEnd={({ active, over }) => {
-        console.log("Drag Ended!");
         if (active.id in tasks && over?.id) {
           // Removed - not changing container position or amount
           // setContainers((containers) => {
@@ -436,10 +433,8 @@ export function MultipleContainers({
           //   return arrayMove(containers, activeIndex, overIndex);
           // });
         }
-        console.log(active.id);
         const activeContainer = findContainer(active.id);
         if (!activeContainer) {
-          console.log("No active container found!");
           setActiveId(null);
           return;
         }
@@ -447,13 +442,11 @@ export function MultipleContainers({
         const overId = over?.id;
 
         if (overId == null) {
-          console.log("No Active overId!");
           setActiveId(null);
           return;
         }
 
         if (overId === TRASH_ID) {
-          console.log("Trashing");
           // setTasks((tasks) => ({
           //   ...tasks,
           //   [activeContainer]: tasks[activeContainer].filter(
@@ -484,10 +477,7 @@ export function MultipleContainers({
         // }
 
         const overContainer = findContainer(overId);
-        console.log(overContainer);
         if (overContainer) {
-          console.log("We are over a container!");
-          console.log(overContainer);
           const activeIndex = tasks[activeContainer].findIndex(
             (task) => task.id === active.id
           );

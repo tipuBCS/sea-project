@@ -8,5 +8,6 @@ export type UpdateTaskRequest = {
     description?: string;
     completed?: boolean;
     assignedTo?: string;
+    category?: string;
 };
 

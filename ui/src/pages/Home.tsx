@@ -15,7 +15,7 @@ import {
   ToggleButton,
 } from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
@@ -75,11 +75,91 @@ function Test() {
     fetchTaskData();
   }, []);
 
+  const previousTasks = useRef<ContainerCollection>({});
+
+  useEffect(() => {
+    // Find what changed by comparing previous and current tasks
+    const changes = findChanges(previousTasks.current, tasks);
+    function updateTaskCategory(task: TaskType, newCategory: string) {
+      updateTask(
+        task.id,
+        USERID,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        newCategory
+      );
+    }
+    changes.forEach((change) => {
+      updateTaskCategory(change.tasks, change.toContainer);
+    });
+
+    if (changes.length > 0) {
+      console.log("Changes detected:", changes);
+    }
+
+    // Update the previous value
+    previousTasks.current = tasks;
+  }, [tasks]);
+
+  const findChanges = (
+    prev: ContainerCollection,
+    current: ContainerCollection
+  ) => {
+    const changes: Array<{
+      type: "moved";
+      container: string;
+      tasks: TaskType;
+      fromContainer: string;
+      toContainer: string;
+    }> = [];
+
+    // Create maps for previous and current task locations
+    const prevTaskLocations = new Map<string, string>();
+    const currentTaskLocations = new Map<string, string>();
+
+    // Map all tasks in previous state
+    Object.entries(prev).forEach(([containerId, tasks]) => {
+      tasks.forEach((task) => {
+        prevTaskLocations.set(task.id.toString(), containerId);
+      });
+    });
+
+    // Check for moved tasks in current state
+    Object.entries(current).forEach(([containerId, tasks]) => {
+      tasks.forEach((task) => {
+        const taskId = task.id.toString();
+        const prevContainer = prevTaskLocations.get(taskId);
+
+        // If task existed before and is in a different container now
+        if (prevContainer && prevContainer !== containerId) {
+          changes.push({
+            type: "moved",
+            container: containerId,
+            tasks: task,
+            fromContainer: prevContainer,
+            toContainer: containerId,
+          });
+        }
+      });
+    });
+
+    return changes;
+  };
+
   function onChangeTask(updates: Partial<TaskType>) {
     if (!editTaskId) {
       return;
     }
-    updateTask(editTaskId, USERID, updates.name, updates.description, updates.completed, updates.assignedTo);
+    updateTask(
+      editTaskId,
+      USERID,
+      updates.name,
+      updates.description,
+      updates.completed,
+      updates.assignedTo
+    );
     setTasks((prevItems) => {
       // Find which container has this item
       const containerId = Object.keys(prevItems).find((containerId) =>
@@ -111,6 +191,11 @@ function Test() {
     }
     return tasks[containerId].find((task) => task.id === id);
   }
+
+  useEffect(() => {
+    console.log("tasks changed!");
+    console.log(tasks);
+  }, [tasks]);
 
   return (
     <AppLayout
