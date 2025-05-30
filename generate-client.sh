@@ -1,9 +1,23 @@
 #!/bin/bash
 # generate-client.sh
 
+
+# Function to kill process on port 3002
+kill_port_process() {
+    PID=$(lsof -ti:3002)
+    if [ ! -z "$PID" ]; then
+        echo "Killing process on port 3002 (PID: $PID)..."
+        kill -9 $PID
+    else
+        echo "No process found running on port 3002"
+    fi
+}
+
+# Kill process on port 3002 before starting
+kill_port_process
+
 # Set variables
 VENV_PATH="backend/.env/bin/activate"
-# VENV_PATH="venv/bin/activate"    # for Unix/Mac
 API_PORT=4001
 UI_DIR="../ui"  # adjust this path to your UI directory
 TIMEOUT=10  # seconds to wait for server to start
@@ -18,6 +32,8 @@ check_server() {
 cleanup() {
     echo "Stopping serverless offline..."
     kill $SERVER_PID
+    # Kill process on port 3002 after completion
+    kill_port_process
     exit
 }
 

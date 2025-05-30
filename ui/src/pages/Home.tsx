@@ -20,7 +20,7 @@ import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import { getTasks } from "../api/api";
+import { getTasks, updateTask } from "../api/api";
 import type {
   ContainerCollection,
   TaskType,
@@ -31,6 +31,8 @@ export type ContainerType = {
   name: string;
 };
 
+const USERID = "1";
+
 function Test() {
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: "Uncategorised", name: "Uncategorised" },
@@ -40,13 +42,7 @@ function Test() {
     { id: "Done", name: "Done" },
   ]);
 
-  const [tasks, setTasks] = useState<ContainerCollection>({
-    Uncategorised: [],
-    PrioritizedBacklog: [],
-    Backlog: [],
-    Doing: [],
-    Done: [],
-  });
+  const [tasks, setTasks] = useState<ContainerCollection>({});
 
   function toggleSplitPanel() {
     setSplitPanelOpen((enable) => !enable);
@@ -65,7 +61,9 @@ function Test() {
   useEffect(() => {
     const fetchTaskData = async () => {
       try {
-        const response = await getTasks("test");
+        console.log("Fetching task ..");
+        const response = await getTasks(USERID);
+        console.log(response);
         setTasks(response);
       } catch (error) {
         if (error instanceof Error) {
@@ -81,6 +79,7 @@ function Test() {
     if (!editTaskId) {
       return;
     }
+    updateTask(editTaskId, USERID, updates.name, updates.description, updates.completed, updates.assignedTo);
     setTasks((prevItems) => {
       // Find which container has this item
       const containerId = Object.keys(prevItems).find((containerId) =>
@@ -149,9 +148,9 @@ function Test() {
                     label="Task Heading"
                   >
                     <Input
-                      onChange={({ detail }) =>
-                        onChangeTask({ name: detail.value })
-                      }
+                      onChange={({ detail }) => {
+                        onChangeTask({ name: detail.value });
+                      }}
                       value={getTaskFromId(editTaskId)?.name ?? ""}
                     />
                   </FormField>

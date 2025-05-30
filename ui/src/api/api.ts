@@ -31,10 +31,6 @@ export async function getLoginResponse(
   username: string,
   password: string
 ): Promise<LoginResponse> {
-  const body = JSON.stringify({
-    username,
-    password,
-  });
   const response = await apiClient.default.loginApiLoginPost({
     username,
     password,
@@ -42,38 +38,25 @@ export async function getLoginResponse(
   return response;
 }
 
-export async function getTasks(username: string): Promise<ContainerCollection> {
-  // return await [
-  //   {
-  //     id: "1",
-  //     name: "First Task",
-  //     description: "lorem ipsum",
-  //     assignedTo: undefined,
-  //     category: "Milestones",
-  //   },
-  //   {
-  //     id: "2",
-  //     name: "Second Task",
-  //     description: "lorem ipsum",
-  //     assignedTo: undefined,
-  //     category: "Milestones",
-  //   },
+export async function getTasks(userId: string): Promise<ContainerCollection> {
+  console.log("Running get tasks ..");
+  return await apiClient.default.getTasksApiTasksUserIdGet((userId = "1"));
+}
 
-  //   {
-  //     id: "3",
-  //     name: "third Task",
-  //     description: "lorem ipsum",
-  //     assignedTo: undefined,
-  //     category: "ProtoSec",
-  //   },
-
-  //   {
-  //     id: "4",
-  //     name: "Fouth Task",
-  //     description: "lorem ipsum",
-  //     assignedTo: undefined,
-  //     category: "ProtoSec",
-  //   },
-  // ];
-  return await apiClient.default.getTasksApiTasksGet();
+export async function updateTask(
+  taskId: string | number,
+  userId: string,
+  name?: string,
+  description?: string,
+  completed?: boolean,
+  assignedTo?: string
+) {
+  console.log("Updating Task ..");
+  apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
+    userId: userId,
+    name,
+    description,
+    completed,
+    assignedTo,
+  });
 }

@@ -45,10 +45,11 @@ import { coordinateGetter as multipleContainersCoordinateGetter } from "./multip
 
 import { Container, type ContainerProps, Item } from "../../components";
 
+import type { ContainerType } from "../../../../pages/Home";
 import type {
-  ContainerType,
-} from "../../../../pages/Home";
-import type { TaskType, ContainerCollection } from "../../../../api/auto-generated-client";
+  TaskType,
+  ContainerCollection,
+} from "../../../../api/auto-generated-client";
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -505,29 +506,33 @@ export function MultipleContainers({
               id={container.id}
               label={container.name}
               columns={columns}
-              items={tasks[container.id]}
+              items={tasks[container.id] ?? []}
               scrollable={scrollable}
               style={containerStyle}
               unstyled={minimal}
             >
-              <SortableContext items={tasks[container.id]} strategy={strategy}>
-                {tasks[container.id].map((task, index) => {
-                  return (
-                    <SortableItem
-                      startEditingTask={startEditingTask}
-                      task={task}
-                      disabled={isSortingContainer}
-                      key={task.id}
-                      id={task.id}
-                      index={index}
-                      handle={handle}
-                      style={getItemStyles}
-                      wrapperStyle={wrapperStyle}
-                      containerId={container.id}
-                      getIndex={getIndex}
-                    />
-                  );
-                })}
+              <SortableContext
+                items={tasks[container.id] ?? []}
+                strategy={strategy}
+              >
+                {tasks[container.id] &&
+                  tasks[container.id].map((task, index) => {
+                    return (
+                      <SortableItem
+                        startEditingTask={startEditingTask}
+                        task={task}
+                        disabled={isSortingContainer}
+                        key={task.id}
+                        id={task.id}
+                        index={index}
+                        handle={handle}
+                        style={getItemStyles}
+                        wrapperStyle={wrapperStyle}
+                        containerId={container.id}
+                        getIndex={getIndex}
+                      />
+                    );
+                  })}
               </SortableContext>
             </DroppableContainer>
           ))}

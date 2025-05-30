@@ -11,10 +11,13 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { ContainerCollection } from './models/ContainerCollection';
+export type { CreateTaskRequest } from './models/CreateTaskRequest';
+export type { CreateTaskResponse } from './models/CreateTaskResponse';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { LoginRequest } from './models/LoginRequest';
 export type { LoginResponse } from './models/LoginResponse';
 export type { TaskType } from './models/TaskType';
+export type { UpdateTaskRequest } from './models/UpdateTaskRequest';
 export type { ValidationError } from './models/ValidationError';
 
 export { DefaultService } from './services/DefaultService';

@@ -2,12 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type TaskType = {
-    id: (string | number);
-    name: string;
-    description: string;
-    completed: boolean;
-    createdAt: string;
+export type UpdateTaskRequest = {
+    userId: string;
+    name?: string;
+    description?: string;
+    completed?: boolean;
     assignedTo?: string;
 };
 

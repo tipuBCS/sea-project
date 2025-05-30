@@ -1,11 +1,19 @@
-from typing import Dict, List, TypedDict, Union
+from datetime import datetime
+import re
+from typing import Container, Dict, List, Union
+from unicodedata import category
+from xml.etree.ElementTree import tostring
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from pydantic import BaseModel
+from pynamodb.models import Model
+from pynamodb.attributes import UnicodeAttribute, BooleanAttribute, UTCDateTimeAttribute
+
 
 app = FastAPI()
 
+TASK_TABLE_NAME = "sea-tasks-2"
 frontEnd_URL = ""
 
 app.add_middleware(
@@ -15,6 +23,38 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class UserModel(Model):
+    """
+    A DynamoDB User
+    """
+
+    class Meta:
+        table_name = "dynamodb-user"
+
+    email = UnicodeAttribute(null=True)
+    first_name = UnicodeAttribute(range_key=True)
+    last_name = UnicodeAttribute(hash_key=True)
+
+
+class TaskTableModel(Model):
+    class Meta:
+        table_name = TASK_TABLE_NAME
+
+    pk = UnicodeAttribute(hash_key=True)
+    sk = UnicodeAttribute(range_key=True)
+
+    id = UnicodeAttribute()
+    userId = UnicodeAttribute()
+
+    name = UnicodeAttribute(default="")
+    description = UnicodeAttribute(default="")
+    completed = BooleanAttribute(default=False)
+    createdAt = UTCDateTimeAttribute(default_for_new=datetime.now())
+    assignedTo = UnicodeAttribute(default="")
+
+    category = UnicodeAttribute()
 
 
 @app.get("/")
@@ -32,6 +72,7 @@ class TaskType(BaseModel):
     name: str
     description: str
     completed: bool
+    createdAt: datetime
     assignedTo: str | None
 
 
@@ -39,34 +80,101 @@ class ContainerCollection(BaseModel):
     __root__: Dict[Union[str, int], List[TaskType]]
 
 
-@app.get("/api/tasks", response_model=ContainerCollection)
-async def get_tasks():
-    return {
-        "Uncategorised": [
-            {
-                "id": "123",
-                "name": "Item 1 Testing changes",
-                "description": "First item description",
-                "completed": False,
-            },
-            {
-                "id": "A2",
-                "name": "Item 2",
-                "description": "Second Item description",
-                "completed": False,
-            },
-            {
-                "id": "A3",
-                "name": "Item 3",
-                "description": "Third Item description",
-                "completed": False,
-            },
-        ],
-        "PrioritizedBacklog": [],
-        "Backlog": [],
-        "Doing": [],
-        "Done": [],
-    }
+class CreateTaskRequest(BaseModel):
+    taskId: str
+    userId: str
+    category: str
+
+
+class CreateTaskResponse(BaseModel):
+    success: bool
+
+
+def createTask(userId: str, taskId: str, category: str):
+    task = TaskTableModel(f"USER#{userId}", f"TASK#{taskId}")
+    task.id = taskId
+    task.userId = userId
+    task.category = category
+    task.save()
+
+
+async def getTasks(userId: str):
+    tasks = TaskTableModel.query(hash_key=f"USER#{userId}")
+    return tasks
+
+
+@app.post("/api/tasks", response_model=CreateTaskResponse)
+async def create_task(request: CreateTaskRequest):
+    try:
+        createTask(request.userId, request.taskId, request.category)
+        return CreateTaskResponse(success=True)
+    except:
+        return CreateTaskResponse(success=False)
+
+
+class GetTaskRequest(BaseModel):
+    userId: str
+
+
+@app.get("/api/tasks/{userId}", response_model=ContainerCollection)
+async def get_tasks(userId: str):
+    print("Received Get Task Request ..")
+    print(userId)
+    tasks = await getTasks(userId)
+    return_tasks = {}
+    for task in tasks:
+        print(task)
+        if task.category not in return_tasks:
+            return_tasks[task.category] = []
+        newTask = TaskType(
+            id=task.id,
+            name=task.name,
+            description=task.description,
+            completed=task.completed,
+            createdAt=task.createdAt,
+            assignedTo=task.assignedTo,
+        )
+        return_tasks[task.category].append(newTask)
+    return return_tasks
+
+
+class UpdateTaskRequest(BaseModel):
+    userId: str  # Shouldn't need this in the end
+    name: str | None
+    description: str | None
+    completed: bool | None
+    assignedTo: str | None
+
+
+async def updateTask(
+    userId, taskId, name=None, description=None, completed=None, assignedTo=None
+):
+    task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
+    actions = []
+    if name:
+        actions.append(TaskTableModel.name.set(name))
+    if description:
+        actions.append(TaskTableModel.description.set(description))
+
+    if not (completed == None):
+        actions.append(TaskTableModel.completed.set(completed))
+    if assignedTo:
+        actions.append(TaskTableModel.assignedTo.set(assignedTo))
+    task.update(actions)
+
+
+@app.patch("/api/tasks/{taskId}")
+async def update_task(taskId: str, request: UpdateTaskRequest):
+    print("Received Update request")
+    print(request)
+    await updateTask(
+        request.userId,
+        taskId,
+        request.name,
+        request.description,
+        request.completed,
+        request.assignedTo,
+    )
 
 
 class LoginRequest(BaseModel):
@@ -94,6 +202,6 @@ async def login(request: LoginRequest):
 
 # Handler for AWS Lambda
 handler = Mangum(app)
-print("Started up Backend Server!")
-print(app)
-print(handler)
+
+# UserModel.create_table(read_capacity_units=1, write_capacity_units=1)
+# TaskTableModel.create_table(billing_mode="PAY_PER_REQUEST")
