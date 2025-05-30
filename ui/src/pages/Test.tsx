@@ -28,6 +28,7 @@ import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
 import type { NonCancelableEventHandler } from "@cloudscape-design/components/internal/events";
 import { BaseChangeDetail } from "@cloudscape-design/components/input/interfaces";
+import { getTasks } from "../api/api";
 
 const measuring: MeasuringConfiguration = {
   droppable: {
@@ -97,9 +98,9 @@ export type ContainerType = {
 };
 
 // {"container1": [{id: "1", name: "Task1 Title", {id: "2", name: "Task 2 Title"}}]}
-export type ContainerCollection = Record<UniqueIdentifier, ItemType[]>;
+export type ContainerCollection = Record<UniqueIdentifier, TaskType[]>;
 
-export type ItemType = {
+export type TaskType = {
   id: UniqueIdentifier;
   name: string;
   description: string;
@@ -116,7 +117,7 @@ function Test() {
     { id: "Done", name: "Done" },
   ]);
 
-  const [items, setItems] = useState<ContainerCollection>({
+  const [tasks, setTasks] = useState<ContainerCollection>({
     Uncategorised: [
       {
         id: "123",
@@ -152,7 +153,7 @@ function Test() {
 
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
-  function startEditingTask(task: ItemType) {
+  function startEditingTask(task: TaskType) {
     console.log("Clicked edit!");
     setEditTaskId(task.id);
     setSplitPanelOpen(true);
@@ -172,11 +173,11 @@ function Test() {
   //   fetchTaskData();
   // }, []);
 
-  function onChangeTask(updates: Partial<ItemType>) {
+  function onChangeTask(updates: Partial<TaskType>) {
     if (!editTaskId) {
       return;
     }
-    setItems((prevItems) => {
+    setTasks((prevItems) => {
       // Find which container has this item
       const containerId = Object.keys(prevItems).find((containerId) =>
         prevItems[containerId].some((item) => item.id === editTaskId)
@@ -196,27 +197,17 @@ function Test() {
     });
   }
 
-  function getTaskFromId(id: UniqueIdentifier): ItemType | undefined {
+  function getTaskFromId(id: UniqueIdentifier): TaskType | undefined {
     // Find which container has this item
-    const containerId = Object.keys(items).find((containerId) =>
-      items[containerId].some((item) => item.id === id)
+    const containerId = Object.keys(tasks).find((containerId) =>
+      tasks[containerId].some((task) => task.id === id)
     );
 
     if (!containerId) {
       return undefined; // Item not found in any container
     }
-    return items[containerId].find((item) => item.id === id);
+    return tasks[containerId].find((task) => task.id === id);
   }
-
-  // // Update The currently edited task
-  // useEffect(() => {
-  //   // Update the task
-  //   setEditTask((task) => {
-  //     if (!task) {
-  //       return;
-  //     }
-  //   });
-  // }, [items]);
 
   return (
     <AppLayout
@@ -292,8 +283,8 @@ function Test() {
             <MultipleContainers
               containers={containers}
               setContainers={setContainers}
-              items={items}
-              setItems={setItems}
+              tasks={tasks}
+              setTasks={setTasks}
               itemCount={5}
               strategy={rectSortingStrategy}
               vertical={false}

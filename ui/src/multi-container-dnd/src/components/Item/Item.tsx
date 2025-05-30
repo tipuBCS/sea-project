@@ -6,12 +6,12 @@ import React, { useEffect, useState } from "react";
 import { Handle, Remove } from "./components";
 
 import { Button } from "@cloudscape-design/components";
-import type { ItemType } from "../../../../pages/Test";
+import type { TaskType } from "../../../../pages/Test";
 import styles from "./Item.module.scss";
 
 export interface Props {
-  startEditingTask: (task: ItemType) => void;
-  item: ItemType;
+  startEditingTask: (task: TaskType) => void;
+  task: TaskType;
   dragOverlay?: boolean;
   color?: string;
   disabled?: boolean;
@@ -49,7 +49,7 @@ export const Item = React.memo(
     (
       {
         startEditingTask,
-        item,
+        task,
         color,
         dragOverlay,
         dragging,
@@ -136,7 +136,7 @@ export const Item = React.memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            <div className={classNames(styles.ItemText)}>{item.name}</div>
+            <div className={classNames(styles.ItemText)}>{task.name}</div>
 
             {itemHovered ? (
               <span
@@ -148,7 +148,7 @@ export const Item = React.memo(
                   onClick={(e) => {
                     e.stopPropagation();
                     console.log("Clicked edit in button!");
-                    startEditingTask(item);
+                    startEditingTask(task);
                   }}
                 >
                   Edit
