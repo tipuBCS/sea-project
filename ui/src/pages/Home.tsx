@@ -1,96 +1,117 @@
 import {
   AppLayout,
   Button,
+  ColumnLayout,
   ContentLayout,
+  Form,
+  FormField,
   Header,
-  HelpPanel,
+  Input,
   Link,
   SideNavigation,
+  SpaceBetween,
+  SplitPanel,
+  Textarea,
+  ToggleButton,
 } from "@cloudscape-design/components";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { type Swapy, createSwapy, utils } from "swapy";
-import { getTasks } from "../api/api";
+import type { UniqueIdentifier } from "@dnd-kit/core";
+import { useEffect, useState } from "react";
 import "../helper/mainContainer.css";
 
-function Home() {
-  // const [tasks, setTasks] = useState<Task[]>([]);
+import { rectSortingStrategy } from "@dnd-kit/sortable";
+import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
+import { getTasks } from "../api/api";
+import type {
+  ContainerCollection,
+  TaskType,
+} from "../api/auto-generated-client";
 
-  // const [slotItemMap, setSlotItemMap] = useState(
-  //   utils.initSlotItemMap(tasks, "id")
-  // );
+export type ContainerType = {
+  id: UniqueIdentifier;
+  name: string;
+};
 
-  // const slottedItems = useMemo(
-  //   () => utils.toSlottedItems(tasks, "id", slotItemMap),
-  //   [tasks, slotItemMap]
-  // );
+function Test() {
+  const [containers, setContainers] = useState<ContainerType[]>([
+    { id: "Uncategorised", name: "Uncategorised" },
+    { id: "PrioritizedBacklog", name: "Prioritized Backlog" },
+    { id: "Backlog", name: "Backlog" },
+    { id: "Doing", name: "Doing" },
+    { id: "Done", name: "Done" },
+  ]);
 
-  // useEffect(() => {
-  //   console.log("tasks:");
-  //   console.log(tasks);
-  // }, [tasks]);
+  const [tasks, setTasks] = useState<ContainerCollection>({
+    Uncategorised: [],
+    PrioritizedBacklog: [],
+    Backlog: [],
+    Doing: [],
+    Done: [],
+  });
 
-  // const [error, setError] = useState<string | null>(null);
-  // const swapy = useRef<null | Swapy>(null);
-  // const container = useRef(null);
+  function toggleSplitPanel() {
+    setSplitPanelOpen((enable) => !enable);
+  }
+  const [error, setError] = useState<string | null>(null);
 
-  // const [rows, setRows] = useState([
-  //   "Uncategorised",
-  //   "Milestones",
-  //   "ProtoSec",
-  //   "Backlog",
-  //   "Prioritized Backlog",
-  // ]);
+  const [editTaskId, setEditTaskId] = useState<UniqueIdentifier>();
 
-  // // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  // useEffect(
-  //   () =>
-  //     utils.dynamicSwapy(
-  //       swapy.current,
-  //       tasks,
-  //       "id",
-  //       slotItemMap,
-  //       setSlotItemMap
-  //     ),
-  //   [tasks]
-  // );
+  const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
-  // useEffect(() => {
-  //   // biome-ignore lint/style/noNonNullAssertion: <explanation>
-  //   swapy.current = createSwapy(container.current!, {
-  //     manualSwap: true,
-  //     // animation: 'dynamic'
-  //     // autoScrollOnDrag: true,
-  //     // swapMode: 'drop',
-  //     // enabled: true,
-  //     // dragAxis: 'x',
-  //     // dragOnHold: true
-  //   });
+  function startEditingTask(task: TaskType) {
+    console.log("Clicked edit!");
+    setEditTaskId(task.id);
+    setSplitPanelOpen(true);
+  }
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      try {
+        const response = await getTasks("test");
+        setTasks(response);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+        setError("An unknown error occurred!");
+      }
+    };
+    fetchTaskData();
+  }, []);
 
-  //   swapy.current.onSwap((event) => {
-  //     console.log(event);
-  //     setSlotItemMap(event.newSlotItemMap.asArray);
-  //   });
+  function onChangeTask(updates: Partial<TaskType>) {
+    if (!editTaskId) {
+      return;
+    }
+    setTasks((prevItems) => {
+      // Find which container has this item
+      const containerId = Object.keys(prevItems).find((containerId) =>
+        prevItems[containerId].some((item) => item.id === editTaskId)
+      );
 
-  //   return () => {
-  //     swapy.current?.destroy();
-  //   };
-  // }, []);
+      if (!containerId) {
+        return prevItems; // Item not found in any container
+      }
 
-  // // useEffect(() => {
-  // //   const fetchTaskData = async () => {
-  // //     try {
-  // //       const response = await getTasks("test");
-  // //       console.log(response);
-  // //       setTasks(response);
-  // //     } catch (error) {
-  // //       if (error instanceof Error) {
-  // //         setError(error.message);
-  // //       }
-  // //       setError("An unknown error occurred!");
-  // //     }
-  // //   };
-  // //   fetchTaskData();
-  // // }, []);
+      // Update the item in the found container
+      return {
+        ...prevItems,
+        [containerId]: prevItems[containerId].map((item) =>
+          item.id === editTaskId ? { ...item, ...updates } : item
+        ),
+      };
+    });
+  }
+
+  function getTaskFromId(id: UniqueIdentifier): TaskType | undefined {
+    // Find which container has this item
+    const containerId = Object.keys(tasks).find((containerId) =>
+      tasks[containerId].some((task) => task.id === id)
+    );
+
+    if (!containerId) {
+      return undefined; // Item not found in any container
+    }
+    return tasks[containerId].find((task) => task.id === id);
+  }
 
   return (
     <AppLayout
@@ -107,19 +128,79 @@ function Home() {
           ]}
         />
       }
-      tools={<HelpPanel header={<h2>Overview</h2>}>Help content</HelpPanel>}
+      splitPanelOpen={splitPanelOpen}
+      onSplitPanelToggle={() => {
+        toggleSplitPanel();
+      }}
+      splitPanel={
+        editTaskId ? (
+          <SplitPanel header={"Edit Task"}>
+            <ColumnLayout columns={4}>
+              <Form
+                actions={
+                  <SpaceBetween size="xs" direction="horizontal">
+                    <Button>Submit</Button>
+                  </SpaceBetween>
+                }
+              >
+                <SpaceBetween size="l">
+                  <FormField
+                    description="Enter your task heading"
+                    label="Task Heading"
+                  >
+                    <Input
+                      onChange={({ detail }) =>
+                        onChangeTask({ name: detail.value })
+                      }
+                      value={getTaskFromId(editTaskId)?.name ?? ""}
+                    />
+                  </FormField>
+                  <FormField
+                    description="Enter your task description"
+                    label="Task Description"
+                  >
+                    <Textarea
+                      onChange={({ detail }) =>
+                        onChangeTask({ description: detail.value })
+                      }
+                      value={getTaskFromId(editTaskId)?.description ?? ""}
+                    />
+                  </FormField>
+                  <ToggleButton
+                    pressed={getTaskFromId(editTaskId)?.completed ?? false}
+                  >
+                    Mark as Complete
+                  </ToggleButton>
+                </SpaceBetween>
+              </Form>
+            </ColumnLayout>
+          </SplitPanel>
+        ) : undefined
+      }
       content={
-        // biome-ignore lint/style/useSelfClosingElements: <explanation>
         <ContentLayout
           header={
             <Header variant="h1" info={<Link variant="info">Info</Link>}>
               Kanban Board
             </Header>
           }
-        ></ContentLayout>
+        >
+          <div className="App">
+            <MultipleContainers
+              containers={containers}
+              setContainers={setContainers}
+              tasks={tasks}
+              setTasks={setTasks}
+              itemCount={5}
+              strategy={rectSortingStrategy}
+              vertical={false}
+              startEditingTask={startEditingTask}
+            />
+          </div>
+        </ContentLayout>
       }
     />
   );
 }
 
-export default Home;
+export default Test;

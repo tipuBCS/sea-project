@@ -47,7 +47,7 @@ import { Container, type ContainerProps, Item } from "../../components";
 
 import type {
   ContainerType,
-} from "../../../../pages/Test";
+} from "../../../../pages/Home";
 import type { TaskType, ContainerCollection } from "../../../../api/auto-generated-client";
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>
