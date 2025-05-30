@@ -1,9 +1,7 @@
 import {
   AppLayout,
-  type AppLayoutProps,
   Button,
   ColumnLayout,
-  Container,
   ContentLayout,
   Form,
   FormField,
@@ -16,96 +14,21 @@ import {
   Textarea,
   ToggleButton,
 } from "@cloudscape-design/components";
-import {
-  type MeasuringConfiguration,
-  MeasuringStrategy,
-  type UniqueIdentifier,
-} from "@dnd-kit/core";
+import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import type { NonCancelableEventHandler } from "@cloudscape-design/components/internal/events";
-import { BaseChangeDetail } from "@cloudscape-design/components/input/interfaces";
 import { getTasks } from "../api/api";
-
-const measuring: MeasuringConfiguration = {
-  droppable: {
-    strategy: MeasuringStrategy.Always,
-  },
-};
-
-interface Task {
-  id: number;
-  name: string;
-  description: string;
-  assignedTo: undefined;
-  category: string;
-}
-
-interface Tasks {
-  [key: string]: Task[];
-}
-
-const task1 = {
-  id: 1,
-  name: "First Task",
-  description: "lorem ipsum",
-  assignedTo: undefined,
-  category: "Milestones",
-};
-
-const initalTask: Tasks = {
-  Milestones: [
-    {
-      id: 1,
-      name: "First Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "Milestones",
-    },
-    {
-      id: 2,
-      name: "Second Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "Milestones",
-    },
-  ],
-  ProtoSec: [
-    {
-      id: 3,
-      name: "third Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "ProtoSec",
-    },
-
-    {
-      id: 4,
-      name: "Fouth Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "ProtoSec",
-    },
-  ],
-};
+import type {
+  ContainerCollection,
+  TaskType,
+} from "../api/auto-generated-client";
 
 export type ContainerType = {
   id: UniqueIdentifier;
   name: string;
-};
-
-// {"container1": [{id: "1", name: "Task1 Title", {id: "2", name: "Task 2 Title"}}]}
-export type ContainerCollection = Record<UniqueIdentifier, TaskType[]>;
-
-export type TaskType = {
-  id: UniqueIdentifier;
-  name: string;
-  description: string;
-  completed: boolean;
-  assigned?: string;
 };
 
 function Test() {
@@ -118,26 +41,7 @@ function Test() {
   ]);
 
   const [tasks, setTasks] = useState<ContainerCollection>({
-    Uncategorised: [
-      {
-        id: "123",
-        name: "Item 1",
-        description: "First item description",
-        completed: false,
-      },
-      {
-        id: "A2",
-        name: "Item 2",
-        description: "Second Item description",
-        completed: false,
-      },
-      {
-        id: "A3",
-        name: "Item 3",
-        description: "Third Item description",
-        completed: false,
-      },
-    ],
+    Uncategorised: [],
     PrioritizedBacklog: [],
     Backlog: [],
     Doing: [],
@@ -158,20 +62,20 @@ function Test() {
     setEditTaskId(task.id);
     setSplitPanelOpen(true);
   }
-  // useEffect(() => {
-  //   const fetchTaskData = async () => {
-  //     try {
-  //       const response = await getTasks("test");
-  //       setTasks(response);
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         setError(error.message);
-  //       }
-  //       setError("An unknown error occurred!");
-  //     }
-  //   };
-  //   fetchTaskData();
-  // }, []);
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      try {
+        const response = await getTasks("test");
+        setTasks(response);
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+        setError("An unknown error occurred!");
+      }
+    };
+    fetchTaskData();
+  }, []);
 
   function onChangeTask(updates: Partial<TaskType>) {
     if (!editTaskId) {
@@ -248,7 +152,7 @@ function Test() {
                       onChange={({ detail }) =>
                         onChangeTask({ name: detail.value })
                       }
-                      value={getTaskFromId(editTaskId)?.name ?? ''}
+                      value={getTaskFromId(editTaskId)?.name ?? ""}
                     />
                   </FormField>
                   <FormField
@@ -259,10 +163,12 @@ function Test() {
                       onChange={({ detail }) =>
                         onChangeTask({ description: detail.value })
                       }
-                      value={getTaskFromId(editTaskId)?.description ?? ''}
+                      value={getTaskFromId(editTaskId)?.description ?? ""}
                     />
                   </FormField>
-                  <ToggleButton pressed={getTaskFromId(editTaskId)?.completed ?? false}>
+                  <ToggleButton
+                    pressed={getTaskFromId(editTaskId)?.completed ?? false}
+                  >
                     Mark as Complete
                   </ToggleButton>
                 </SpaceBetween>

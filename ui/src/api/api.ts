@@ -2,8 +2,8 @@ import axios from "axios";
 import {
   type LoginResponse,
   MyApiClient,
-  type Task,
   type OpenAPIConfig,
+  type ContainerCollection,
 } from "./auto-generated-client";
 
 type Config = {
@@ -42,38 +42,38 @@ export async function getLoginResponse(
   return response;
 }
 
-export async function getTasks(username: string): Promise<Array<Task>> {
-  return await [
-    {
-      id: "1",
-      name: "First Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "Milestones",
-    },
-    {
-      id: "2",
-      name: "Second Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "Milestones",
-    },
+export async function getTasks(username: string): Promise<ContainerCollection> {
+  // return await [
+  //   {
+  //     id: "1",
+  //     name: "First Task",
+  //     description: "lorem ipsum",
+  //     assignedTo: undefined,
+  //     category: "Milestones",
+  //   },
+  //   {
+  //     id: "2",
+  //     name: "Second Task",
+  //     description: "lorem ipsum",
+  //     assignedTo: undefined,
+  //     category: "Milestones",
+  //   },
 
-    {
-      id: "3",
-      name: "third Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "ProtoSec",
-    },
+  //   {
+  //     id: "3",
+  //     name: "third Task",
+  //     description: "lorem ipsum",
+  //     assignedTo: undefined,
+  //     category: "ProtoSec",
+  //   },
 
-    {
-      id: "4",
-      name: "Fouth Task",
-      description: "lorem ipsum",
-      assignedTo: undefined,
-      category: "ProtoSec",
-    },
-  ];
-  // return await apiClient.default.getTasksApiTasksGet();
+  //   {
+  //     id: "4",
+  //     name: "Fouth Task",
+  //     description: "lorem ipsum",
+  //     assignedTo: undefined,
+  //     category: "ProtoSec",
+  //   },
+  // ];
+  return await apiClient.default.getTasksApiTasksGet();
 }

@@ -10,10 +10,11 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { ContainerCollection } from './models/ContainerCollection';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { LoginRequest } from './models/LoginRequest';
 export type { LoginResponse } from './models/LoginResponse';
-export type { Task } from './models/Task';
+export type { TaskType } from './models/TaskType';
 export type { ValidationError } from './models/ValidationError';
 
 export { DefaultService } from './services/DefaultService';

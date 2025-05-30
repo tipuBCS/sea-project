@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List, TypedDict, Union
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -16,6 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -26,40 +27,46 @@ async def get_items():
     return {"items": ["item1", "item2"]}
 
 
-class Task(BaseModel):
-    id: str
+class TaskType(BaseModel):
+    id: str | int
     name: str
     description: str
+    completed: bool
     assignedTo: str | None
-    category: str
 
 
-@app.get("/api/tasks", response_model=List[Task])
+class ContainerCollection(BaseModel):
+    __root__: Dict[Union[str, int], List[TaskType]]
+
+
+@app.get("/api/tasks", response_model=ContainerCollection)
 async def get_tasks():
-    return [
-        {
-            "id": "taskid1",
-            "name": "First Task",
-            "description": "lorem ipsum",
-            "assignedTo": None,
-            "category": "Milestones",
-        },
-        {
-            "id": "taskid2",
-            "name": "Second Task",
-            "description": "lorem ipsum",
-            "assignedTo": None,
-            "category": "ProtoSec",
-        },
-        
-        {
-            "id": "taskid3",
-            "name": "third Task",
-            "description": "lorem ipsum",
-            "assignedTo": None,
-            "category": "ProtoSec",
-        },
-    ]
+    return {
+        "Uncategorised": [
+            {
+                "id": "123",
+                "name": "Item 1 Testing changes",
+                "description": "First item description",
+                "completed": False,
+            },
+            {
+                "id": "A2",
+                "name": "Item 2",
+                "description": "Second Item description",
+                "completed": False,
+            },
+            {
+                "id": "A3",
+                "name": "Item 3",
+                "description": "Third Item description",
+                "completed": False,
+            },
+        ],
+        "PrioritizedBacklog": [],
+        "Backlog": [],
+        "Doing": [],
+        "Done": [],
+    }
 
 
 class LoginRequest(BaseModel):
@@ -74,7 +81,7 @@ class LoginResponse(BaseModel):
 
 @app.post("/api/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
-    print("Recieved Login Request")
+    print("Received Login Request ..")
     print(request)
     try:
         if request.username == "test" and request.password == "password":

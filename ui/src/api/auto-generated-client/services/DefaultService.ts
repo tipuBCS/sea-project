@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ContainerCollection } from '../models/ContainerCollection';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { LoginResponse } from '../models/LoginResponse';
-import type { Task } from '../models/Task';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class DefaultService {
@@ -33,10 +33,10 @@ export class DefaultService {
     }
     /**
      * Get Tasks
-     * @returns Task Successful Response
+     * @returns ContainerCollection Successful Response
      * @throws ApiError
      */
-    public getTasksApiTasksGet(): CancelablePromise<Array<Task>> {
+    public getTasksApiTasksGet(): CancelablePromise<ContainerCollection> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/tasks',

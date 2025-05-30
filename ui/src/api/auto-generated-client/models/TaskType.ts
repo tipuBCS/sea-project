@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Task = {
-    id: string;
+export type TaskType = {
+    id: (string | number);
     name: string;
-    description?: string;
+    description: string;
+    completed: boolean;
     assignedTo?: string;
-    category?: string;
 };
 

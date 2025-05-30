@@ -6,8 +6,8 @@ import React, { useEffect, useState } from "react";
 import { Handle, Remove } from "./components";
 
 import { Button } from "@cloudscape-design/components";
-import type { TaskType } from "../../../../pages/Test";
 import styles from "./Item.module.scss";
+import type { TaskType } from "../../../../api/auto-generated-client";
 
 export interface Props {
   startEditingTask: (task: TaskType) => void;

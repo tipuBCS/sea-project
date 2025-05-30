@@ -10,91 +10,87 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type Swapy, createSwapy, utils } from "swapy";
 import { getTasks } from "../api/api";
-import type { Task } from "../api/auto-generated-client";
 import "../helper/mainContainer.css";
-import { TaskContainer } from "../helper/TaskContainer";
-
-
 
 function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  // const [tasks, setTasks] = useState<Task[]>([]);
 
-  const [slotItemMap, setSlotItemMap] = useState(
-    utils.initSlotItemMap(tasks, "id")
-  );
+  // const [slotItemMap, setSlotItemMap] = useState(
+  //   utils.initSlotItemMap(tasks, "id")
+  // );
 
-  const slottedItems = useMemo(
-    () => utils.toSlottedItems(tasks, "id", slotItemMap),
-    [tasks, slotItemMap]
-  );
-
-  useEffect(() => {
-    console.log("tasks:");
-    console.log(tasks);
-  }, [tasks]);
-
-  const [error, setError] = useState<string | null>(null);
-  const swapy = useRef<null | Swapy>(null);
-  const container = useRef(null);
-
-  const [rows, setRows] = useState([
-    "Uncategorised",
-    "Milestones",
-    "ProtoSec",
-    "Backlog",
-    "Prioritized Backlog",
-  ]);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(
-    () =>
-      utils.dynamicSwapy(
-        swapy.current,
-        tasks,
-        "id",
-        slotItemMap,
-        setSlotItemMap
-      ),
-    [tasks]
-  );
-
-  useEffect(() => {
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    swapy.current = createSwapy(container.current!, {
-      manualSwap: true,
-      // animation: 'dynamic'
-      // autoScrollOnDrag: true,
-      // swapMode: 'drop',
-      // enabled: true,
-      // dragAxis: 'x',
-      // dragOnHold: true
-    });
-
-    swapy.current.onSwap((event) => {
-      console.log(event);
-      setSlotItemMap(event.newSlotItemMap.asArray);
-    });
-
-    return () => {
-      swapy.current?.destroy();
-    };
-  }, []);
+  // const slottedItems = useMemo(
+  //   () => utils.toSlottedItems(tasks, "id", slotItemMap),
+  //   [tasks, slotItemMap]
+  // );
 
   // useEffect(() => {
-  //   const fetchTaskData = async () => {
-  //     try {
-  //       const response = await getTasks("test");
-  //       console.log(response);
-  //       setTasks(response);
-  //     } catch (error) {
-  //       if (error instanceof Error) {
-  //         setError(error.message);
-  //       }
-  //       setError("An unknown error occurred!");
-  //     }
+  //   console.log("tasks:");
+  //   console.log(tasks);
+  // }, [tasks]);
+
+  // const [error, setError] = useState<string | null>(null);
+  // const swapy = useRef<null | Swapy>(null);
+  // const container = useRef(null);
+
+  // const [rows, setRows] = useState([
+  //   "Uncategorised",
+  //   "Milestones",
+  //   "ProtoSec",
+  //   "Backlog",
+  //   "Prioritized Backlog",
+  // ]);
+
+  // // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // useEffect(
+  //   () =>
+  //     utils.dynamicSwapy(
+  //       swapy.current,
+  //       tasks,
+  //       "id",
+  //       slotItemMap,
+  //       setSlotItemMap
+  //     ),
+  //   [tasks]
+  // );
+
+  // useEffect(() => {
+  //   // biome-ignore lint/style/noNonNullAssertion: <explanation>
+  //   swapy.current = createSwapy(container.current!, {
+  //     manualSwap: true,
+  //     // animation: 'dynamic'
+  //     // autoScrollOnDrag: true,
+  //     // swapMode: 'drop',
+  //     // enabled: true,
+  //     // dragAxis: 'x',
+  //     // dragOnHold: true
+  //   });
+
+  //   swapy.current.onSwap((event) => {
+  //     console.log(event);
+  //     setSlotItemMap(event.newSlotItemMap.asArray);
+  //   });
+
+  //   return () => {
+  //     swapy.current?.destroy();
   //   };
-  //   fetchTaskData();
   // }, []);
+
+  // // useEffect(() => {
+  // //   const fetchTaskData = async () => {
+  // //     try {
+  // //       const response = await getTasks("test");
+  // //       console.log(response);
+  // //       setTasks(response);
+  // //     } catch (error) {
+  // //       if (error instanceof Error) {
+  // //         setError(error.message);
+  // //       }
+  // //       setError("An unknown error occurred!");
+  // //     }
+  // //   };
+  // //   fetchTaskData();
+  // // }, []);
 
   return (
     <AppLayout

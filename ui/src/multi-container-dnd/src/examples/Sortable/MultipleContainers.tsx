@@ -46,10 +46,9 @@ import { coordinateGetter as multipleContainersCoordinateGetter } from "./multip
 import { Container, type ContainerProps, Item } from "../../components";
 
 import type {
-  ContainerCollection,
   ContainerType,
-  TaskType,
 } from "../../../../pages/Test";
+import type { TaskType, ContainerCollection } from "../../../../api/auto-generated-client";
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
