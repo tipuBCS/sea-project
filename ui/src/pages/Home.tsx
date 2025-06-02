@@ -59,7 +59,7 @@ function Test() {
   // Create a debounced function to update the backend
   const updateBackend = debounce(async (currentTasks: ContainerCollection) => {
     try {
-      console.log('Updating tasks')
+      console.log("Updating tasks");
       await Object.keys(currentTasks).forEach(async (containerId) => {
         await currentTasks[containerId].forEach(async (task, index) => {
           await updateTask(
@@ -83,7 +83,7 @@ function Test() {
   // Set up periodic sync if there are changes
   useEffect(() => {
     if (tasksChanged) {
-      console.log('Updating backend ...')
+      console.log("Updating backend ...");
       updateBackend(tasks);
     }
 
@@ -97,13 +97,32 @@ function Test() {
     setEditTaskId(task.id);
     setSplitPanelOpen(true);
   }
+
+  // Function to sort tasks by position
+  const sortTasksByPosition = (tasks: TaskType[]): TaskType[] => {
+    return [...tasks].sort((a, b) => a.position - b.position);
+  };
+
+  // Function to sort all containers in the collection
+  const sortContainerCollection = (
+    collection: ContainerCollection
+  ): ContainerCollection => {
+    const sortedCollection: ContainerCollection = {};
+
+    for (const [containerId, tasks] of Object.entries(collection)) {
+      sortedCollection[containerId] = sortTasksByPosition(tasks);
+    }
+
+    return sortedCollection;
+  };
+
   useEffect(() => {
     const fetchTaskData = async () => {
       try {
         console.log("Fetching task ..");
-        const response = await getTasks(USERID);
-        console.log(response);
-        setTasks(response);
+        const tasks = await getTasks(USERID);
+        const sortedTasks = sortContainerCollection(tasks);
+        setTasks(sortedTasks);
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);

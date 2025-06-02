@@ -143,7 +143,7 @@ async def get_tasks(userId: str):
             completed=task.completed,
             createdAt=task.createdAt,
             assignedTo=task.assignedTo,
-            position=1000,
+            position=int(task.position),
         )
         return_tasks[task.category].append(newTask)
     return return_tasks
@@ -162,12 +162,12 @@ class UpdateTaskRequest(BaseModel):
 async def updateTask(
     userId,
     taskId,
+    position,
     name=None,
     description=None,
     completed=None,
     assignedTo=None,
     category=None,
-    position=None,
 ):
     task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
     actions = []
@@ -181,53 +181,24 @@ async def updateTask(
         actions.append(TaskTableModel.assignedTo.set(assignedTo))
     if category:
         actions.append(TaskTableModel.category.set(category))
-    if position:
-        actions.append(TaskTableModel.position.set(position))
+    actions.append(TaskTableModel.position.set(position))
     task.update(actions)
 
 
 @app.patch("/api/tasks/{taskId}")
 async def update_task(taskId: str, request: UpdateTaskRequest):
     print("Received update task request ..")
+    print(request)
     await updateTask(
         request.userId,
         taskId,
+        request.position,
         request.name,
         request.description,
         request.completed,
         request.assignedTo,
         request.category,
-        request.position,
     )
-
-
-class TaskPosition(BaseModel):
-    taskId: str
-    position: int
-    category: str
-
-
-class UpdateTaskPositionRequest(BaseModel):
-    userId: str
-    Items: List[TaskPosition]
-
-
-async def updateTaskPosition(request: UpdateTaskPositionRequest):
-    for i in range(len(request.Items)):
-        newTaskPosObj = request.Items[i]
-        task = TaskTableModel.get(
-            hash_key=f"USER#{request.userId}", range_key=f"TASK#{newTaskPosObj.taskId}"
-        )
-        task.position = newTaskPosObj.position
-        task.category = newTaskPosObj.category
-        task.save()
-
-
-@app.patch("/api/position")
-async def update_task_position(request: UpdateTaskPositionRequest):
-    print("Received Update Task Position Request ..")
-    print(request)
-    await updateTaskPosition(request)
 
 
 class LoginRequest(BaseModel):
