@@ -15,17 +15,18 @@ import {
   ToggleButton,
 } from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import { getTasks, updateTask, updateTaskPositions } from "../api/api";
+import { createTaskAPI, getTasks, updateTask } from "../api/api";
 import type {
   ContainerCollection,
   TaskPosition,
   TaskType,
 } from "../api/auto-generated-client";
+import { debounce } from "lodash";
 
 export type ContainerType = {
   id: UniqueIdentifier;
@@ -44,6 +45,7 @@ function Test() {
   ]);
 
   const [tasks, setTasks] = useState<ContainerCollection>({});
+  const [tasksChanged, setTasksChanged] = useState(false);
 
   function toggleSplitPanel() {
     setSplitPanelOpen((enable) => !enable);
@@ -54,8 +56,44 @@ function Test() {
 
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
+  // Create a debounced function to update the backend
+  const updateBackend = debounce(async (currentTasks: ContainerCollection) => {
+    try {
+      console.log('Updating tasks')
+      await Object.keys(currentTasks).forEach(async (containerId) => {
+        await currentTasks[containerId].forEach(async (task, index) => {
+          await updateTask(
+            task.id,
+            USERID,
+            index,
+            task.name,
+            task.description,
+            task.completed,
+            task.assignedTo,
+            containerId
+          );
+        });
+      });
+      setTasksChanged(false);
+    } catch (error) {
+      console.error("Failed to update tasks:", error);
+    }
+  }, 2000); // Will only fire after 2 seconds of no changes
+
+  // Set up periodic sync if there are changes
+  useEffect(() => {
+    if (tasksChanged) {
+      console.log('Updating backend ...')
+      updateBackend(tasks);
+    }
+
+    return () => {
+      // Clean up by canceling any pending debounced calls
+      updateBackend.cancel();
+    };
+  }, [tasks, setTasksChanged]);
+
   function startEditingTask(task: TaskType) {
-    console.log("Clicked edit!");
     setEditTaskId(task.id);
     setSplitPanelOpen(true);
   }
@@ -80,14 +118,7 @@ function Test() {
     if (!editTaskId) {
       return;
     }
-    updateTask(
-      editTaskId,
-      USERID,
-      updates.name,
-      updates.description,
-      updates.completed,
-      updates.assignedTo
-    );
+    setTasksChanged(true);
     setTasks((prevItems) => {
       // Find which container has this item
       const containerId = Object.keys(prevItems).find((containerId) =>
@@ -120,22 +151,25 @@ function Test() {
     return tasks[containerId].find((task) => task.id === id);
   }
 
-  useEffect(() => {
-    console.log("tasks changed!");
-    console.log(tasks);
-    const items: Array<TaskPosition> = [];
-    Object.keys(tasks).find((containerId) =>
-      tasks[containerId].forEach((task, index) =>
-        items.push({
-          taskId: task.id.toString(),
-          position: index,
-          category: containerId,
-        })
-      )
-    );
+  function createTask(category: string) {
+    console.log(`Creating task in category: ${category}`);
+    const newId = crypto.randomUUID();
+    createTaskAPI(USERID, newId, category);
+    setTasks((tasks) => {
+      const newTask: TaskType = {
+        id: newId,
+        name: "",
+        description: "",
+        completed: false,
+        createdAt: "",
+        position: 1000,
+      };
 
-    updateTaskPositions(USERID, items);
-  }, [tasks]);
+      const taskInCategory = tasks[category] ?? [];
+
+      return { ...tasks, [category]: [...taskInCategory, newTask] };
+    });
+  }
 
   return (
     <AppLayout
@@ -211,6 +245,8 @@ function Test() {
         >
           <div className="App">
             <MultipleContainers
+              setTasksChanged={setTasksChanged}
+              createTask={createTask}
               containers={containers}
               setContainers={setContainers}
               tasks={tasks}

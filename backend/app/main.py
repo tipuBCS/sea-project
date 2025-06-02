@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+from turtle import position
 from typing import Container, Dict, List, Union
 from unicodedata import category
 from xml.etree.ElementTree import tostring
@@ -102,6 +103,7 @@ def createTask(userId: str, taskId: str, category: str):
     task.id = taskId
     task.userId = userId
     task.category = category
+    task.position = 1000
     task.save()
 
 
@@ -112,6 +114,7 @@ async def getTasks(userId: str):
 
 @app.post("/api/tasks", response_model=CreateTaskResponse)
 async def create_task(request: CreateTaskRequest):
+    print("Received Create task request!")
     try:
         createTask(request.userId, request.taskId, request.category)
         return CreateTaskResponse(success=True)
@@ -153,6 +156,7 @@ class UpdateTaskRequest(BaseModel):
     completed: bool | None
     assignedTo: str | None
     category: str | None
+    position: int
 
 
 async def updateTask(
@@ -163,6 +167,7 @@ async def updateTask(
     completed=None,
     assignedTo=None,
     category=None,
+    position=None,
 ):
     task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
     actions = []
@@ -170,13 +175,14 @@ async def updateTask(
         actions.append(TaskTableModel.name.set(name))
     if description:
         actions.append(TaskTableModel.description.set(description))
-
     if not (completed == None):
         actions.append(TaskTableModel.completed.set(completed))
     if assignedTo:
         actions.append(TaskTableModel.assignedTo.set(assignedTo))
     if category:
         actions.append(TaskTableModel.category.set(category))
+    if position:
+        actions.append(TaskTableModel.position.set(position))
     task.update(actions)
 
 
@@ -191,6 +197,7 @@ async def update_task(taskId: str, request: UpdateTaskRequest):
         request.completed,
         request.assignedTo,
         request.category,
+        request.position,
     )
 
 

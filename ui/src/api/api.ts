@@ -39,6 +39,18 @@ export async function getLoginResponse(
   return response;
 }
 
+export async function createTaskAPI(
+  userId: string,
+  taskId: string,
+  category: string
+) {
+  return await apiClient.default.createTaskApiTasksPost({
+    userId,
+    taskId,
+    category,
+  });
+}
+
 export async function getTasks(userId: string): Promise<ContainerCollection> {
   console.log("Running get tasks ..");
   return await apiClient.default.getTasksApiTasksUserIdGet((userId = "1"));
@@ -47,11 +59,12 @@ export async function getTasks(userId: string): Promise<ContainerCollection> {
 export async function updateTask(
   taskId: string | number,
   userId: string,
+  position: number,
   name?: string,
   description?: string,
   completed?: boolean,
   assignedTo?: string,
-  category?: string
+  category?: string,
 ) {
   console.log("Updating Task ..");
   apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
@@ -61,12 +74,6 @@ export async function updateTask(
     completed,
     assignedTo,
     category,
+    position,
   });
-}
-
-export async function updateTaskPositions(
-  userId: string,
-  Items: Array<TaskPosition>
-) {
-  apiClient.default.updateTaskPositionApiPositionPatch({ userId, Items });
 }

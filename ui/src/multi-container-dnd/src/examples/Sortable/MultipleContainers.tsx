@@ -50,11 +50,14 @@ import type {
   TaskType,
   ContainerCollection,
 } from "../../../../api/auto-generated-client";
+import { Button } from "@cloudscape-design/components";
+import "../../styles.css";
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
 function DroppableContainer({
+  createTask,
   children,
   columns = 1,
   disabled,
@@ -63,6 +66,7 @@ function DroppableContainer({
   style,
   ...props
 }: ContainerProps & {
+  createTask: (category: string) => void;
   disabled?: boolean;
   id: UniqueIdentifier;
   items: TaskType[];
@@ -108,6 +112,15 @@ function DroppableContainer({
       {...props}
     >
       {children}
+      <div className="add-task-container">
+        <Button
+          variant={"link"}
+          fullWidth={false}
+          onClick={() => createTask(id.toString())}
+        >
+          Add Task
+        </Button>
+      </div>
     </Container>
   );
 }
@@ -123,6 +136,8 @@ const dropAnimation: DropAnimation = {
 };
 
 interface Props {
+  setTasksChanged: Dispatch<SetStateAction<boolean>>;
+  createTask: (category: string) => void;
   containers: ContainerType[];
   setContainers: Dispatch<SetStateAction<ContainerType[]>>;
   startEditingTask: (task: TaskType) => void;
@@ -158,6 +173,8 @@ const PLACEHOLDER_ID = "placeholder";
 const empty: UniqueIdentifier[] = [];
 
 export function MultipleContainers({
+  setTasksChanged,
+  createTask,
   containers,
   setContainers,
   startEditingTask,
@@ -372,6 +389,7 @@ export function MultipleContainers({
         }
 
         if (activeContainer !== overContainer) {
+          setTasksChanged(true)
           setTasks((tasks) => {
             const activeTasks = tasks[activeContainer];
             if (!(overContainer in tasks)) {
@@ -386,7 +404,6 @@ export function MultipleContainers({
             const activeIndex = activeTasks.findIndex(
               (task) => task.id === active.id
             );
-
 
             let newIndex: number;
 
@@ -486,6 +503,7 @@ export function MultipleContainers({
           );
 
           if (activeIndex !== overIndex) {
+            setTasksChanged(true)
             setTasks((tasks) => ({
               ...tasks,
               [overContainer]: arrayMove(
@@ -521,6 +539,7 @@ export function MultipleContainers({
         >
           {containers.map((container) => (
             <DroppableContainer
+              createTask={createTask}
               key={container.id}
               id={container.id}
               label={container.name}
