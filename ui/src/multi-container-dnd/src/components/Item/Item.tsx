@@ -10,6 +10,7 @@ import styles from "./Item.module.scss";
 import type { TaskType } from "../../../../api/auto-generated-client";
 
 export interface Props {
+  deleteTask: (deleteTaskId: string) => void;
   startEditingTask: (task: TaskType) => void;
   task: TaskType;
   dragOverlay?: boolean;
@@ -48,6 +49,7 @@ export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        deleteTask,
         startEditingTask,
         task,
         color,
@@ -157,6 +159,7 @@ export const Item = React.memo(
                   <Remove
                     className={styles.Remove}
                     onClick={() => {
+                      deleteTask(task.id.toString());
                       console.log("clicked remove");
                     }}
                   />

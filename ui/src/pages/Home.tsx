@@ -20,10 +20,9 @@ import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import { createTaskAPI, getTasks, updateTask } from "../api/api";
+import { createTaskAPI, deleteTaskAPI, getTasks, updateTask } from "../api/api";
 import type {
   ContainerCollection,
-  TaskPosition,
   TaskType,
 } from "../api/auto-generated-client";
 import { debounce } from "lodash";
@@ -115,6 +114,31 @@ function Test() {
 
     return sortedCollection;
   };
+
+  function deleteTask(deleteTaskId: string) {
+    console.log(`RUnning delete task on id: ${deleteTaskId}`);
+    setTasksChanged(true);
+    deleteTaskAPI(USERID, deleteTaskId);
+
+    setTasks((prevItems) => {
+      // Find which container has this item
+      const containerId = Object.keys(prevItems).find((containerId) =>
+        prevItems[containerId].some((item) => item.id === deleteTaskId)
+      );
+
+      if (!containerId) {
+        return prevItems; // Item not found in any container
+      }
+
+      // Update the item in the found container
+      return {
+        ...prevItems,
+        [containerId]: prevItems[containerId].filter(
+          (item) => item.id !== deleteTaskId
+        ),
+      };
+    });
+  }
 
   useEffect(() => {
     const fetchTaskData = async () => {
@@ -264,6 +288,7 @@ function Test() {
         >
           <div className="App">
             <MultipleContainers
+              deleteTask={deleteTask}
               setTasksChanged={setTasksChanged}
               createTask={createTask}
               containers={containers}

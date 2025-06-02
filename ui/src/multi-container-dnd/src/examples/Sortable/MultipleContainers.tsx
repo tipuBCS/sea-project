@@ -136,6 +136,7 @@ const dropAnimation: DropAnimation = {
 };
 
 interface Props {
+  deleteTask: (deleteTaskId: string) => void;
   setTasksChanged: Dispatch<SetStateAction<boolean>>;
   createTask: (category: string) => void;
   containers: ContainerType[];
@@ -173,6 +174,7 @@ const PLACEHOLDER_ID = "placeholder";
 const empty: UniqueIdentifier[] = [];
 
 export function MultipleContainers({
+  deleteTask,
   setTasksChanged,
   createTask,
   containers,
@@ -398,7 +400,7 @@ export function MultipleContainers({
                 return { ...tasks, [overContainer]: [] };
               });
             }
-            const overTasks = tasks[overContainer];
+            const overTasks = tasks[overContainer] ?? [];
 
             const overIndex = overTasks.findIndex((task) => task.id === overId);
             const activeIndex = activeTasks.findIndex(
@@ -557,6 +559,7 @@ export function MultipleContainers({
                   tasks[container.id].map((task, index) => {
                     return (
                       <SortableItem
+                        deleteTask={deleteTask}
                         startEditingTask={startEditingTask}
                         task={task}
                         disabled={isSortingContainer}
@@ -597,6 +600,7 @@ export function MultipleContainers({
     if (!task) return;
     return (
       <Item
+        deleteTask={deleteTask}
         startEditingTask={startEditingTask}
         task={task}
         value={id}
@@ -630,6 +634,7 @@ export function MultipleContainers({
       >
         {tasks[containerId].map((task, index) => (
           <Item
+            deleteTask={deleteTask}
             startEditingTask={startEditingTask}
             task={task}
             key={task.id}
@@ -704,6 +709,7 @@ function Trash({ id }: { id: UniqueIdentifier }) {
 }
 
 interface SortableItemProps {
+  deleteTask: (deleteTaskId: string) => void;
   startEditingTask: (task: TaskType) => void;
   task: TaskType;
   containerId: UniqueIdentifier;
@@ -717,6 +723,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({
+  deleteTask,
   startEditingTask,
   task,
   disabled,
@@ -746,6 +753,7 @@ function SortableItem({
 
   return (
     <Item
+      deleteTask={deleteTask}
       startEditingTask={startEditingTask}
       ref={disabled ? undefined : setNodeRef}
       value={id}

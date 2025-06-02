@@ -200,6 +200,20 @@ async def update_task(taskId: str, request: UpdateTaskRequest):
         request.category,
     )
 
+async def deleteTask(userId, taskId):
+    task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
+    task.delete()
+
+
+class DeleteTaskRequest(BaseModel):
+    userId: str
+
+
+@app.delete("/api/tasks/{taskId}")
+async def delete_task(taskId: str, request: DeleteTaskRequest):
+    print("Received delete task request ..")
+    await deleteTask(request.userId, taskId)
+
 
 class LoginRequest(BaseModel):
     username: str

@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { TaskPosition } from './TaskPosition';
-export type UpdateTaskPositionRequest = {
+export type DeleteTaskRequest = {
     userId: string;
-    Items: Array<TaskPosition>;
 };
 

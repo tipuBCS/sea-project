@@ -4,7 +4,6 @@ import {
   MyApiClient,
   type OpenAPIConfig,
   type ContainerCollection,
-  TaskPosition,
 } from "./auto-generated-client";
 
 type Config = {
@@ -64,7 +63,7 @@ export async function updateTask(
   description?: string,
   completed?: boolean,
   assignedTo?: string,
-  category?: string,
+  category?: string
 ) {
   console.log("Updating Task ..");
   apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
@@ -76,4 +75,8 @@ export async function updateTask(
     category,
     position,
   });
+}
+
+export async function deleteTaskAPI(userId: string, taskId: string) {
+  apiClient.default.deleteTaskApiTasksTaskIdDelete(taskId, { userId });
 }
