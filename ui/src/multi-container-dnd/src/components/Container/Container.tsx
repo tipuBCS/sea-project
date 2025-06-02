@@ -71,7 +71,7 @@ export const Container = forwardRef<HTMLDivElement, Props>(
             {label}
             <div className={styles.Actions}>
               {onRemove ? <Remove onClick={onRemove} /> : undefined}
-              <Handle {...handleProps} />
+              {/* <Handle {...handleProps} /> */}
             </div>
           </div>
         ) : null}

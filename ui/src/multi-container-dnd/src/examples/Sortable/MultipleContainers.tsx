@@ -104,10 +104,6 @@ function DroppableContainer({
         opacity: isDragging ? 0.5 : undefined,
       }}
       hover={isOverContainer}
-      handleProps={{
-        ...attributes,
-        ...listeners,
-      }}
       columns={columns}
       {...props}
     >
@@ -519,9 +515,10 @@ export function MultipleContainers({
     >
       <div
         style={{
-          display: "inline-grid",
-          boxSizing: "border-box",
-          padding: 20,
+          display: "flex",
+          maxWidth: "100%",
+          overflowX: "scroll",
+          borderRadius: "10px",
           gridAutoFlow: vertical ? "row" : "column",
         }}
       >

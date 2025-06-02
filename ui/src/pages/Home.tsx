@@ -2,6 +2,7 @@ import {
   AppLayout,
   Button,
   ColumnLayout,
+  Container,
   ContentLayout,
   Form,
   FormField,
@@ -280,8 +281,14 @@ function Test() {
       }
       content={
         <ContentLayout
+          defaultPadding
+          headerVariant="high-contrast"
+          headerBackgroundStyle="linear-gradient(135deg, rgb(255, 99, 71) 3%, rgb(255, 140, 0) 44%, rgb(255, 69, 0) 69%, rgb(255, 20, 147) 94%)"
           header={
-            <Header variant="h1" info={<Link variant="info">Info</Link>}>
+            <Header
+              variant="h2"
+              description="Use this board keep track of your work."
+            >
               Kanban Board
             </Header>
           }
