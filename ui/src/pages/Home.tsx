@@ -300,7 +300,10 @@ function Test() {
                     }}
                     pressed={getTaskFromId(editTaskId)?.completed ?? false}
                   >
-                    Mark as Complete
+                    Mark as{" "}
+                    {getTaskFromId(editTaskId)?.completed
+                      ? "Incomplete"
+                      : "Complete"}
                   </ToggleButton>
                 </SpaceBetween>
               </Form>
