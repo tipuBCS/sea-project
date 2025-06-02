@@ -216,7 +216,7 @@ function Test() {
   }
 
   function toggleTaskComplete(taskId: string) {
-    setTasksChanged(true)
+    setTasksChanged(true);
     setTasks((prevItems) => {
       // Find which container has this item
       const containerId = Object.keys(prevItems).find((containerId) =>
@@ -293,6 +293,11 @@ function Test() {
                     />
                   </FormField>
                   <ToggleButton
+                    onChange={() => {
+                      editTaskId
+                        ? toggleTaskComplete(editTaskId.toString())
+                        : null;
+                    }}
                     pressed={getTaskFromId(editTaskId)?.completed ?? false}
                   >
                     Mark as Complete
