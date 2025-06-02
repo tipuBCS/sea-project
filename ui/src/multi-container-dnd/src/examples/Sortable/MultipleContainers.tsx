@@ -391,17 +391,14 @@ export function MultipleContainers({
         }
 
         if (activeContainer !== overContainer) {
-          setTasksChanged(true)
+          console.log(`Over container: ${overContainer}`);
+          setTasksChanged(true);
           setTasks((tasks) => {
             const activeTasks = tasks[activeContainer];
-            if (!(overContainer in tasks)) {
-              // Add an empty container is tasks
-              setTasks((tasks) => {
-                return { ...tasks, [overContainer]: [] };
-              });
+            let overTasks: TaskType[] = [];
+            if (overContainer in tasks) {
+              overTasks = tasks[overContainer];
             }
-            const overTasks = tasks[overContainer] ?? [];
-
             const overIndex = overTasks.findIndex((task) => task.id === overId);
             const activeIndex = activeTasks.findIndex(
               (task) => task.id === active.id
@@ -432,12 +429,9 @@ export function MultipleContainers({
                 (task) => task.id !== active.id
               ),
               [overContainer]: [
-                ...tasks[overContainer].slice(0, newIndex),
+                ...overTasks.slice(0, newIndex),
                 tasks[activeContainer][activeIndex],
-                ...tasks[overContainer].slice(
-                  newIndex,
-                  tasks[overContainer].length
-                ),
+                ...overTasks.slice(newIndex, overTasks.length),
               ],
             };
           });
@@ -505,7 +499,7 @@ export function MultipleContainers({
           );
 
           if (activeIndex !== overIndex) {
-            setTasksChanged(true)
+            setTasksChanged(true);
             setTasks((tasks) => ({
               ...tasks,
               [overContainer]: arrayMove(
