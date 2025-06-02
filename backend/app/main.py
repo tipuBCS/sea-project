@@ -8,7 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from pydantic import BaseModel
 from pynamodb.models import Model
-from pynamodb.attributes import UnicodeAttribute, BooleanAttribute, UTCDateTimeAttribute
+from pynamodb.attributes import (
+    UnicodeAttribute,
+    BooleanAttribute,
+    UTCDateTimeAttribute,
+    NumberAttribute,
+)
 
 
 app = FastAPI()
@@ -55,6 +60,7 @@ class TaskTableModel(Model):
     assignedTo = UnicodeAttribute(default="")
 
     category = UnicodeAttribute()
+    position = NumberAttribute()
 
 
 @app.get("/")
@@ -74,6 +80,7 @@ class TaskType(BaseModel):
     completed: bool
     createdAt: datetime
     assignedTo: str | None
+    position: int
 
 
 class ContainerCollection(BaseModel):
@@ -133,6 +140,7 @@ async def get_tasks(userId: str):
             completed=task.completed,
             createdAt=task.createdAt,
             assignedTo=task.assignedTo,
+            position=1000,
         )
         return_tasks[task.category].append(newTask)
     return return_tasks
@@ -148,7 +156,13 @@ class UpdateTaskRequest(BaseModel):
 
 
 async def updateTask(
-    userId, taskId, name=None, description=None, completed=None, assignedTo=None, category=None
+    userId,
+    taskId,
+    name=None,
+    description=None,
+    completed=None,
+    assignedTo=None,
+    category=None,
 ):
     task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
     actions = []
@@ -165,10 +179,10 @@ async def updateTask(
         actions.append(TaskTableModel.category.set(category))
     task.update(actions)
 
+
 @app.patch("/api/tasks/{taskId}")
 async def update_task(taskId: str, request: UpdateTaskRequest):
-    print("Received Update request")
-    print(request)
+    print("Received update task request ..")
     await updateTask(
         request.userId,
         taskId,
@@ -176,8 +190,37 @@ async def update_task(taskId: str, request: UpdateTaskRequest):
         request.description,
         request.completed,
         request.assignedTo,
-        request.category
+        request.category,
     )
+
+
+class TaskPosition(BaseModel):
+    taskId: str
+    position: int
+    category: str
+
+
+class UpdateTaskPositionRequest(BaseModel):
+    userId: str
+    Items: List[TaskPosition]
+
+
+async def updateTaskPosition(request: UpdateTaskPositionRequest):
+    for i in range(len(request.Items)):
+        newTaskPosObj = request.Items[i]
+        task = TaskTableModel.get(
+            hash_key=f"USER#{request.userId}", range_key=f"TASK#{newTaskPosObj.taskId}"
+        )
+        task.position = newTaskPosObj.position
+        task.category = newTaskPosObj.category
+        task.save()
+
+
+@app.patch("/api/position")
+async def update_task_position(request: UpdateTaskPositionRequest):
+    print("Received Update Task Position Request ..")
+    print(request)
+    await updateTaskPosition(request)
 
 
 class LoginRequest(BaseModel):

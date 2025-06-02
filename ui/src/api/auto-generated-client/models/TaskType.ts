@@ -9,5 +9,6 @@ export type TaskType = {
     completed: boolean;
     createdAt: string;
     assignedTo?: string;
+    position: number;
 };
 

@@ -20,9 +20,10 @@ import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import { getTasks, updateTask } from "../api/api";
+import { getTasks, updateTask, updateTaskPositions } from "../api/api";
 import type {
   ContainerCollection,
+  TaskPosition,
   TaskType,
 } from "../api/auto-generated-client";
 
@@ -195,6 +196,18 @@ function Test() {
   useEffect(() => {
     console.log("tasks changed!");
     console.log(tasks);
+    const items: Array<TaskPosition> = [];
+    Object.keys(tasks).find((containerId) =>
+      tasks[containerId].forEach((task, index) =>
+        items.push({
+          taskId: task.id.toString(),
+          position: index,
+          category: containerId,
+        })
+      )
+    );
+
+    updateTaskPositions(USERID, items);
   }, [tasks]);
 
   return (

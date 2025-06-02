@@ -7,6 +7,7 @@ import type { CreateTaskRequest } from '../models/CreateTaskRequest';
 import type { CreateTaskResponse } from '../models/CreateTaskResponse';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { LoginResponse } from '../models/LoginResponse';
+import type { UpdateTaskPositionRequest } from '../models/UpdateTaskPositionRequest';
 import type { UpdateTaskRequest } from '../models/UpdateTaskRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -90,6 +91,25 @@ export class DefaultService {
             path: {
                 'taskId': taskId,
             },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Update Task Position
+     * @param requestBody
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public updateTaskPositionApiPositionPatch(
+        requestBody: UpdateTaskPositionRequest,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/position',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

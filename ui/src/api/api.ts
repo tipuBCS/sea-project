@@ -4,6 +4,7 @@ import {
   MyApiClient,
   type OpenAPIConfig,
   type ContainerCollection,
+  TaskPosition,
 } from "./auto-generated-client";
 
 type Config = {
@@ -50,7 +51,7 @@ export async function updateTask(
   description?: string,
   completed?: boolean,
   assignedTo?: string,
-  category?: string,
+  category?: string
 ) {
   console.log("Updating Task ..");
   apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
@@ -59,6 +60,13 @@ export async function updateTask(
     description,
     completed,
     assignedTo,
-    category
+    category,
   });
+}
+
+export async function updateTaskPositions(
+  userId: string,
+  Items: Array<TaskPosition>
+) {
+  apiClient.default.updateTaskPositionApiPositionPatch({ userId, Items });
 }
