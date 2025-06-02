@@ -38,8 +38,8 @@ const USERID = "1";
 function Test() {
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: "Uncategorised", name: "Uncategorised" },
-    { id: "PrioritizedBacklog", name: "Prioritized Backlog" },
     { id: "Backlog", name: "Backlog" },
+    { id: "PrioritizedBacklog", name: "Prioritized Backlog" },
     { id: "Doing", name: "Doing" },
     { id: "Done", name: "Done" },
   ]);

@@ -8,6 +8,8 @@ import type { CreateTaskResponse } from '../models/CreateTaskResponse';
 import type { DeleteTaskRequest } from '../models/DeleteTaskRequest';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { LoginResponse } from '../models/LoginResponse';
+import type { RegisterRequest } from '../models/RegisterRequest';
+import type { RegisterResponse } from '../models/RegisterResponse';
 import type { UpdateTaskRequest } from '../models/UpdateTaskRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -115,6 +117,25 @@ export class DefaultService {
             path: {
                 'taskId': taskId,
             },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Register
+     * @param requestBody
+     * @returns RegisterResponse Successful Response
+     * @throws ApiError
+     */
+    public registerApiRegisterPost(
+        requestBody: RegisterRequest,
+    ): CancelablePromise<RegisterResponse> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/register',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

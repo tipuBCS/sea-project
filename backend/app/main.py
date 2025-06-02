@@ -1,13 +1,15 @@
 from datetime import datetime
-import re
+import enum
 from turtle import position
-from typing import Container, Dict, List, Union
+from typing import Dict, List, Union
 from unicodedata import category
+import uuid
 from xml.etree.ElementTree import tostring
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from pydantic import BaseModel
+from pynamodb.indexes import GlobalSecondaryIndex, AllProjection
 from pynamodb.models import Model
 from pynamodb.attributes import (
     UnicodeAttribute,
@@ -19,7 +21,15 @@ from pynamodb.attributes import (
 
 app = FastAPI()
 
+USER_TABLE_NAME = "sea-users"
 TASK_TABLE_NAME = "sea-tasks-2"
+
+
+class Roles(enum.Enum):
+    USER = "USER"
+    ADMIN = "ADMIN"
+
+
 frontEnd_URL = ""
 
 app.add_middleware(
@@ -31,17 +41,28 @@ app.add_middleware(
 )
 
 
+class UsernameIndex(GlobalSecondaryIndex):
+    class Meta:
+        projection = AllProjection()
+
+    username = UnicodeAttribute(hash_key=True)
+
+
 class UserModel(Model):
     """
     A DynamoDB User
     """
 
     class Meta:
-        table_name = "dynamodb-user"
+        table_name = USER_TABLE_NAME
 
-    email = UnicodeAttribute(null=True)
-    first_name = UnicodeAttribute(range_key=True)
-    last_name = UnicodeAttribute(hash_key=True)
+    pk = UnicodeAttribute(hash_key=True)
+    userId = UnicodeAttribute(null=False)
+    username = UnicodeAttribute(null=False)
+    password = UnicodeAttribute(null=False)
+    role = UnicodeAttribute(default=Roles.USER.value)
+
+    user_index = UsernameIndex()
 
 
 class TaskTableModel(Model):
@@ -200,6 +221,7 @@ async def update_task(taskId: str, request: UpdateTaskRequest):
         request.category,
     )
 
+
 async def deleteTask(userId, taskId):
     task = TaskTableModel.get(hash_key=f"USER#{userId}", range_key=f"TASK#{taskId}")
     task.delete()
@@ -225,15 +247,41 @@ class LoginResponse(BaseModel):
     isValid: bool
 
 
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+
+
+class RegisterResponse(BaseModel):
+    success: bool
+
+
+@app.post("/api/register", response_model=RegisterResponse)
+async def register(request: RegisterRequest):
+    print("Received Register Request ..")
+    print(request)
+    try:
+        userId = str(uuid.uuid4())
+        user = UserModel(f"USER#{userId}")
+        user.userId = userId
+        user.username = request.username
+        user.password = request.password
+        user.save()
+        return RegisterResponse(success=True)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     print("Received Login Request ..")
     print(request)
     try:
-        if request.username == "test" and request.password == "password":
-            return LoginResponse(isValid=True)
+        for user in UserModel.user_index.query(request.username, limit=1):
+            print(user)
+            if user.password == request.password:
+                return LoginResponse(isValid=True)
         return LoginResponse(isValid=False)
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -241,5 +289,5 @@ async def login(request: LoginRequest):
 # Handler for AWS Lambda
 handler = Mangum(app)
 
-# UserModel.create_table(read_capacity_units=1, write_capacity_units=1)
 # TaskTableModel.create_table(billing_mode="PAY_PER_REQUEST")
+# UserModel.create_table(billing_mode="PAY_PER_REQUEST")

@@ -80,3 +80,7 @@ export async function updateTask(
 export async function deleteTaskAPI(userId: string, taskId: string) {
   apiClient.default.deleteTaskApiTasksTaskIdDelete(taskId, { userId });
 }
+
+export async function registerAPI(username: string, password: string) {
+  await apiClient.default.registerApiRegisterPost({ username, password });
+}

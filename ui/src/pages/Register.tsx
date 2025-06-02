@@ -9,8 +9,8 @@ import {
   Input,
   SpaceBetween,
 } from "@cloudscape-design/components";
-import { getLoginResponse } from "../api/api";
 import { Navigate, useNavigate } from "react-router-dom";
+import { registerAPI } from "../api/api";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -18,15 +18,29 @@ function Register() {
   const [password2, setPassword2] = useState("");
   const navigate = useNavigate();
 
-  function signIn() {
-    const response = getLoginResponse(username, password);
+  async function register() {
+    const response = await registerAPI(username, password);
     console.log(response);
   }
 
   return (
     <FullPageCenteredBoxLayout>
       <Container
-        header={<Header actions={<Button onClick={() => {navigate('/login')}}>Login</Button>}>Register</Header>}
+        header={
+          <Header
+            actions={
+              <Button
+                onClick={() => {
+                  navigate("/login");
+                }}
+              >
+                Login
+              </Button>
+            }
+          >
+            Register
+          </Header>
+        }
       >
         <form
           onSubmit={(e) => {
@@ -39,7 +53,7 @@ function Register() {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    signIn();
+                    register();
                   }}
                 >
                   Register

@@ -17,6 +17,8 @@ export type { DeleteTaskRequest } from './models/DeleteTaskRequest';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { LoginRequest } from './models/LoginRequest';
 export type { LoginResponse } from './models/LoginResponse';
+export type { RegisterRequest } from './models/RegisterRequest';
+export type { RegisterResponse } from './models/RegisterResponse';
 export type { TaskType } from './models/TaskType';
 export type { UpdateTaskRequest } from './models/UpdateTaskRequest';
 export type { ValidationError } from './models/ValidationError';
