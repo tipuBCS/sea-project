@@ -132,6 +132,7 @@ const dropAnimation: DropAnimation = {
 };
 
 interface Props {
+  toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
   setTasksChanged: Dispatch<SetStateAction<boolean>>;
   createTask: (category: string) => void;
@@ -170,6 +171,7 @@ const PLACEHOLDER_ID = "placeholder";
 const empty: UniqueIdentifier[] = [];
 
 export function MultipleContainers({
+  toggleTaskComplete,
   deleteTask,
   setTasksChanged,
   createTask,
@@ -550,6 +552,7 @@ export function MultipleContainers({
                   tasks[container.id].map((task, index) => {
                     return (
                       <SortableItem
+                        toggleTaskComplete={toggleTaskComplete}
                         deleteTask={deleteTask}
                         startEditingTask={startEditingTask}
                         task={task}
@@ -591,6 +594,7 @@ export function MultipleContainers({
     if (!task) return;
     return (
       <Item
+        toggleTaskComplete={toggleTaskComplete}
         deleteTask={deleteTask}
         startEditingTask={startEditingTask}
         task={task}
@@ -625,6 +629,7 @@ export function MultipleContainers({
       >
         {tasks[containerId].map((task, index) => (
           <Item
+            toggleTaskComplete={toggleTaskComplete}
             deleteTask={deleteTask}
             startEditingTask={startEditingTask}
             task={task}
@@ -700,6 +705,7 @@ function Trash({ id }: { id: UniqueIdentifier }) {
 }
 
 interface SortableItemProps {
+  toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
   startEditingTask: (task: TaskType) => void;
   task: TaskType;
@@ -714,6 +720,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({
+  toggleTaskComplete,
   deleteTask,
   startEditingTask,
   task,
@@ -744,6 +751,7 @@ function SortableItem({
 
   return (
     <Item
+      toggleTaskComplete={toggleTaskComplete}
       deleteTask={deleteTask}
       startEditingTask={startEditingTask}
       ref={disabled ? undefined : setNodeRef}

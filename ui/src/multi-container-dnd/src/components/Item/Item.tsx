@@ -5,11 +5,12 @@ import React, { useEffect, useState } from "react";
 
 import { Handle, Remove } from "./components";
 
-import { Button } from "@cloudscape-design/components";
+import { Button, Icon } from "@cloudscape-design/components";
 import styles from "./Item.module.scss";
 import type { TaskType } from "../../../../api/auto-generated-client";
 
 export interface Props {
+  toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
   startEditingTask: (task: TaskType) => void;
   task: TaskType;
@@ -49,6 +50,7 @@ export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        toggleTaskComplete,
         deleteTask,
         startEditingTask,
         task,
@@ -138,6 +140,25 @@ export const Item = React.memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
+            <button
+              onMouseEnter={() => setButtonHovered(true)}
+              onMouseLeave={() => setButtonHovered(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleTaskComplete(task.id.toString());
+              }}
+              className={classNames(styles.taskCheckbox)}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {task.completed ? (
+                  <img
+                    width="100%"
+                    height="100%"
+                    src="../../../../GreenCheckmark.png"
+                  ></img>
+                ) : null}
+              </div>
+            </button>
             <div className={classNames(styles.ItemText)}>{task.name}</div>
 
             {itemHovered ? (
@@ -149,7 +170,6 @@ export const Item = React.memo(
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log("Clicked edit in button!");
                     startEditingTask(task);
                   }}
                 >
@@ -160,11 +180,9 @@ export const Item = React.memo(
                     className={styles.Remove}
                     onClick={() => {
                       deleteTask(task.id.toString());
-                      console.log("clicked remove");
                     }}
                   />
                 }
-                {/* {handle ? <Handle {...handleProps} {...listeners} /> : null} */}
               </span>
             ) : null}
           </div>

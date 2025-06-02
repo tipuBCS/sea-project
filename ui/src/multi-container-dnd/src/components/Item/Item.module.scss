@@ -135,6 +135,7 @@ $focused-outline-color: #4c9ffe;
 }
 
 .ItemText {
+  padding-left: 5px;
   // background-color: green;
   overflow:hidden;
   word-wrap: break-word; // Forces long words to break
@@ -157,3 +158,35 @@ $focused-outline-color: #4c9ffe;
   flex-direction: row;
   right: 10px;
 }
+
+
+.taskCheckbox {
+  min-width: 24px;
+  max-width: 24px;
+  min-height: 24px;
+  max-height: 24px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  font-size: 16px;
+  padding: 1;
+}
+
+.taskCheckbox:hover {
+  border-color: #888;
+}
+
+.taskCheckbox:active {
+  transform: scale(0.95);
+}
+
+/* When task is completed */
+.taskCheckbox[aria-checked="true"] {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+
+    

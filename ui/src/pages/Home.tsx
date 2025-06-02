@@ -215,6 +215,30 @@ function Test() {
     });
   }
 
+  function toggleTaskComplete(taskId: string) {
+    setTasksChanged(true)
+    setTasks((prevItems) => {
+      // Find which container has this item
+      const containerId = Object.keys(prevItems).find((containerId) =>
+        prevItems[containerId].some((item) => item.id === taskId)
+      );
+
+      if (!containerId) {
+        return prevItems; // Item not found in any container
+      }
+
+      // Update the item in the found container
+      return {
+        ...prevItems,
+        [containerId]: prevItems[containerId].map((task) =>
+          task.id === taskId ? { ...task, completed: !task.completed } : task
+        ),
+      };
+    });
+    console.log(tasks);
+    console.log("Toggling");
+  }
+
   return (
     <AppLayout
       navigation={
@@ -295,6 +319,7 @@ function Test() {
         >
           <div className="App">
             <MultipleContainers
+              toggleTaskComplete={toggleTaskComplete}
               deleteTask={deleteTask}
               setTasksChanged={setTasksChanged}
               createTask={createTask}
