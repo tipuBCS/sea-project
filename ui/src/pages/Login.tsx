@@ -35,7 +35,7 @@ function Login() {
       if (response.isValid) {
         navigate("/home");
       } else {
-        setErrorMessage("Incorrect Username or passsord!");
+        setErrorMessage("Incorrect Username or password!");
       }
     } catch (error) {
       console.log("error occured during login: ", error);
@@ -45,7 +45,7 @@ function Login() {
   }
 
   return (
-    <FullPageCenteredBoxLayout>
+    <FullPageCenteredBoxLayout width={400} height={400}>
       <Container
         header={
           <Header

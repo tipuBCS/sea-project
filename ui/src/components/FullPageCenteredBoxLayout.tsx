@@ -2,8 +2,12 @@ import type { JSX } from "react";
 
 export const FullPageCenteredBoxLayout = ({
   children,
+  width,
+  height,
 }: {
   children: JSX.Element | JSX.Element[];
+  width: number;
+  height?: number;
 }) => (
   <div
     style={{
@@ -16,8 +20,7 @@ export const FullPageCenteredBoxLayout = ({
   >
     <div
       style={{
-        width: 400,
-        height: 400,
+        width: width,
       }}
     >
       {children}

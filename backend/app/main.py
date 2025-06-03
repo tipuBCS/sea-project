@@ -264,7 +264,7 @@ async def register(request: RegisterRequest):
         userId = str(uuid.uuid4())
         user = UserModel(f"USER#{userId}")
         user.userId = userId
-        user.username = request.username
+        user.username = request.username.lower()
         user.password = request.password
         user.save()
         return RegisterResponse(success=True)
@@ -277,7 +277,7 @@ async def login(request: LoginRequest):
     print("Received Login Request ..")
     print(request)
     try:
-        for user in UserModel.user_index.query(request.username, limit=1):
+        for user in UserModel.user_index.query(request.username.lower(), limit=1):
             print(user)
             if user.password == request.password:
                 return LoginResponse(isValid=True)

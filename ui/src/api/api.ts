@@ -82,5 +82,5 @@ export async function deleteTaskAPI(userId: string, taskId: string) {
 }
 
 export async function registerAPI(username: string, password: string) {
-  await apiClient.default.registerApiRegisterPost({ username, password });
+  return await apiClient.default.registerApiRegisterPost({ username, password });
 }
