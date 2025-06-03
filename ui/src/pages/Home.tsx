@@ -139,6 +139,9 @@ function Test() {
         ),
       };
     });
+    if (editTaskId === deleteTaskId) {
+      setSplitPanelOpen(false);
+    }
   }
 
   useEffect(() => {
@@ -213,6 +216,7 @@ function Test() {
 
       return { ...tasks, [category]: [...taskInCategory, newTask] };
     });
+    setEditTaskId(newId);
   }
 
   function toggleTaskComplete(taskId: string) {
