@@ -21,7 +21,7 @@ $focused-outline-color: #4c9ffe;
       background-color: var(--action-background, rgba(0, 0, 0, 0.05));
 
       svg {
-        fill: #6f7b88;
+        fill: #ff1b1b;
       }
     }
   }
@@ -31,14 +31,14 @@ $focused-outline-color: #4c9ffe;
     margin: auto;
     height: 100%;
     overflow: visible;
-    fill: #919eab;
+    fill: #ff1b1b;
   }
 
   &:active {
-    background-color: var(--background, rgba(0, 0, 0, 0.05));
+    background-color: var(--background, rgba(53, 196, 37, 0.05));
 
     svg {
-      fill: var(--fill, #788491);
+      fill: var(--fill, #ce2525);
     }
   }
 

@@ -7,7 +7,7 @@ export function Remove(props: ActionProps) {
     <Action
       {...props}
       active={{
-        fill: 'rgba(255, 70, 70, 0.95)',
+        fill: 'rgba(94, 14, 14, 0.95)',
         background: 'rgba(255, 70, 70, 0.1)',
       }}
     >
