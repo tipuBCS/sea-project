@@ -245,6 +245,7 @@ class LoginRequest(BaseModel):
 # Define the response model
 class LoginResponse(BaseModel):
     isValid: bool
+    userId: Union[str, None]
 
 
 class RegisterRequest(BaseModel):
@@ -280,10 +281,32 @@ async def login(request: LoginRequest):
         for user in UserModel.user_index.query(request.username.lower(), limit=1):
             print(user)
             if user.password == request.password:
-                return LoginResponse(isValid=True)
-        return LoginResponse(isValid=False)
+                return LoginResponse(isValid=True, userId=user.userId)
+        return LoginResponse(isValid=False, userId=None)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class User(BaseModel):
+    userId: str
+    username: str
+
+
+class GetUsersResponse(BaseModel):
+    users: List[User]
+
+
+@app.get("/api/users", response_model=GetUsersResponse)
+async def getUsers():
+    username_list = []
+    users = UserModel.scan(attributes_to_get=["username", "userId"])
+    print(users)
+    for user in users:
+        print(user)
+        username_list.append({"userId": user.userId, "username": user.username})
+        print(username_list)
+    print("returning the users")
+    return {"users": username_list}
 
 
 # Handler for AWS Lambda

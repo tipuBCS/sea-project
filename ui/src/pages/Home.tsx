@@ -10,6 +10,7 @@ import {
   Input,
   Link,
   SideNavigation,
+  SideNavigationProps,
   SpaceBetween,
   SplitPanel,
   Textarea,
@@ -21,12 +22,20 @@ import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import { createTaskAPI, deleteTaskAPI, getTasks, updateTask } from "../api/api";
+import {
+  createTaskAPI,
+  deleteTaskAPI,
+  getAllUsers,
+  getTasks,
+  updateTask,
+} from "../api/api";
 import type {
   ContainerCollection,
   TaskType,
 } from "../api/auto-generated-client";
 import { debounce } from "lodash";
+import { useNavigate, useParams } from "react-router-dom";
+import { assert } from "console";
 
 export type ContainerType = {
   id: UniqueIdentifier;
@@ -35,7 +44,15 @@ export type ContainerType = {
 
 const USERID = "1";
 
-function Test() {
+function Home() {
+  const navigate = useNavigate();
+  const params = useParams<{ userId: string }>();
+  const userId = params.userId as string;
+
+  if (!userId) {
+    navigate("/login");
+    return null;
+  }
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: "Uncategorised", name: "Uncategorised" },
     { id: "Backlog", name: "Backlog" },
@@ -46,6 +63,7 @@ function Test() {
 
   const [tasks, setTasks] = useState<ContainerCollection>({});
   const [tasksChanged, setTasksChanged] = useState(false);
+  const [users, setUsers] = useState<string[]>();
 
   function toggleSplitPanel() {
     setSplitPanelOpen((enable) => !enable);
@@ -56,23 +74,28 @@ function Test() {
 
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
+  const [sideNavItems, setSideNavItems] = useState<
+    ReadonlyArray<SideNavigationProps.Link>
+  >([]);
+
   // Create a debounced function to update the backend
   const updateBackend = debounce(async (currentTasks: ContainerCollection) => {
     try {
       console.log("Updating tasks");
-      await Object.keys(currentTasks).forEach(async (containerId) => {
-        await currentTasks[containerId].forEach(async (task, index) => {
-          await updateTask(
-            task.id,
-            USERID,
-            index,
-            task.name,
-            task.description,
-            task.completed,
-            task.assignedTo,
-            containerId
-          );
-        });
+      Object.keys(currentTasks).forEach(async (containerId) => {
+        currentTasks[containerId].forEach(
+          async (task, index) =>
+            await updateTask(
+              task.id,
+              userId,
+              index,
+              task.name,
+              task.description,
+              task.completed,
+              task.assignedTo,
+              containerId
+            )
+        );
       });
       setTasksChanged(false);
     } catch (error) {
@@ -119,7 +142,7 @@ function Test() {
   function deleteTask(deleteTaskId: string) {
     console.log(`RUnning delete task on id: ${deleteTaskId}`);
     setTasksChanged(true);
-    deleteTaskAPI(USERID, deleteTaskId);
+    deleteTaskAPI(userId, deleteTaskId);
 
     setTasks((prevItems) => {
       // Find which container has this item
@@ -148,7 +171,7 @@ function Test() {
     const fetchTaskData = async () => {
       try {
         console.log("Fetching task ..");
-        const tasks = await getTasks(USERID);
+        const tasks = await getTasks(userId);
         const sortedTasks = sortContainerCollection(tasks);
         setTasks(sortedTasks);
       } catch (error) {
@@ -159,6 +182,29 @@ function Test() {
       }
     };
     fetchTaskData();
+
+    const fetchUserData = async () => {
+      try {
+        const response = await getAllUsers();
+        if (response.users) {
+          // setUsers(response.users);
+          const sideNavItems: SideNavigationProps.Link[] = response.users.map(
+            (user) => {
+              return {
+                type: "link",
+                text: `${user.username}`,
+                href: `${user.userId}`,
+              };
+            }
+          );
+
+          setSideNavItems(sideNavItems);
+        }
+      } catch (error) {
+        console.log("Error occurred trying to fetch all users");
+      }
+    };
+    fetchUserData();
   }, []);
 
   function onChangeTask(updates: Partial<TaskType>) {
@@ -201,7 +247,7 @@ function Test() {
   function createTask(category: string) {
     console.log(`Creating task in category: ${category}`);
     const newId = crypto.randomUUID();
-    createTaskAPI(USERID, newId, category);
+    createTaskAPI(userId, newId, category);
     setTasks((tasks) => {
       const newTask: TaskType = {
         id: newId,
@@ -247,14 +293,17 @@ function Test() {
     <AppLayout
       navigation={
         <SideNavigation
+          activeHref={userId}
           header={{
             href: "#",
             text: "Kanban Board",
           }}
           items={[
-            { type: "link", text: "Board 1", href: "#1" },
-            { type: "link", text: "Board 2", href: "#2" },
-            { type: "link", text: "Board 3", href: "#3" },
+            {
+              type: "section-group",
+              title: "User Boards",
+              items: [...sideNavItems],
+            },
           ]}
         />
       }
@@ -351,4 +400,4 @@ function Test() {
   );
 }
 
-export default Test;
+export default Home;

@@ -33,12 +33,12 @@ function Login() {
     try {
       const response = await getLoginResponse(username, password);
       if (response.isValid) {
-        navigate("/home");
+        navigate(`/home/${response.userId}`);
       } else {
         setErrorMessage("Incorrect Username or password!");
       }
     } catch (error) {
-      console.log("error occured during login: ", error);
+      console.log("error occurred during login: ", error);
     }
 
     setIsLoading(false);

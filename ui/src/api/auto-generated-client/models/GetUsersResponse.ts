@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type LoginResponse = {
-    isValid: boolean;
-    userId?: string;
+import type { User } from './User';
+export type GetUsersResponse = {
+    users: Array<User>;
 };
 

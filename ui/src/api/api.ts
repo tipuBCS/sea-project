@@ -11,7 +11,7 @@ type Config = {
 };
 
 const API_URL = await axios
-  .get("config.json")
+  .get("../config.json")
   .then(async (response) => {
     const data: Config = response.data;
     return data.ApiUrl;
@@ -52,7 +52,7 @@ export async function createTaskAPI(
 
 export async function getTasks(userId: string): Promise<ContainerCollection> {
   console.log("Running get tasks ..");
-  return await apiClient.default.getTasksApiTasksUserIdGet((userId = "1"));
+  return await apiClient.default.getTasksApiTasksUserIdGet(userId);
 }
 
 export async function updateTask(
@@ -82,5 +82,12 @@ export async function deleteTaskAPI(userId: string, taskId: string) {
 }
 
 export async function registerAPI(username: string, password: string) {
-  return await apiClient.default.registerApiRegisterPost({ username, password });
+  return await apiClient.default.registerApiRegisterPost({
+    username,
+    password,
+  });
+}
+
+export async function getAllUsers() {
+  return await apiClient.default.getUsersApiUsersGet();
 }
