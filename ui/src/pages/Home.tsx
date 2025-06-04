@@ -12,8 +12,6 @@ import {
   SplitPanel,
   Textarea,
   ToggleButton,
-  TopNavigation,
-  TopNavigationProps,
 } from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
@@ -22,28 +20,26 @@ import "../helper/mainContainer.css";
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { debounce } from "lodash";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  createTaskAPI,
-  deleteTaskAPI,
-  getAllUsers,
-  getTasks,
-  getUser,
-  updateTask,
-} from "../api/api";
+import { getAllUsers, getTasks, getUser, updateTask } from "../api/api";
 import type {
   ContainerCollection,
   GetUserResponse,
   TaskType,
 } from "../api/auto-generated-client";
+import TopNav from "../components/TopNav";
 import "../helper/home.css";
 import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
+import useTaskManagement from "../hooks/useTaskManagement";
+import SideNav from "../components/SideNav";
+import TaskEditor from "../components/TaskEditor";
+import BoardContent from "../components/BoardContent";
 
 export type ContainerType = {
   id: UniqueIdentifier;
   name: string;
 };
 
-enum Mode {
+export enum Mode {
   Light = "light",
   Dark = "dark",
 }
@@ -52,6 +48,23 @@ function Home() {
   const navigate = useNavigate();
   const params = useParams<{ userId: string }>();
   const userIdBoard = params.userId as string;
+
+  const [splitPanelOpen, setSplitPanelOpen] = useState(false);
+
+  const {
+    tasks,
+    setTasks,
+    editTaskId,
+    containers,
+    setContainers,
+    onChangeTask,
+    deleteTask,
+    createTask,
+    toggleTaskComplete,
+    setTasksChanged,
+    tasksChanged,
+    setEditTaskId,
+  } = useTaskManagement({ userIdBoard, setSplitPanelOpen });
 
   const [boardUsername, setBoardUsername] = useState("undefined");
 
@@ -143,30 +156,15 @@ function Home() {
     getAndSetBoardUsername();
   }, [userId]);
 
-  const [containers, setContainers] = useState<ContainerType[]>([
-    { id: "Uncategorised", name: "Uncategorised" },
-    { id: "Backlog", name: "Backlog" },
-    { id: "PrioritizedBacklog", name: "Prioritized Backlog" },
-    { id: "Doing", name: "Doing" },
-    { id: "Done", name: "Done" },
-  ]);
-
-  const [tasks, setTasks] = useState<ContainerCollection>({});
-  const [tasksChanged, setTasksChanged] = useState(false);
-
   function toggleSplitPanel() {
     setSplitPanelOpen((enable) => !enable);
   }
   const [error, setError] = useState<string | null>(null);
 
-  const [editTaskId, setEditTaskId] = useState<UniqueIdentifier>();
-
-  const [splitPanelOpen, setSplitPanelOpen] = useState(false);
-
   const [mode, setMode] = useState<Mode>(Mode.Light);
 
   const [sideNavItems, setSideNavItems] = useState<
-    ReadonlyArray<SideNavigationProps.Link>
+    Array<SideNavigationProps.Link>
   >([]);
 
   // Create a debounced function to update the backend
@@ -230,34 +228,6 @@ function Home() {
     return sortedCollection;
   };
 
-  function deleteTask(deleteTaskId: string) {
-    console.log(`Running delete task on id: ${deleteTaskId}`);
-    setTasksChanged(true);
-    deleteTaskAPI(deleteTaskId);
-
-    setTasks((prevItems) => {
-      // Find which container has this item
-      const containerId = Object.keys(prevItems).find((containerId) =>
-        prevItems[containerId].some((item) => item.id === deleteTaskId)
-      );
-
-      if (!containerId) {
-        return prevItems; // Item not found in any container
-      }
-
-      // Update the item in the found container
-      return {
-        ...prevItems,
-        [containerId]: prevItems[containerId].filter(
-          (item) => item.id !== deleteTaskId
-        ),
-      };
-    });
-    if (editTaskId === deleteTaskId) {
-      setSplitPanelOpen(false);
-    }
-  }
-
   function logout() {
     localStorage.setItem("userId", "");
     localStorage.setItem("username", "");
@@ -265,23 +235,6 @@ function Home() {
     localStorage.setItem("role", "");
     navigate("/login");
   }
-
-  const topMenu = (
-    username: string
-  ): TopNavigationProps.MenuDropdownUtility => {
-    return {
-      type: "menu-dropdown",
-      text: username,
-      items: [{ id: "logout", text: "Sign out" }],
-
-      onItemClick: (event) => {
-        event.preventDefault();
-        if (event.detail.id === "logout") {
-          logout();
-        }
-      },
-    };
-  };
 
   useEffect(() => {
     const fetchTaskData = async () => {
@@ -300,31 +253,6 @@ function Home() {
     fetchTaskData();
   }, []);
 
-  function onChangeTask(updates: Partial<TaskType>) {
-    if (!editTaskId) {
-      return;
-    }
-    setTasksChanged(true);
-    setTasks((prevItems) => {
-      // Find which container has this item
-      const containerId = Object.keys(prevItems).find((containerId) =>
-        prevItems[containerId].some((item) => item.id === editTaskId)
-      );
-
-      if (!containerId) {
-        return prevItems; // Item not found in any container
-      }
-
-      // Update the item in the found container
-      return {
-        ...prevItems,
-        [containerId]: prevItems[containerId].map((item) =>
-          item.id === editTaskId ? { ...item, ...updates } : item
-        ),
-      };
-    });
-  }
-
   function getTaskFromId(id: UniqueIdentifier): TaskType | undefined {
     // Find which container has this item
     const containerId = Object.keys(tasks).find((containerId) =>
@@ -337,87 +265,25 @@ function Home() {
     return tasks[containerId].find((task) => task.id === id);
   }
 
-  function createTask(category: string) {
-    console.log(`Creating task in category: ${category}`);
-    const newId = crypto.randomUUID();
-    createTaskAPI(newId, category, userIdBoard);
-    setTasks((tasks) => {
-      const newTask: TaskType = {
-        id: newId,
-        name: "",
-        description: "",
-        completed: false,
-        createdAt: "",
-        position: 1000,
-      };
-
-      const taskInCategory = tasks[category] ?? [];
-
-      return { ...tasks, [category]: [...taskInCategory, newTask] };
-    });
-    setEditTaskId(newId);
-  }
-
-  function toggleTaskComplete(taskId: string) {
-    setTasksChanged(true);
-    setTasks((prevItems) => {
-      // Find which container has this item
-      const containerId = Object.keys(prevItems).find((containerId) =>
-        prevItems[containerId].some((item) => item.id === taskId)
-      );
-
-      if (!containerId) {
-        return prevItems; // Item not found in any container
-      }
-
-      // Update the item in the found container
-      return {
-        ...prevItems,
-        [containerId]: prevItems[containerId].map((task) =>
-          task.id === taskId ? { ...task, completed: !task.completed } : task
-        ),
-      };
-    });
-  }
-
   function canEditBoard(): boolean {
     return role?.toLowerCase() === "admin" || userIdBoard === userId;
   }
 
   return (
     <>
-      <TopNavigation
-        data-color="red"
-        identity={{ title: "Kanban Board", href: "" }}
-        utilities={[
-          {
-            type: "button",
-            text: mode === Mode.Light ? "Dark" : "Light",
-            onClick: () =>
-              setMode(mode === Mode.Light ? Mode.Dark : Mode.Light),
-          },
-          {
-            type: "button",
-            text: `Role: ${role}`,
-          },
-          topMenu(displayName || "undefined"),
-        ]}
-      ></TopNavigation>
+      <TopNav
+        displayName={displayName}
+        mode={mode}
+        setMode={setMode}
+        role={role}
+        logout={logout}
+      />
       <AppLayout
         navigation={
-          <SideNavigation
-            activeHref={userIdBoard}
-            header={{
-              href: userId || "undefined",
-              text: "Your Board",
-            }}
-            items={[
-              {
-                type: "section-group",
-                title: "Other Boards",
-                items: [...sideNavItems],
-              },
-            ]}
+          <SideNav
+            userId={userId}
+            userIdBoard={userIdBoard}
+            sideNavItems={sideNavItems}
           />
         }
         splitPanelOpen={splitPanelOpen}
@@ -426,87 +292,29 @@ function Home() {
         }}
         splitPanel={
           editTaskId ? (
-            <SplitPanel header={"Edit Task"}>
-              <ColumnLayout columns={4}>
-                <Form>
-                  <SpaceBetween size="l">
-                    <FormField
-                      description="Enter your task heading"
-                      label="Task Heading"
-                    >
-                      <Input
-                        disabled={!canEditBoard()}
-                        onChange={({ detail }) => {
-                          onChangeTask({ name: detail.value });
-                        }}
-                        value={getTaskFromId(editTaskId)?.name ?? ""}
-                      />
-                    </FormField>
-                    <FormField
-                      description="Enter your task description"
-                      label="Task Description"
-                    >
-                      <Textarea
-                        disabled={!canEditBoard()}
-                        onChange={({ detail }) =>
-                          onChangeTask({ description: detail.value })
-                        }
-                        value={getTaskFromId(editTaskId)?.description ?? ""}
-                      />
-                    </FormField>
-                    <ToggleButton
-                      disabled={!canEditBoard()}
-                      onChange={() => {
-                        editTaskId
-                          ? toggleTaskComplete(editTaskId.toString())
-                          : null;
-                      }}
-                      pressed={getTaskFromId(editTaskId)?.completed ?? false}
-                    >
-                      Mark as{" "}
-                      {getTaskFromId(editTaskId)?.completed
-                        ? "Incomplete"
-                        : "Complete"}
-                    </ToggleButton>
-                  </SpaceBetween>
-                </Form>
-              </ColumnLayout>
-            </SplitPanel>
+            <TaskEditor
+              canEditBoard={canEditBoard}
+              onChangeTask={onChangeTask}
+              getTaskFromId={getTaskFromId}
+              editTaskId={editTaskId}
+              toggleTaskComplete={toggleTaskComplete}
+            />
           ) : undefined
         }
         content={
-          <ContentLayout
-            defaultPadding
-            headerVariant="high-contrast"
-            headerBackgroundStyle="linear-gradient(135deg, rgb(255, 99, 71) 3%, rgb(255, 140, 0) 44%, rgb(255, 69, 0) 69%, rgb(255, 20, 147) 94%)"
-            header={
-              <Header
-                variant="h2"
-                description="Use this board keep track of your work."
-              >
-                {boardUsername} Board{" "}
-                {canEditBoard() ? "(Editable)" : "(Viewable)"}
-              </Header>
-            }
-          >
-            <div className="App">
-              <MultipleContainers
-                canEditBoard={canEditBoard}
-                toggleTaskComplete={toggleTaskComplete}
-                deleteTask={deleteTask}
-                setTasksChanged={setTasksChanged}
-                createTask={createTask}
-                containers={containers}
-                setContainers={setContainers}
-                tasks={tasks}
-                setTasks={setTasks}
-                itemCount={5}
-                strategy={rectSortingStrategy}
-                vertical={false}
-                startEditingTask={startEditingTask}
-              />
-            </div>
-          </ContentLayout>
+          <BoardContent
+            boardUsername={boardUsername}
+            canEditBoard={canEditBoard}
+            toggleTaskComplete={toggleTaskComplete}
+            deleteTask={deleteTask}
+            setTasksChanged={setTasksChanged}
+            createTask={createTask}
+            containers={containers}
+            setContainers={setContainers}
+            tasks={tasks}
+            setTasks={setTasks}
+            startEditingTask={startEditingTask}
+          />
         }
       />
     </>
