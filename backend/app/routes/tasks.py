@@ -99,6 +99,21 @@ async def doesUserHavePermissionToTask(username, password, taskId) -> bool:
     return False
 
 
+async def canUserCreateTaskInBoard(username, password, boardUserId) -> bool:
+    if not users.isLoginValid(username, password):
+        return False
+
+    # Check if they are admin
+    user = await users.getUserByUsername(username)
+    if user.role.lower() == users.Roles.ADMIN.value.lower():
+        return True
+
+    # Check if they own the board
+    if user.userId == boardUserId:
+        return True
+    return False
+
+
 # ========== CREATE TASK ==========
 # ========== CREATE TASK ==========
 # ========== CREATE TASK ==========
@@ -108,6 +123,7 @@ class CreateTaskRequest(BaseModel):
     username: str
     password: str
     taskId: str
+    boardUserId: str
     category: str
 
 
@@ -128,8 +144,11 @@ def createTask(userId: str, taskId: str, category: str):
 async def create_task(request: CreateTaskRequest):
     print("Received Create task request!")
     try:
-        user = await users.getUserByUsername(request.username)
-        createTask(user.userId, request.taskId, request.category)
+        if not canUserCreateTaskInBoard(
+            request.username, request.password, request.boardUserId
+        ):
+            return CreateTaskResponse(success=False)
+        createTask(request.boardUserId, request.taskId, request.category)
         return CreateTaskResponse(success=True)
     except:
         return CreateTaskResponse(success=False)

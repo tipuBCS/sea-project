@@ -55,7 +55,7 @@ function Home() {
 
   const [boardUsername, setBoardUsername] = useState("undefined");
 
-  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [displayName, setDisplayName] = useState<string | undefined>(undefined);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [role, setRole] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -65,7 +65,6 @@ function Home() {
     if (!localUserId || !localUsername || !localRole) {
       navigate("/login");
     }
-    setUsername(localUsername!);
     setUserId(localUserId!);
     setRole(localRole!);
 
@@ -80,7 +79,7 @@ function Home() {
             (boardUser) => {
               return {
                 type: "link",
-                text: `${boardUser.username}`,
+                text: `${boardUser.displayName}`,
                 href: boardUser.userId,
               };
             }
@@ -102,6 +101,17 @@ function Home() {
     };
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    const setUserDisplayName = async () => {
+      if (!userId) {
+        return;
+      }
+      const user = await getUser(userId);
+      setDisplayName(user.displayName);
+    };
+    setUserDisplayName();
+  }, [userId]);
 
   useEffect(() => {
     const getBoardUser = async (): Promise<GetUserResponse> => {
@@ -330,7 +340,7 @@ function Home() {
   function createTask(category: string) {
     console.log(`Creating task in category: ${category}`);
     const newId = crypto.randomUUID();
-    createTaskAPI(newId, category);
+    createTaskAPI(newId, category, userIdBoard);
     setTasks((tasks) => {
       const newTask: TaskType = {
         id: newId,
@@ -390,7 +400,7 @@ function Home() {
             type: "button",
             text: `Role: ${role}`,
           },
-          topMenu(username || "undefined"),
+          topMenu(displayName || "undefined"),
         ]}
       ></TopNavigation>
       <AppLayout

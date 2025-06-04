@@ -44,11 +44,12 @@ export async function getLoginResponse(
   return response;
 }
 
-export async function createTaskAPI(taskId: string, category: string) {
+export async function createTaskAPI(taskId: string, boardUserId: string, category: string) {
   const { username, password } = getLoginCredentials();
   return await apiClient.tasks.createTaskTasksApiTasksPost({
     username,
     password,
+    boardUserId,
     taskId,
     category,
   });

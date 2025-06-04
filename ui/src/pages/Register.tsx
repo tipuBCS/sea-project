@@ -118,10 +118,11 @@ function Register() {
     setPasswordErrorMessage(passwordErrors[0]);
     setPassword2ErrorMessage(password2Errors[0]);
     if (
-      usernameErrors.length > 1 ||
-      passwordErrors.length > 1 ||
-      password2Errors.length > 1
+      usernameErrors.length > 0 ||
+      passwordErrors.length > 0 ||
+      password2Errors.length > 0
     ) {
+      console.log("There was atleast one error");
       return;
     }
 
@@ -129,7 +130,7 @@ function Register() {
     try {
       const response = await registerAPI(username, password, role);
       if (response.success) {
-        navigate("/home");
+        navigate("/login");
       } else {
         setErrorMessage("Server error occurred, please try again!");
       }
@@ -252,9 +253,15 @@ function Register() {
                     {
                       value: "User",
                       label: "Standard User",
-                      description: "Create and edit your own boards, and view boards shared by others",
+                      description:
+                        "Create and edit your own boards, and view boards shared by others",
                     },
-                    { value: "Admin", label: "Administrator", description: "Full access: Create, edit, and manage all boards, plus user management capabilities." },
+                    {
+                      value: "Admin",
+                      label: "Administrator",
+                      description:
+                        "Full access: Create, edit, and manage all boards, plus user management capabilities.",
+                    },
                   ]}
                   onChange={({ detail }) => {
                     console.log(detail);

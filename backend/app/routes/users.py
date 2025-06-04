@@ -43,6 +43,7 @@ class UserModel(Model):
     pk = UnicodeAttribute(hash_key=True)
     userId = UnicodeAttribute(null=False)
     username = UnicodeAttribute(null=False)
+    displayName = UnicodeAttribute(null=False)
     password = UnicodeAttribute(null=False)
     role = UnicodeAttribute(default=Roles.USER.value)
 
@@ -124,6 +125,7 @@ async def register(request: RegisterRequest):
         user = UserModel(f"USER#{userId}")
         user.userId = userId
         user.username = request.username.lower()
+        user.displayName = request.username
         user.password = request.password
         user.role = request.role
         user.save()
@@ -192,6 +194,7 @@ async def login(request: LoginRequest):
 class User(BaseModel):
     userId: str
     username: str
+    displayName: str
 
 
 class GetUsersResponse(BaseModel):
@@ -202,12 +205,18 @@ class GetUsersResponse(BaseModel):
 async def getUsers():
     username_list = []
     users: ResultIterator[UserModel] = UserModel.scan(
-        attributes_to_get=["username", "userId"]
+        attributes_to_get=["username", "userId", "displayName"]
     )
     print(users)
     for user in users:
         print(user)
-        username_list.append({"userId": user.userId, "username": user.username})
+        username_list.append(
+            {
+                "userId": user.userId,
+                "username": user.username,
+                "displayName": user.displayName,
+            }
+        )
         print(username_list)
     print("returning the users")
     return {"users": username_list}
@@ -226,7 +235,7 @@ class GetUserResponse(BaseModel):
 async def getUser(userId: str):
     try:
         user = UserModel.get(hash_key=f"USER#{userId}")
-        return {"displayName": user.username}
+        return {"displayName": user.displayName}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

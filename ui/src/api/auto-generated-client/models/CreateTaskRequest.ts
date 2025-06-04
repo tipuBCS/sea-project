@@ -6,6 +6,7 @@ export type CreateTaskRequest = {
     username: string;
     password: string;
     taskId: string;
+    boardUserId: string;
     category: string;
 };
 
