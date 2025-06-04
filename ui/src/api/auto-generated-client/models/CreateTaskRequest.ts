@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type CreateTaskRequest = {
+    username: string;
+    password: string;
     taskId: string;
-    userId: string;
     category: string;
 };
 

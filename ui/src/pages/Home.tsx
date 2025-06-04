@@ -1,14 +1,11 @@
 import {
   AppLayout,
-  Button,
   ColumnLayout,
-  Container,
   ContentLayout,
   Form,
   FormField,
   Header,
   Input,
-  Link,
   SideNavigation,
   SideNavigationProps,
   SpaceBetween,
@@ -23,7 +20,8 @@ import { useEffect, useState } from "react";
 import "../helper/mainContainer.css";
 
 import { rectSortingStrategy } from "@dnd-kit/sortable";
-import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
+import { debounce } from "lodash";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   createTaskAPI,
   deleteTaskAPI,
@@ -37,9 +35,8 @@ import type {
   GetUserResponse,
   TaskType,
 } from "../api/auto-generated-client";
-import { debounce } from "lodash";
-import { useNavigate, useParams } from "react-router-dom";
-import "../helper/home.css"
+import "../helper/home.css";
+import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
 
 export type ContainerType = {
   id: UniqueIdentifier;
@@ -167,15 +164,11 @@ function Home() {
     try {
       console.log("Updating tasks");
 
-      const username = localStorage.getItem("username");
-      const password = localStorage.getItem("password");
       Object.keys(currentTasks).forEach(async (containerId) => {
         currentTasks[containerId].forEach(
           async (task, index) =>
             await updateTask(
               task.id,
-              username!,
-              password!,
               index,
               task.name,
               task.description,
@@ -228,9 +221,9 @@ function Home() {
   };
 
   function deleteTask(deleteTaskId: string) {
-    console.log(`RUnning delete task on id: ${deleteTaskId}`);
+    console.log(`Running delete task on id: ${deleteTaskId}`);
     setTasksChanged(true);
-    deleteTaskAPI(userIdBoard, deleteTaskId);
+    deleteTaskAPI(deleteTaskId);
 
     setTasks((prevItems) => {
       // Find which container has this item
@@ -337,7 +330,7 @@ function Home() {
   function createTask(category: string) {
     console.log(`Creating task in category: ${category}`);
     const newId = crypto.randomUUID();
-    createTaskAPI(userIdBoard, newId, category);
+    createTaskAPI(newId, category);
     setTasks((tasks) => {
       const newTask: TaskType = {
         id: newId,

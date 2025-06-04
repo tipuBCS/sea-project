@@ -28,4 +28,5 @@ export type { UpdateTaskRequest } from './models/UpdateTaskRequest';
 export type { User } from './models/User';
 export type { ValidationError } from './models/ValidationError';
 
-export { DefaultService } from './services/DefaultService';
+export { TasksService } from './services/TasksService';
+export { UsersService } from './services/UsersService';

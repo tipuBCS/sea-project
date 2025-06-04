@@ -27,37 +27,39 @@ const openAPIConfig: Partial<OpenAPIConfig> = {
 
 const apiClient = await new MyApiClient(openAPIConfig);
 
+function getLoginCredentials(): { username: string; password: string } {
+  const username = localStorage.getItem("username") || "";
+  const password = localStorage.getItem("password") || "";
+  return { username, password };
+}
+
 export async function getLoginResponse(
   username: string,
   password: string
 ): Promise<LoginResponse> {
-  const response = await apiClient.default.loginApiLoginPost({
+  const response = await apiClient.users.loginUsersApiLoginPost({
     username,
     password,
   });
   return response;
 }
 
-export async function createTaskAPI(
-  userId: string,
-  taskId: string,
-  category: string
-) {
-  return await apiClient.default.createTaskApiTasksPost({
-    userId,
+export async function createTaskAPI(taskId: string, category: string) {
+  const { username, password } = getLoginCredentials();
+  return await apiClient.tasks.createTaskTasksApiTasksPost({
+    username,
+    password,
     taskId,
     category,
   });
 }
 
 export async function getTasks(userId: string): Promise<ContainerCollection> {
-  return await apiClient.default.getTasksApiTasksUserIdGet(userId);
+  return await apiClient.tasks.getTasksTasksApiTasksUserIdGet(userId);
 }
 
 export async function updateTask(
   taskId: string | number,
-  username: string,
-  password: string,
   position: number,
   name?: string,
   description?: string,
@@ -66,7 +68,8 @@ export async function updateTask(
   category?: string
 ) {
   console.log("Updating Task ..");
-  apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
+  const { username, password } = getLoginCredentials();
+  apiClient.tasks.updateTaskTasksApiTasksTaskIdPatch(taskId.toString(), {
     username,
     password,
     name,
@@ -78,21 +81,25 @@ export async function updateTask(
   });
 }
 
-export async function deleteTaskAPI(userId: string, taskId: string) {
-  apiClient.default.deleteTaskApiTasksTaskIdDelete(taskId, { userId });
+export async function deleteTaskAPI(taskId: string) {
+  const { username, password } = getLoginCredentials();
+  apiClient.tasks.deleteTaskTasksApiTasksTaskIdDelete(taskId, {
+    username,
+    password,
+  });
 }
 
 export async function registerAPI(username: string, password: string) {
-  return await apiClient.default.registerApiRegisterPost({
+  return await apiClient.users.registerUsersApiRegisterPost({
     username,
     password,
   });
 }
 
 export async function getAllUsers() {
-  return await apiClient.default.getUsersApiUsersGet();
+  return await apiClient.users.getUsersUsersApiUsersGet();
 }
 
 export async function getUser(userId: string) {
-  return await apiClient.default.getUserApiUserUserIdGet(userId);
+  return await apiClient.users.getUserUsersApiUserUserIdGet(userId);
 }

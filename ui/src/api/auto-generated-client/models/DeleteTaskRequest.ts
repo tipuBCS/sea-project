@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type DeleteTaskRequest = {
-    userId: string;
+    username: string;
+    password: string;
 };
 
