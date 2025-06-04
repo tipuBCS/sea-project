@@ -89,10 +89,11 @@ export async function deleteTaskAPI(taskId: string) {
   });
 }
 
-export async function registerAPI(username: string, password: string) {
+export async function registerAPI(username: string, password: string, role: string) {
   return await apiClient.users.registerUsersApiRegisterPost({
     username,
     password,
+    role
   });
 }
 

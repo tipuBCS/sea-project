@@ -371,7 +371,7 @@ function Home() {
   }
 
   function canEditBoard(): boolean {
-    return role === "ADMIN" || userIdBoard === userId;
+    return role?.toLowerCase() === "admin" || userIdBoard === userId;
   }
 
   return (

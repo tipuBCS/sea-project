@@ -64,6 +64,7 @@ async def isLoginValid(username, password):
             return True
     return False
 
+
 async def getUserByUsername(username) -> UserModel:
     users: ResultIterator[UserModel] = UserModel.user_index.query(
         hash_key=username, limit=1
@@ -75,6 +76,7 @@ async def getUserByUsername(username) -> UserModel:
         raise HTTPException(status_code=500, detail=str("User not found in database"))
     return user
 
+
 # ========== REGISTER DEFINITION ==========
 # ========== REGISTER DEFINITION ==========
 # ========== REGISTER DEFINITION ==========
@@ -83,10 +85,27 @@ async def getUserByUsername(username) -> UserModel:
 class RegisterRequest(BaseModel):
     username: str
     password: str
+    role: str
 
 
 class RegisterResponse(BaseModel):
     success: bool
+
+
+def isUsernameValid(username: str) -> bool:
+    return True
+
+
+def isPasswordValid(password: str) -> bool:
+    return True
+
+
+def isRoleValid(role: str) -> bool:
+    if role.upper() == Roles.ADMIN.value.upper():
+        return True
+    if role.upper() == Roles.USER.value.upper():
+        return True
+    return False
 
 
 @router.post("/api/register", response_model=RegisterResponse)
@@ -94,11 +113,19 @@ async def register(request: RegisterRequest):
     print("Received Register Request ..")
     print(request)
     try:
+        if not isUsernameValid(request.username):
+            raise Exception("Username was invalid")
+        if not isPasswordValid(request.password):
+            raise Exception("Password was invalid")
+        if not isRoleValid(request.role):
+            raise Exception("Role was invalid")
+
         userId = str(uuid.uuid4())
         user = UserModel(f"USER#{userId}")
         user.userId = userId
         user.username = request.username.lower()
         user.password = request.password
+        user.role = request.role
         user.save()
         return RegisterResponse(success=True)
     except Exception as e:
@@ -193,6 +220,7 @@ async def getUsers():
 
 class GetUserResponse(BaseModel):
     displayName: str
+
 
 @router.get("/api/user/{userId}", response_model=GetUserResponse)
 async def getUser(userId: str):

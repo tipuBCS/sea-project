@@ -81,7 +81,7 @@ async def doesUserHavePermissionToTask(username, password, taskId) -> bool:
     user = await users.getUserByUsername(username)
     # Check if user is an admin
 
-    if user.role == users.Roles.ADMIN.value:
+    if user.role.lower() == users.Roles.ADMIN.value.lower():
         print(f"YES - User is an admin")
         return True
 

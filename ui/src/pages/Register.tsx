@@ -8,6 +8,7 @@ import {
   Grid,
   Header,
   Input,
+  RadioGroup,
   SpaceBetween,
   Spinner,
 } from "@cloudscape-design/components";
@@ -23,6 +24,8 @@ function Register() {
   const [password2, setPassword2] = useState("");
   const [password2ErrorMessage, setPassword2ErrorMessage] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [role, setRole] = useState("User");
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
@@ -124,7 +127,7 @@ function Register() {
 
     setIsLoading(true);
     try {
-      const response = await registerAPI(username, password);
+      const response = await registerAPI(username, password, role);
       if (response.success) {
         navigate("/home");
       } else {
@@ -135,7 +138,7 @@ function Register() {
       setErrorMessage("Server error occurred, please try again!");
     }
 
-    // setIsLoading(false);
+    setIsLoading(false);
   }
 
   return (
@@ -240,6 +243,24 @@ function Register() {
                     ></img>
                   </button>
                 </Grid>
+              </FormField>
+
+              <FormField label="Role">
+                <RadioGroup
+                  value={role}
+                  items={[
+                    {
+                      value: "User",
+                      label: "Standard User",
+                      description: "Create and edit your own boards, and view boards shared by others",
+                    },
+                    { value: "Admin", label: "Administrator", description: "Full access: Create, edit, and manage all boards, plus user management capabilities." },
+                  ]}
+                  onChange={({ detail }) => {
+                    console.log(detail);
+                    setRole(detail.value);
+                  }}
+                ></RadioGroup>
               </FormField>
             </SpaceBetween>
           </Form>
