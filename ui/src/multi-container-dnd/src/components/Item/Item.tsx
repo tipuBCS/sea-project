@@ -10,6 +10,7 @@ import styles from "./Item.module.scss";
 import type { TaskType } from "../../../../api/auto-generated-client";
 
 export interface Props {
+  canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
   startEditingTask: (task: TaskType) => void;
@@ -50,6 +51,7 @@ export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        canEditBoard,
         toggleTaskComplete,
         deleteTask,
         startEditingTask,
@@ -136,7 +138,7 @@ export const Item = React.memo(
             )}
             style={style}
             data-cypress="draggable-item"
-            {...(!buttonHovered ? listeners : undefined)}
+            {...(canEditBoard() && !buttonHovered ? listeners : undefined)}
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
@@ -145,7 +147,9 @@ export const Item = React.memo(
               onMouseLeave={() => setButtonHovered(false)}
               onClick={(e) => {
                 e.stopPropagation();
-                toggleTaskComplete(task.id.toString());
+                if (canEditBoard()) {
+                  toggleTaskComplete(task.id.toString());
+                }
               }}
               className={classNames(styles.taskCheckbox)}
             >
@@ -173,13 +177,15 @@ export const Item = React.memo(
                     startEditingTask(task);
                   }}
                 >
-                  Edit
+                  {canEditBoard() ? "Edit" : "View"}
                 </Button>
                 {
                   <Remove
                     className={styles.Remove}
                     onClick={() => {
-                      deleteTask(task.id.toString());
+                      if (canEditBoard()) {
+                        deleteTask(task.id.toString());
+                      }
                     }}
                   />
                 }

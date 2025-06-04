@@ -6,6 +6,7 @@ import type { ContainerCollection } from '../models/ContainerCollection';
 import type { CreateTaskRequest } from '../models/CreateTaskRequest';
 import type { CreateTaskResponse } from '../models/CreateTaskResponse';
 import type { DeleteTaskRequest } from '../models/DeleteTaskRequest';
+import type { GetUserResponse } from '../models/GetUserResponse';
 import type { GetUsersResponse } from '../models/GetUsersResponse';
 import type { LoginRequest } from '../models/LoginRequest';
 import type { LoginResponse } from '../models/LoginResponse';
@@ -172,6 +173,26 @@ export class DefaultService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/users',
+        });
+    }
+    /**
+     * Getuser
+     * @param userId
+     * @returns GetUserResponse Successful Response
+     * @throws ApiError
+     */
+    public getUserApiUserUserIdGet(
+        userId: string,
+    ): CancelablePromise<GetUserResponse> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/user/{userId}',
+            path: {
+                'userId': userId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
         });
     }
 }

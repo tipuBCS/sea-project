@@ -31,7 +31,7 @@ function Register() {
     const errorList = [];
     // Check username entered
     if (username.length === 0) {
-      // setUsernameErrorMessage('USername cnat be empty', "")
+      // setUsernameErrorMessage('USername cant be empty', "")
       errorList.push("Username cannot be blank!");
     }
 

@@ -51,13 +51,13 @@ export async function createTaskAPI(
 }
 
 export async function getTasks(userId: string): Promise<ContainerCollection> {
-  console.log("Running get tasks ..");
   return await apiClient.default.getTasksApiTasksUserIdGet(userId);
 }
 
 export async function updateTask(
   taskId: string | number,
-  userId: string,
+  username: string,
+  password: string,
   position: number,
   name?: string,
   description?: string,
@@ -67,7 +67,8 @@ export async function updateTask(
 ) {
   console.log("Updating Task ..");
   apiClient.default.updateTaskApiTasksTaskIdPatch(taskId.toString(), {
-    userId: userId,
+    username,
+    password,
     name,
     description,
     completed,
@@ -90,4 +91,8 @@ export async function registerAPI(username: string, password: string) {
 
 export async function getAllUsers() {
   return await apiClient.default.getUsersApiUsersGet();
+}
+
+export async function getUser(userId: string) {
+  return await apiClient.default.getUserApiUserUserIdGet(userId);
 }

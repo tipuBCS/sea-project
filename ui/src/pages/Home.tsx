@@ -29,15 +29,17 @@ import {
   deleteTaskAPI,
   getAllUsers,
   getTasks,
+  getUser,
   updateTask,
 } from "../api/api";
 import type {
   ContainerCollection,
+  GetUserResponse,
   TaskType,
 } from "../api/auto-generated-client";
 import { debounce } from "lodash";
 import { useNavigate, useParams } from "react-router-dom";
-import { assert } from "console";
+import "../helper/home.css"
 
 export type ContainerType = {
   id: UniqueIdentifier;
@@ -49,34 +51,16 @@ enum Mode {
   Dark = "dark",
 }
 
-function logout() {
-  localStorage.setItem("userId", "");
-  localStorage.setItem("username", "");
-  localStorage.setItem("role", "");
-}
-
-const topMenu = (username: string): TopNavigationProps.MenuDropdownUtility => {
-  return {
-    type: "menu-dropdown",
-    text: username,
-    items: [{ id: "logout", text: "Sign out" }],
-
-    onItemClick: (event) => {
-      event.preventDefault();
-      if (event.detail.id === "logout") {
-        logout();
-      }
-    },
-  };
-};
-
 function Home() {
   const navigate = useNavigate();
   const params = useParams<{ userId: string }>();
   const userIdBoard = params.userId as string;
 
-  const [username, setUsername] = useState("undefined");
-  const [userId, setUserId] = useState("undefined");
+  const [boardUsername, setBoardUsername] = useState("undefined");
+
+  const [username, setUsername] = useState<string | undefined>(undefined);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [role, setRole] = useState<string | undefined>(undefined);
   useEffect(() => {
     const localUserId = localStorage.getItem("userId");
     const localUsername = localStorage.getItem("username");
@@ -86,15 +70,14 @@ function Home() {
     }
     setUsername(localUsername!);
     setUserId(localUserId!);
+    setRole(localRole!);
 
     if (!userIdBoard) {
       navigate("/login");
     }
-
     const fetchUserData = async () => {
       try {
         const response = await getAllUsers();
-        console.log(response);
         if (response.users) {
           const sideNavItems: SideNavigationProps.Link[] = response.users.map(
             (boardUser) => {
@@ -108,10 +91,7 @@ function Home() {
 
           // Filter out the current user's board
           const filteredSideNavItems = sideNavItems.filter((navItem) => {
-            console.log(navItem.href);
-            console.log(localUserId);
             if (navItem.href === localUserId) {
-              console.log("Filtering out the same href");
               return false;
             }
             return true;
@@ -126,6 +106,36 @@ function Home() {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    const getBoardUser = async (): Promise<GetUserResponse> => {
+      try {
+        const response = await getUser(userIdBoard);
+        return response;
+      } catch (error) {
+        console.error(`Error occurred fetching user: ${error}`);
+        throw error;
+      }
+    };
+
+    const getAndSetBoardUsername = async () => {
+      if (userId === undefined) {
+        return;
+      }
+      console.log(`board: ${userIdBoard}`);
+      console.log(`user: ${userId}`);
+      if (userIdBoard === userId) {
+        console.log("This is our board");
+        setBoardUsername("Your");
+      } else {
+        console.log("This is not our board!");
+        const user = await getBoardUser();
+        console.log("Setting board to display name");
+        setBoardUsername(`${user.displayName}'s`);
+      }
+    };
+    getAndSetBoardUsername();
+  }, [userId]);
+
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: "Uncategorised", name: "Uncategorised" },
     { id: "Backlog", name: "Backlog" },
@@ -136,7 +146,6 @@ function Home() {
 
   const [tasks, setTasks] = useState<ContainerCollection>({});
   const [tasksChanged, setTasksChanged] = useState(false);
-  const [users, setUsers] = useState<string[]>();
 
   function toggleSplitPanel() {
     setSplitPanelOpen((enable) => !enable);
@@ -157,12 +166,16 @@ function Home() {
   const updateBackend = debounce(async (currentTasks: ContainerCollection) => {
     try {
       console.log("Updating tasks");
+
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
       Object.keys(currentTasks).forEach(async (containerId) => {
         currentTasks[containerId].forEach(
           async (task, index) =>
             await updateTask(
               task.id,
-              userIdBoard,
+              username!,
+              password!,
               index,
               task.name,
               task.description,
@@ -241,6 +254,31 @@ function Home() {
       setSplitPanelOpen(false);
     }
   }
+
+  function logout() {
+    localStorage.setItem("userId", "");
+    localStorage.setItem("username", "");
+    localStorage.setItem("password", "");
+    localStorage.setItem("role", "");
+    navigate("/login");
+  }
+
+  const topMenu = (
+    username: string
+  ): TopNavigationProps.MenuDropdownUtility => {
+    return {
+      type: "menu-dropdown",
+      text: username,
+      items: [{ id: "logout", text: "Sign out" }],
+
+      onItemClick: (event) => {
+        event.preventDefault();
+        if (event.detail.id === "logout") {
+          logout();
+        }
+      },
+    };
+  };
 
   useEffect(() => {
     const fetchTaskData = async () => {
@@ -337,13 +375,16 @@ function Home() {
         ),
       };
     });
-    console.log(tasks);
-    console.log("Toggling");
+  }
+
+  function canEditBoard(): boolean {
+    return role === "ADMIN" || userIdBoard === userId;
   }
 
   return (
     <>
       <TopNavigation
+        data-color="red"
         identity={{ title: "Kanban Board", href: "" }}
         utilities={[
           {
@@ -352,7 +393,11 @@ function Home() {
             onClick: () =>
               setMode(mode === Mode.Light ? Mode.Dark : Mode.Light),
           },
-          topMenu(username),
+          {
+            type: "button",
+            text: `Role: ${role}`,
+          },
+          topMenu(username || "undefined"),
         ]}
       ></TopNavigation>
       <AppLayout
@@ -360,7 +405,7 @@ function Home() {
           <SideNavigation
             activeHref={userIdBoard}
             header={{
-              href: userId,
+              href: userId || "undefined",
               text: "Your Board",
             }}
             items={[
@@ -380,19 +425,14 @@ function Home() {
           editTaskId ? (
             <SplitPanel header={"Edit Task"}>
               <ColumnLayout columns={4}>
-                <Form
-                  actions={
-                    <SpaceBetween size="xs" direction="horizontal">
-                      <Button>Submit</Button>
-                    </SpaceBetween>
-                  }
-                >
+                <Form>
                   <SpaceBetween size="l">
                     <FormField
                       description="Enter your task heading"
                       label="Task Heading"
                     >
                       <Input
+                        disabled={!canEditBoard()}
                         onChange={({ detail }) => {
                           onChangeTask({ name: detail.value });
                         }}
@@ -404,6 +444,7 @@ function Home() {
                       label="Task Description"
                     >
                       <Textarea
+                        disabled={!canEditBoard()}
                         onChange={({ detail }) =>
                           onChangeTask({ description: detail.value })
                         }
@@ -411,6 +452,7 @@ function Home() {
                       />
                     </FormField>
                     <ToggleButton
+                      disabled={!canEditBoard()}
                       onChange={() => {
                         editTaskId
                           ? toggleTaskComplete(editTaskId.toString())
@@ -439,12 +481,14 @@ function Home() {
                 variant="h2"
                 description="Use this board keep track of your work."
               >
-                Kanban Board
+                {boardUsername} Board{" "}
+                {canEditBoard() ? "(Editable)" : "(Viewable)"}
               </Header>
             }
           >
             <div className="App">
               <MultipleContainers
+                canEditBoard={canEditBoard}
                 toggleTaskComplete={toggleTaskComplete}
                 deleteTask={deleteTask}
                 setTasksChanged={setTasksChanged}

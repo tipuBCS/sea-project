@@ -57,6 +57,7 @@ const animateLayoutChanges: AnimateLayoutChanges = (args) =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
 function DroppableContainer({
+  canEditBoard,
   createTask,
   children,
   columns = 1,
@@ -66,6 +67,7 @@ function DroppableContainer({
   style,
   ...props
 }: ContainerProps & {
+  canEditBoard: () => boolean;
   createTask: (category: string) => void;
   disabled?: boolean;
   id: UniqueIdentifier;
@@ -112,7 +114,11 @@ function DroppableContainer({
         <Button
           variant={"link"}
           fullWidth={false}
-          onClick={() => createTask(id.toString())}
+          onClick={() => {
+            if (canEditBoard()) {
+              createTask(id.toString());
+            }
+          }}
         >
           Add Task
         </Button>
@@ -132,6 +138,7 @@ const dropAnimation: DropAnimation = {
 };
 
 interface Props {
+  canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
   setTasksChanged: Dispatch<SetStateAction<boolean>>;
@@ -171,6 +178,7 @@ const PLACEHOLDER_ID = "placeholder";
 const empty: UniqueIdentifier[] = [];
 
 export function MultipleContainers({
+  canEditBoard,
   toggleTaskComplete,
   deleteTask,
   setTasksChanged,
@@ -534,6 +542,7 @@ export function MultipleContainers({
         >
           {containers.map((container) => (
             <DroppableContainer
+              canEditBoard={canEditBoard}
               createTask={createTask}
               key={container.id}
               id={container.id}
@@ -552,6 +561,7 @@ export function MultipleContainers({
                   tasks[container.id].map((task, index) => {
                     return (
                       <SortableItem
+                        canEditBoard={canEditBoard}
                         toggleTaskComplete={toggleTaskComplete}
                         deleteTask={deleteTask}
                         startEditingTask={startEditingTask}
@@ -594,6 +604,7 @@ export function MultipleContainers({
     if (!task) return;
     return (
       <Item
+        canEditBoard={canEditBoard}
         toggleTaskComplete={toggleTaskComplete}
         deleteTask={deleteTask}
         startEditingTask={startEditingTask}
@@ -629,6 +640,7 @@ export function MultipleContainers({
       >
         {tasks[containerId].map((task, index) => (
           <Item
+            canEditBoard={canEditBoard}
             toggleTaskComplete={toggleTaskComplete}
             deleteTask={deleteTask}
             startEditingTask={startEditingTask}
@@ -705,6 +717,7 @@ function Trash({ id }: { id: UniqueIdentifier }) {
 }
 
 interface SortableItemProps {
+  canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
   startEditingTask: (task: TaskType) => void;
@@ -720,6 +733,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({
+  canEditBoard,
   toggleTaskComplete,
   deleteTask,
   startEditingTask,
@@ -751,6 +765,7 @@ function SortableItem({
 
   return (
     <Item
+      canEditBoard={canEditBoard}
       toggleTaskComplete={toggleTaskComplete}
       deleteTask={deleteTask}
       startEditingTask={startEditingTask}

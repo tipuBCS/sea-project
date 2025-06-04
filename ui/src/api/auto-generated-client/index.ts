@@ -14,6 +14,7 @@ export type { ContainerCollection } from './models/ContainerCollection';
 export type { CreateTaskRequest } from './models/CreateTaskRequest';
 export type { CreateTaskResponse } from './models/CreateTaskResponse';
 export type { DeleteTaskRequest } from './models/DeleteTaskRequest';
+export type { GetUserResponse } from './models/GetUserResponse';
 export type { GetUsersResponse } from './models/GetUsersResponse';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { LoginFail } from './models/LoginFail';

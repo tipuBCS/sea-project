@@ -37,6 +37,7 @@ function Login() {
         const responseSuccess = response as LoginSuccess;
         localStorage.setItem("userId", responseSuccess.userId);
         localStorage.setItem("username", responseSuccess.username);
+        localStorage.setItem("password", password);
         localStorage.setItem("role", responseSuccess.role);
         navigate(`/home/${responseSuccess.userId}`);
       } else {

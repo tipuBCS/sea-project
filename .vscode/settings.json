@@ -1,5 +1,10 @@
 {
-  "cSpell.words": ["Uncategorised"],
+  "cSpell.words": [
+    "codegen",
+    "droppables",
+    "seaproject",
+    "Uncategorised"
+  ],
   "python.defaultInterpreterPath": "/Users/tipub/Desktop/workspace/university/Year2/SoftwareEngineeringAndAgile/sea-project/backend/.env/bin/python3.10",
   "python.analysis.autoImportCompletions": true
 }

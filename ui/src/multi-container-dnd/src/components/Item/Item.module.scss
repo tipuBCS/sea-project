@@ -145,6 +145,7 @@ $focused-outline-color: #4c9ffe;
   // Optional: limit to specific number of lines
   display: -webkit-box;
   -webkit-line-clamp: 3; // Shows only 3 lines
+  line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 

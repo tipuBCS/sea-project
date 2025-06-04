@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UpdateTaskRequest = {
-    userId: string;
+    username: string;
+    password: string;
     name?: string;
     description?: string;
     completed?: boolean;
