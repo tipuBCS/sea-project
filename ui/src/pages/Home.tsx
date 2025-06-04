@@ -15,6 +15,8 @@ import {
   SplitPanel,
   Textarea,
   ToggleButton,
+  TopNavigation,
+  TopNavigationProps,
 } from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
@@ -42,17 +44,88 @@ export type ContainerType = {
   name: string;
 };
 
-const USERID = "1";
+enum Mode {
+  Light = "light",
+  Dark = "dark",
+}
+
+function logout() {
+  localStorage.setItem("userId", "");
+  localStorage.setItem("username", "");
+  localStorage.setItem("role", "");
+}
+
+const topMenu = (username: string): TopNavigationProps.MenuDropdownUtility => {
+  return {
+    type: "menu-dropdown",
+    text: username,
+    items: [{ id: "logout", text: "Sign out" }],
+
+    onItemClick: (event) => {
+      event.preventDefault();
+      if (event.detail.id === "logout") {
+        logout();
+      }
+    },
+  };
+};
 
 function Home() {
   const navigate = useNavigate();
   const params = useParams<{ userId: string }>();
-  const userId = params.userId as string;
+  const userIdBoard = params.userId as string;
 
-  if (!userId) {
-    navigate("/login");
-    return null;
-  }
+  const [username, setUsername] = useState("undefined");
+  const [userId, setUserId] = useState("undefined");
+  useEffect(() => {
+    const localUserId = localStorage.getItem("userId");
+    const localUsername = localStorage.getItem("username");
+    const localRole = localStorage.getItem("role");
+    if (!localUserId || !localUsername || !localRole) {
+      navigate("/login");
+    }
+    setUsername(localUsername!);
+    setUserId(localUserId!);
+
+    if (!userIdBoard) {
+      navigate("/login");
+    }
+
+    const fetchUserData = async () => {
+      try {
+        const response = await getAllUsers();
+        console.log(response);
+        if (response.users) {
+          const sideNavItems: SideNavigationProps.Link[] = response.users.map(
+            (boardUser) => {
+              return {
+                type: "link",
+                text: `${boardUser.username}`,
+                href: boardUser.userId,
+              };
+            }
+          );
+
+          // Filter out the current user's board
+          const filteredSideNavItems = sideNavItems.filter((navItem) => {
+            console.log(navItem.href);
+            console.log(localUserId);
+            if (navItem.href === localUserId) {
+              console.log("Filtering out the same href");
+              return false;
+            }
+            return true;
+          });
+
+          setSideNavItems(filteredSideNavItems);
+        }
+      } catch (error) {
+        console.log("Error occurred trying to fetch all users");
+      }
+    };
+    fetchUserData();
+  }, []);
+
   const [containers, setContainers] = useState<ContainerType[]>([
     { id: "Uncategorised", name: "Uncategorised" },
     { id: "Backlog", name: "Backlog" },
@@ -74,6 +147,8 @@ function Home() {
 
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
 
+  const [mode, setMode] = useState<Mode>(Mode.Light);
+
   const [sideNavItems, setSideNavItems] = useState<
     ReadonlyArray<SideNavigationProps.Link>
   >([]);
@@ -87,7 +162,7 @@ function Home() {
           async (task, index) =>
             await updateTask(
               task.id,
-              userId,
+              userIdBoard,
               index,
               task.name,
               task.description,
@@ -142,7 +217,7 @@ function Home() {
   function deleteTask(deleteTaskId: string) {
     console.log(`RUnning delete task on id: ${deleteTaskId}`);
     setTasksChanged(true);
-    deleteTaskAPI(userId, deleteTaskId);
+    deleteTaskAPI(userIdBoard, deleteTaskId);
 
     setTasks((prevItems) => {
       // Find which container has this item
@@ -171,7 +246,7 @@ function Home() {
     const fetchTaskData = async () => {
       try {
         console.log("Fetching task ..");
-        const tasks = await getTasks(userId);
+        const tasks = await getTasks(userIdBoard);
         const sortedTasks = sortContainerCollection(tasks);
         setTasks(sortedTasks);
       } catch (error) {
@@ -182,29 +257,6 @@ function Home() {
       }
     };
     fetchTaskData();
-
-    const fetchUserData = async () => {
-      try {
-        const response = await getAllUsers();
-        if (response.users) {
-          // setUsers(response.users);
-          const sideNavItems: SideNavigationProps.Link[] = response.users.map(
-            (user) => {
-              return {
-                type: "link",
-                text: `${user.username}`,
-                href: `${user.userId}`,
-              };
-            }
-          );
-
-          setSideNavItems(sideNavItems);
-        }
-      } catch (error) {
-        console.log("Error occurred trying to fetch all users");
-      }
-    };
-    fetchUserData();
   }, []);
 
   function onChangeTask(updates: Partial<TaskType>) {
@@ -247,7 +299,7 @@ function Home() {
   function createTask(category: string) {
     console.log(`Creating task in category: ${category}`);
     const newId = crypto.randomUUID();
-    createTaskAPI(userId, newId, category);
+    createTaskAPI(userIdBoard, newId, category);
     setTasks((tasks) => {
       const newTask: TaskType = {
         id: newId,
@@ -290,113 +342,127 @@ function Home() {
   }
 
   return (
-    <AppLayout
-      navigation={
-        <SideNavigation
-          activeHref={userId}
-          header={{
-            href: "#",
-            text: "Kanban Board",
-          }}
-          items={[
-            {
-              type: "section-group",
-              title: "User Boards",
-              items: [...sideNavItems],
-            },
-          ]}
-        />
-      }
-      splitPanelOpen={splitPanelOpen}
-      onSplitPanelToggle={() => {
-        toggleSplitPanel();
-      }}
-      splitPanel={
-        editTaskId ? (
-          <SplitPanel header={"Edit Task"}>
-            <ColumnLayout columns={4}>
-              <Form
-                actions={
-                  <SpaceBetween size="xs" direction="horizontal">
-                    <Button>Submit</Button>
-                  </SpaceBetween>
-                }
-              >
-                <SpaceBetween size="l">
-                  <FormField
-                    description="Enter your task heading"
-                    label="Task Heading"
-                  >
-                    <Input
-                      onChange={({ detail }) => {
-                        onChangeTask({ name: detail.value });
+    <>
+      <TopNavigation
+        identity={{ title: "Kanban Board", href: "" }}
+        utilities={[
+          {
+            type: "button",
+            text: mode === Mode.Light ? "Dark" : "Light",
+            onClick: () =>
+              setMode(mode === Mode.Light ? Mode.Dark : Mode.Light),
+          },
+          topMenu(username),
+        ]}
+      ></TopNavigation>
+      <AppLayout
+        navigation={
+          <SideNavigation
+            activeHref={userIdBoard}
+            header={{
+              href: userId,
+              text: "Your Board",
+            }}
+            items={[
+              {
+                type: "section-group",
+                title: "Other Boards",
+                items: [...sideNavItems],
+              },
+            ]}
+          />
+        }
+        splitPanelOpen={splitPanelOpen}
+        onSplitPanelToggle={() => {
+          toggleSplitPanel();
+        }}
+        splitPanel={
+          editTaskId ? (
+            <SplitPanel header={"Edit Task"}>
+              <ColumnLayout columns={4}>
+                <Form
+                  actions={
+                    <SpaceBetween size="xs" direction="horizontal">
+                      <Button>Submit</Button>
+                    </SpaceBetween>
+                  }
+                >
+                  <SpaceBetween size="l">
+                    <FormField
+                      description="Enter your task heading"
+                      label="Task Heading"
+                    >
+                      <Input
+                        onChange={({ detail }) => {
+                          onChangeTask({ name: detail.value });
+                        }}
+                        value={getTaskFromId(editTaskId)?.name ?? ""}
+                      />
+                    </FormField>
+                    <FormField
+                      description="Enter your task description"
+                      label="Task Description"
+                    >
+                      <Textarea
+                        onChange={({ detail }) =>
+                          onChangeTask({ description: detail.value })
+                        }
+                        value={getTaskFromId(editTaskId)?.description ?? ""}
+                      />
+                    </FormField>
+                    <ToggleButton
+                      onChange={() => {
+                        editTaskId
+                          ? toggleTaskComplete(editTaskId.toString())
+                          : null;
                       }}
-                      value={getTaskFromId(editTaskId)?.name ?? ""}
-                    />
-                  </FormField>
-                  <FormField
-                    description="Enter your task description"
-                    label="Task Description"
-                  >
-                    <Textarea
-                      onChange={({ detail }) =>
-                        onChangeTask({ description: detail.value })
-                      }
-                      value={getTaskFromId(editTaskId)?.description ?? ""}
-                    />
-                  </FormField>
-                  <ToggleButton
-                    onChange={() => {
-                      editTaskId
-                        ? toggleTaskComplete(editTaskId.toString())
-                        : null;
-                    }}
-                    pressed={getTaskFromId(editTaskId)?.completed ?? false}
-                  >
-                    Mark as{" "}
-                    {getTaskFromId(editTaskId)?.completed
-                      ? "Incomplete"
-                      : "Complete"}
-                  </ToggleButton>
-                </SpaceBetween>
-              </Form>
-            </ColumnLayout>
-          </SplitPanel>
-        ) : undefined
-      }
-      content={
-        <ContentLayout
-          defaultPadding
-          headerVariant="high-contrast"
-          headerBackgroundStyle="linear-gradient(135deg, rgb(255, 99, 71) 3%, rgb(255, 140, 0) 44%, rgb(255, 69, 0) 69%, rgb(255, 20, 147) 94%)"
-          header={
-            <Header
-              variant="h2"
-              description="Use this board keep track of your work."
-            >
-              Kanban Board
-            </Header>
-          }
-        >
-          <div className="App">
-            <MultipleContainers
-              toggleTaskComplete={toggleTaskComplete}
-              deleteTask={deleteTask}
-              setTasksChanged={setTasksChanged}
-              createTask={createTask}
-              containers={containers}
-              setContainers={setContainers}
-              tasks={tasks}
-              setTasks={setTasks}
-              itemCount={5}
-              strategy={rectSortingStrategy}
-              vertical={false}
-              startEditingTask={startEditingTask}
-            />
-          </div>
-        </ContentLayout>
-      }
-    />
+                      pressed={getTaskFromId(editTaskId)?.completed ?? false}
+                    >
+                      Mark as{" "}
+                      {getTaskFromId(editTaskId)?.completed
+                        ? "Incomplete"
+                        : "Complete"}
+                    </ToggleButton>
+                  </SpaceBetween>
+                </Form>
+              </ColumnLayout>
+            </SplitPanel>
+          ) : undefined
+        }
+        content={
+          <ContentLayout
+            defaultPadding
+            headerVariant="high-contrast"
+            headerBackgroundStyle="linear-gradient(135deg, rgb(255, 99, 71) 3%, rgb(255, 140, 0) 44%, rgb(255, 69, 0) 69%, rgb(255, 20, 147) 94%)"
+            header={
+              <Header
+                variant="h2"
+                description="Use this board keep track of your work."
+              >
+                Kanban Board
+              </Header>
+            }
+          >
+            <div className="App">
+              <MultipleContainers
+                toggleTaskComplete={toggleTaskComplete}
+                deleteTask={deleteTask}
+                setTasksChanged={setTasksChanged}
+                createTask={createTask}
+                containers={containers}
+                setContainers={setContainers}
+                tasks={tasks}
+                setTasks={setTasks}
+                itemCount={5}
+                strategy={rectSortingStrategy}
+                vertical={false}
+                startEditingTask={startEditingTask}
+              />
+            </div>
+          </ContentLayout>
+        }
+      />
+    </>
   );
 }
 

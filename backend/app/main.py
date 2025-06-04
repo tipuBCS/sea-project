@@ -1,7 +1,7 @@
 from datetime import datetime
 import enum
 from turtle import position
-from typing import Dict, List, Union
+from typing import Dict, List, Literal, Union
 from unicodedata import category
 import uuid
 from xml.etree.ElementTree import tostring
@@ -17,6 +17,7 @@ from pynamodb.attributes import (
     UTCDateTimeAttribute,
     NumberAttribute,
 )
+from pynamodb.pagination import ResultIterator
 
 
 app = FastAPI()
@@ -242,10 +243,20 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class LoginSuccess(BaseModel):
+    isValid: Literal[True]
+    userId: str
+    username: str
+    role: str
+
+
+class LoginFail(BaseModel):
+    isValid: Literal[False]
+
+
 # Define the response model
 class LoginResponse(BaseModel):
-    isValid: bool
-    userId: Union[str, None]
+    response: Union[LoginSuccess, LoginFail]
 
 
 class RegisterRequest(BaseModel):
@@ -278,11 +289,20 @@ async def login(request: LoginRequest):
     print("Received Login Request ..")
     print(request)
     try:
-        for user in UserModel.user_index.query(request.username.lower(), limit=1):
-            print(user)
+        users: ResultIterator[UserModel] = UserModel.user_index.query(
+            request.username.lower(), limit=1
+        )
+        for user in users:
             if user.password == request.password:
-                return LoginResponse(isValid=True, userId=user.userId)
-        return LoginResponse(isValid=False, userId=None)
+                return LoginResponse(
+                    response=LoginSuccess(
+                        isValid=True,
+                        userId=user.userId,
+                        username=user.username,
+                        role=user.role,
+                    )
+                )
+        return LoginResponse(response=LoginFail(isValid=False))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -299,7 +319,9 @@ class GetUsersResponse(BaseModel):
 @app.get("/api/users", response_model=GetUsersResponse)
 async def getUsers():
     username_list = []
-    users = UserModel.scan(attributes_to_get=["username", "userId"])
+    users: ResultIterator[UserModel] = UserModel.scan(
+        attributes_to_get=["username", "userId"]
+    )
     print(users)
     for user in users:
         print(user)

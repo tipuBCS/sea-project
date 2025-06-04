@@ -2,8 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { LoginFail } from './LoginFail';
+import type { LoginSuccess } from './LoginSuccess';
 export type LoginResponse = {
-    isValid: boolean;
-    userId?: string;
+    response: (LoginSuccess | LoginFail);
 };
 

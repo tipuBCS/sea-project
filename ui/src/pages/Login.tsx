@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLoginResponse } from "../api/api";
 import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
+import { LoginSuccess } from "../api/auto-generated-client";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -31,14 +32,19 @@ function Login() {
     }
     setIsLoading(true);
     try {
-      const response = await getLoginResponse(username, password);
+      const { response } = await getLoginResponse(username, password);
       if (response.isValid) {
-        navigate(`/home/${response.userId}`);
+        const responseSuccess = response as LoginSuccess;
+        localStorage.setItem("userId", responseSuccess.userId);
+        localStorage.setItem("username", responseSuccess.username);
+        localStorage.setItem("role", responseSuccess.role);
+        navigate(`/home/${responseSuccess.userId}`);
       } else {
         setErrorMessage("Incorrect Username or password!");
       }
     } catch (error) {
       console.log("error occurred during login: ", error);
+      setErrorMessage("Internal Server error occurred!");
     }
 
     setIsLoading(false);
