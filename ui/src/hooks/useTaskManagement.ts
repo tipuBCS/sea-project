@@ -70,7 +70,7 @@ export default function useTaskManagement({
     if (!userIdBoard) {
       throw console.error("Tried to create a task with no userIdBoard");
     }
-    createTaskAPI(newId, category, userIdBoard);
+    createTaskAPI(newId, userIdBoard, category);
     setTasks((tasks) => {
       const newTask: TaskType = {
         id: newId,

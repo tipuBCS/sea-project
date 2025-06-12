@@ -8,7 +8,6 @@ import {
   ToggleButton,
 } from "@cloudscape-design/components";
 import { JSX } from "react";
-import { Form } from "react-router-dom";
 import { TaskType } from "../api/auto-generated-client";
 import { UniqueIdentifier } from "@dnd-kit/core";
 
@@ -29,7 +28,7 @@ const TaskEditor = ({
   return (
     <SplitPanel header={"Edit Task"}>
       <ColumnLayout columns={4}>
-        <Form>
+        <form>
           <SpaceBetween size="l">
             <FormField
               description="Enter your task heading"
@@ -66,7 +65,7 @@ const TaskEditor = ({
               {getTaskFromId(editTaskId)?.completed ? "Incomplete" : "Complete"}
             </ToggleButton>
           </SpaceBetween>
-        </Form>
+        </form>
       </ColumnLayout>
     </SplitPanel>
   );

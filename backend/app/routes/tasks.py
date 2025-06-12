@@ -100,7 +100,7 @@ async def doesUserHavePermissionToTask(username, password, taskId) -> bool:
 
 
 async def canUserCreateTaskInBoard(username, password, boardUserId) -> bool:
-    if not users.isLoginValid(username, password):
+    if not await users.isLoginValid(username, password):
         return False
 
     # Check if they are admin
@@ -142,15 +142,18 @@ def createTask(userId: str, taskId: str, category: str):
 
 @router.post("/api/tasks", response_model=CreateTaskResponse)
 async def create_task(request: CreateTaskRequest):
-    print("Received Create task request!")
+    print("Received Create task request ..")
     try:
-        if not canUserCreateTaskInBoard(
+        if not await canUserCreateTaskInBoard(
             request.username, request.password, request.boardUserId
         ):
+            print("Insufficient Permission to create Task ..")
             return CreateTaskResponse(success=False)
+        print("Creating Task ..")
         createTask(request.boardUserId, request.taskId, request.category)
         return CreateTaskResponse(success=True)
     except:
+        print("Insufficient Permission to create Task ..")
         return CreateTaskResponse(success=False)
 
 
@@ -169,9 +172,10 @@ async def get_tasks(userId: str):
     print("Received Get Task Request ..")
     print(userId)
     tasks = await getTasks(userId)
+    count = 0
     return_tasks = {}
     for task in tasks:
-        print(task)
+        count += 1
         if task.category not in return_tasks:
             return_tasks[task.category] = []
         newTask = TaskType(
@@ -184,6 +188,7 @@ async def get_tasks(userId: str):
             position=int(task.position),
         )
         return_tasks[task.category].append(newTask)
+    print(f"Returning {count} Tasks ..")
     return return_tasks
 
 

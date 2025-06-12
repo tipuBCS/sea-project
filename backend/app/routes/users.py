@@ -60,7 +60,6 @@ async def isLoginValid(username, password):
         username.lower(), limit=1
     )
     for user in users:
-        print(user)
         if user.password == password:
             return True
     return False
@@ -203,13 +202,12 @@ class GetUsersResponse(BaseModel):
 
 @router.get("/api/users", response_model=GetUsersResponse)
 async def getUsers():
+    print('Received Get Users Request ..')
     username_list = []
     users: ResultIterator[UserModel] = UserModel.scan(
         attributes_to_get=["username", "userId", "displayName"]
     )
-    print(users)
     for user in users:
-        print(user)
         username_list.append(
             {
                 "userId": user.userId,
@@ -217,8 +215,7 @@ async def getUsers():
                 "displayName": user.displayName,
             }
         )
-        print(username_list)
-    print("returning the users")
+    print(f"Returning {len(username_list)} users ..")
     return {"users": username_list}
 
 
