@@ -1,10 +1,7 @@
 {
-  "PythonRequirementsLambdaLayerS3Key": "serverless/sea-project-backend/dev/1747922213670-2025-05-22T13:56:53.670Z/pythonRequirements.zip",
   "ApiUrl": "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com/api",
-  "PythonRequirementsLambdaLayerQualifiedArn": "arn:aws:lambda:eu-west-2:092646077738:layer:sea-project-backend-dev-python-requirements:8",
-  "ApiLambdaFunctionQualifiedArn": "arn:aws:lambda:eu-west-2:092646077738:function:sea-project-backend-dev-api:43",
+  "ApiLambdaFunctionQualifiedArn": "arn:aws:lambda:eu-west-2:092646077738:function:sea-project-backend-dev-api:53",
   "HttpApiId": "056sv4iaig",
-  "PythonRequirementsLambdaLayerHash": "99d3c929aaeda97ab2f55e1e32abbf6a44c7e465",
   "ServerlessDeploymentBucketName": "serverless-framework-deployments-eu-west-2-893992a9-f870",
   "HttpApiUrl": "https://056sv4iaig.execute-api.eu-west-2.amazonaws.com"
 }

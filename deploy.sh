@@ -21,4 +21,4 @@ aws cloudfront create-invalidation --distribution-id E1A3KIDEFNLLCM --paths "/*"
 
 # Deploy Backend
 cd ../backend
-serverless deploy
+pnpm run deploy

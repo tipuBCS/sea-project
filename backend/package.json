@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "sls deploy && aws s3 sync scripts/dist s3://sea-project/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

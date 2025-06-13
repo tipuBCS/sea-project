@@ -5,12 +5,10 @@
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
 import { AxiosHttpRequest } from './core/AxiosHttpRequest';
-import { TasksService } from './services/TasksService';
-import { UsersService } from './services/UsersService';
+import { DefaultService } from './services/DefaultService';
 type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class MyApiClient {
-    public readonly tasks: TasksService;
-    public readonly users: UsersService;
+    public readonly default: DefaultService;
     public readonly request: BaseHttpRequest;
     constructor(config?: Partial<OpenAPIConfig>, HttpRequest: HttpRequestConstructor = AxiosHttpRequest) {
         this.request = new HttpRequest({
@@ -24,8 +22,7 @@ export class MyApiClient {
             HEADERS: config?.HEADERS,
             ENCODE_PATH: config?.ENCODE_PATH,
         });
-        this.tasks = new TasksService(this.request);
-        this.users = new UsersService(this.request);
+        this.default = new DefaultService(this.request);
     }
 }
 

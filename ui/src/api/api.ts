@@ -1,20 +1,25 @@
 import axios from "axios";
 import {
+  type ContainerCollection,
   type LoginResponse,
   MyApiClient,
   type OpenAPIConfig,
-  type ContainerCollection,
 } from "./auto-generated-client";
 
 type Config = {
-  ApiUrl: string;
+  HttpApiUrl: string;
 };
 
 const API_URL = await axios
-  .get("../config.json")
+  .get("../config.json", {
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+    },
+  })
   .then(async (response) => {
     const data: Config = response.data;
-    return data.ApiUrl;
+    return data.HttpApiUrl;
   })
   .catch((error) => {
     console.log("Error occurred retrieving config.json file!");
@@ -44,7 +49,11 @@ export async function getLoginResponse(
   return response;
 }
 
-export async function createTaskAPI(taskId: string, boardUserId: string, category: string) {
+export async function createTaskAPI(
+  taskId: string,
+  boardUserId: string,
+  category: string
+) {
   const { username, password } = getLoginCredentials();
   return await apiClient.tasks.createTaskTasksApiTasksPost({
     username,
@@ -90,11 +99,15 @@ export async function deleteTaskAPI(taskId: string) {
   });
 }
 
-export async function registerAPI(username: string, password: string, role: string) {
+export async function registerAPI(
+  username: string,
+  password: string,
+  role: string
+) {
   return await apiClient.users.registerUsersApiRegisterPost({
     username,
     password,
-    role
+    role,
   });
 }
 

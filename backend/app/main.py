@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from mangum import Mangum
+from fastapi.middleware.cors import CORSMiddleware
 import enum
 from typing import Dict, List, Literal, Union
 import uuid
@@ -15,6 +16,15 @@ from fastapi import APIRouter, HTTPException
 app = FastAPI()
 
 USER_TABLE_NAME = "sea-users"
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace with your frontend URL in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class Roles(enum.Enum):

@@ -5,6 +5,7 @@ frameworkVersion: '4'
 
 provider:
   name: aws
+  profile: tipub
   runtime: python3.9
   region: eu-west-2
   stage: ${opt:stage, 'dev'}
@@ -28,30 +29,9 @@ package:
 plugins:
   - serverless-python-requirements
   - serverless-offline
-  # - serverless-stack-output
-  # - serverless-s3-sync
+  - serverless-stack-output
 
-resources:
-  Outputs:
-    ApiUrl:
-      Value: 
-        Fn::Join:
-          - ""
-          - - "https://"
-            - Ref: HttpApi
-            - ".execute-api.${aws:region}.amazonaws.com/api"
-      Description: "API Gateway URL"
-
-# custom:
-#   output:
-#     handler: scripts/output.handler # Run the handler in this file
-#     file: scripts/dist/config.json # toml, yaml, yml, and json format is available. Make sure the location where you want to save the file exists
-#   s3Sync:
-#   #   hooks:
-#   #     # This hook will run after the deploy:finalize hook
-#   #     - after:deploy:finalize
-#     buckets:
-#       # A simple configuration for copying static assets
-#       - bucketName: sea-project # required
-#         deleteRemoved: false
-#         localDir: scripts/dist # required
+custom:
+  output:
+    - handler: scripts/output.handler # Run the handler in this file
+      file: scripts/dist/config.json # toml, yaml, yml, and json format is available. Make sure the location where you want to save the file exists
