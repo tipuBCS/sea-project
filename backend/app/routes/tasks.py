@@ -53,12 +53,12 @@ class TaskTableModel(Model):
 
 
 class TaskType(BaseModel):
-    id: str | int
+    id: Union[str, int]
     name: str
     description: str
     completed: bool
     createdAt: datetime
-    assignedTo: str | None
+    assignedTo: Union[str, None]
     position: int
 
 
@@ -200,11 +200,11 @@ async def get_tasks(userId: str):
 class UpdateTaskRequest(BaseModel):
     username: str
     password: str
-    name: str | None
-    description: str | None
-    completed: bool | None
-    assignedTo: str | None
-    category: str | None
+    name: Union[str, None]
+    description: Union[str, None]
+    completed: Union[bool, None]
+    assignedTo: Union[str, None]
+    category: Union[str, None]
     position: int
 
 

@@ -69,7 +69,7 @@ async def getUserByUsername(username) -> UserModel:
     users: ResultIterator[UserModel] = UserModel.user_index.query(
         hash_key=username, limit=1
     )
-    user: UserModel | None = None
+    user: Union[UserModel, None] = None
     for _user in users:
         user = _user
     if not user:
@@ -167,6 +167,7 @@ async def login(request: LoginRequest):
             request.username.lower(), limit=1
         )
         print("Got users")
+        print(users)
         for user in users:
             print(user)
             if user.password == request.password:
@@ -202,7 +203,7 @@ class GetUsersResponse(BaseModel):
 
 @router.get("/api/users", response_model=GetUsersResponse)
 async def getUsers():
-    print('Received Get Users Request ..')
+    print("Received Get Users Request ..")
     username_list = []
     users: ResultIterator[UserModel] = UserModel.scan(
         attributes_to_get=["username", "userId", "displayName"]

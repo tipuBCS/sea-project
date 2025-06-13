@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
 import {
   Button,
   Container,
@@ -12,8 +10,10 @@ import {
   SpaceBetween,
   Spinner,
 } from "@cloudscape-design/components";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerAPI } from "../api/api";
+import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
 import "../helper/signIn.css";
 
 function Register() {

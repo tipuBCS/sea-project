@@ -45,12 +45,12 @@ import { coordinateGetter as multipleContainersCoordinateGetter } from "./multip
 
 import { Container, type ContainerProps, Item } from "../../components";
 
-import type { ContainerType } from "../../../../pages/Home";
-import type {
-  TaskType,
-  ContainerCollection,
-} from "../../../../api/auto-generated-client";
 import { Button } from "@cloudscape-design/components";
+import type {
+  ContainerCollection,
+  TaskType,
+} from "../../../../api/auto-generated-client";
+import type { ContainerType } from "../../../../pages/Home";
 import "../../styles.css";
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>

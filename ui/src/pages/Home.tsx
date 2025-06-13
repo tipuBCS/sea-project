@@ -1,23 +1,8 @@
-import {
-  AppLayout,
-  ColumnLayout,
-  ContentLayout,
-  Form,
-  FormField,
-  Header,
-  Input,
-  SideNavigation,
-  SideNavigationProps,
-  SpaceBetween,
-  SplitPanel,
-  Textarea,
-  ToggleButton,
-} from "@cloudscape-design/components";
+import { AppLayout, SideNavigationProps } from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import "../helper/mainContainer.css";
 
-import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { debounce } from "lodash";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAllUsers, getTasks, getUser, updateTask } from "../api/api";
@@ -26,13 +11,12 @@ import type {
   GetUserResponse,
   TaskType,
 } from "../api/auto-generated-client";
-import TopNav from "../components/TopNav";
-import "../helper/home.css";
-import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable/MultipleContainers";
-import useTaskManagement from "../hooks/useTaskManagement";
+import BoardContent from "../components/BoardContent";
 import SideNav from "../components/SideNav";
 import TaskEditor from "../components/TaskEditor";
-import BoardContent from "../components/BoardContent";
+import TopNav from "../components/TopNav";
+import "../helper/home.css";
+import useTaskManagement from "../hooks/useTaskManagement";
 
 export type ContainerType = {
   id: UniqueIdentifier;

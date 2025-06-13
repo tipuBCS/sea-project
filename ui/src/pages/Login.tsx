@@ -11,8 +11,8 @@ import {
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLoginResponse } from "../api/api";
-import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
 import { LoginSuccess } from "../api/auto-generated-client";
+import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
 
 function Login() {
   const [username, setUsername] = useState("");

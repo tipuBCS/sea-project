@@ -10,27 +10,36 @@ type Config = {
   HttpApiUrl: string;
 };
 
-const API_URL = await axios
-  .get("../config.json", {
-    headers: {
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-    },
-  })
-  .then(async (response) => {
-    const data: Config = response.data;
-    return data.HttpApiUrl;
-  })
-  .catch((error) => {
-    console.log("Error occurred retrieving config.json file!");
-    throw error;
-  });
+let apiClient: MyApiClient
 
-const openAPIConfig: Partial<OpenAPIConfig> = {
-  BASE: API_URL,
-};
+async function getAPIURL() {
+  const API_URL = await axios
+    .get("../config.json", {
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+      },
+    })
+    .then(async (response) => {
+      const data: Config = response.data;
+      return data.HttpApiUrl;
+    })
+    .catch((error) => {
+      console.log("Error occurred retrieving config.json file!");
+      throw error;
+    });
+  return API_URL;
+}
 
-const apiClient = await new MyApiClient(openAPIConfig);
+(async () => {
+  const openAPIConfig: Partial<OpenAPIConfig> = {
+    BASE: await getAPIURL(),
+  };
+
+  apiClient = await new MyApiClient(openAPIConfig);
+})().catch((error) => {
+  console.log(`Error occurred  during creation of apiClient ${error}`);
+});
 
 function getLoginCredentials(): { username: string; password: string } {
   const username = localStorage.getItem("username") || "";

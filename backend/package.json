@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "sls deploy && aws s3 sync scripts/dist s3://sea-project/"
+    "deploy": "sls deploy && aws s3 sync scripts/dist s3://sea-project/",
+    "start": "sls offline --httpPort 4000"
   },
   "keywords": [],
   "author": "",

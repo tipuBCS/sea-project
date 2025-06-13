@@ -3,11 +3,11 @@ import type { Transform } from "@dnd-kit/utilities";
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 
-import { Handle, Remove } from "./components";
+import { Remove } from "./components";
 
-import { Button, Icon } from "@cloudscape-design/components";
-import styles from "./Item.module.scss";
+import { Button } from "@cloudscape-design/components";
 import type { TaskType } from "../../../../api/auto-generated-client";
+import styles from "./Item.module.scss";
 
 export interface Props {
   canEditBoard: () => boolean;
