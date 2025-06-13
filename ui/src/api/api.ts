@@ -10,7 +10,7 @@ type Config = {
   HttpApiUrl: string;
 };
 
-let apiClient: MyApiClient
+let apiClient: MyApiClient;
 
 async function getAPIURL() {
   const API_URL = await axios
@@ -34,6 +34,10 @@ async function getAPIURL() {
 (async () => {
   const openAPIConfig: Partial<OpenAPIConfig> = {
     BASE: await getAPIURL(),
+    HEADERS: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
   };
 
   apiClient = await new MyApiClient(openAPIConfig);
@@ -51,11 +55,24 @@ export async function getLoginResponse(
   username: string,
   password: string
 ): Promise<LoginResponse> {
-  const response = await apiClient.users.loginUsersApiLoginPost({
-    username,
-    password,
-  });
-  return response;
+  console.log("Attempting login with URL:", apiClient.request.config.BASE);
+  try {
+    const response = await apiClient.users.loginUsersApiLoginPost({
+      username,
+      password,
+    });
+    console.log("Login success:", response);
+    return response;
+  } catch (error: any) {
+    console.error("Login failed:", error);
+    console.error("Request details:", {
+      url: apiClient.request.config.BASE + "/users/api/login",
+      headers: error.config?.headers,
+      status: error.response?.status,
+      data: error.response?.data,
+    });
+    throw error;
+  }
 }
 
 export async function createTaskAPI(
