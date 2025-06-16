@@ -8,7 +8,7 @@ import {
   SpaceBetween,
   Spinner,
 } from "@cloudscape-design/components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLoginResponse } from "../api/api";
 import { LoginSuccess } from "../api/auto-generated-client";
@@ -50,6 +50,26 @@ function Login() {
 
     setIsLoading(false);
   }
+
+  useEffect(() => {
+    async function autoLogin() {
+      const username = localStorage.getItem("username");
+      const password = localStorage.getItem("password");
+      if (!username || !password) {
+        return;
+      }
+      const { response } = await getLoginResponse(username, password);
+      if (response.isValid) {
+        const responseSuccess = response as LoginSuccess;
+        localStorage.setItem("userId", responseSuccess.userId);
+        localStorage.setItem("username", responseSuccess.username);
+        localStorage.setItem("password", password);
+        localStorage.setItem("role", responseSuccess.role);
+        navigate(`/home/${responseSuccess.userId}`);
+      }
+    }
+    autoLogin();
+  }, []);
 
   return (
     <FullPageCenteredBoxLayout width={400} height={400}>

@@ -63,7 +63,6 @@ export async function getLoginResponse(
   username: string,
   password: string
 ): Promise<LoginResponse> {
-  console.log("Attempting login with URL:", apiClient.request.config.BASE);
   try {
     const response = await (
       await getApiClient()
