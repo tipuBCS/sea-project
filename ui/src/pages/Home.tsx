@@ -94,6 +94,7 @@ function Home() {
         }
       } catch (error) {
         console.log("Error occurred trying to fetch all users");
+        console.log(error)
       }
     };
     fetchUserData();

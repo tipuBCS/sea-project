@@ -12,7 +12,7 @@ type Config = {
 
 let apiClient: MyApiClient;
 
-async function getAPIURL() {
+async function getApiUrl() {
   const API_URL = await axios
     .get("../config.json", {
       headers: {
@@ -31,19 +31,27 @@ async function getAPIURL() {
   return API_URL;
 }
 
-(async () => {
-  const openAPIConfig: Partial<OpenAPIConfig> = {
-    BASE: await getAPIURL(),
-    HEADERS: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  };
-
-  apiClient = await new MyApiClient(openAPIConfig);
-})().catch((error) => {
-  console.log(`Error occurred  during creation of apiClient ${error}`);
-});
+async function getApiClient(): Promise<MyApiClient> {
+  if (apiClient) {
+    console.log("Using Cached api client.");
+    return apiClient;
+  }
+  try {
+    const openAPIConfig: Partial<OpenAPIConfig> = {
+      BASE: await getApiUrl(),
+      HEADERS: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    };
+    console.log("Getting Actual API Client ..");
+    apiClient = new MyApiClient(openAPIConfig);
+    return apiClient;
+  } catch (error) {
+    console.log(`Error occurred during creation of apiClient: ${error}`);
+    throw error;
+  }
+}
 
 function getLoginCredentials(): { username: string; password: string } {
   const username = localStorage.getItem("username") || "";
@@ -57,7 +65,9 @@ export async function getLoginResponse(
 ): Promise<LoginResponse> {
   console.log("Attempting login with URL:", apiClient.request.config.BASE);
   try {
-    const response = await apiClient.users.loginUsersApiLoginPost({
+    const response = await (
+      await getApiClient()
+    ).users.loginUsersApiLoginPost({
       username,
       password,
     });
@@ -65,12 +75,6 @@ export async function getLoginResponse(
     return response;
   } catch (error: any) {
     console.error("Login failed:", error);
-    console.error("Request details:", {
-      url: apiClient.request.config.BASE + "/users/api/login",
-      headers: error.config?.headers,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
     throw error;
   }
 }
@@ -81,7 +85,9 @@ export async function createTaskAPI(
   category: string
 ) {
   const { username, password } = getLoginCredentials();
-  return await apiClient.tasks.createTaskTasksApiTasksPost({
+  return await (
+    await getApiClient()
+  ).tasks.createTaskTasksApiTasksPost({
     username,
     password,
     boardUserId,
@@ -91,7 +97,9 @@ export async function createTaskAPI(
 }
 
 export async function getTasks(userId: string): Promise<ContainerCollection> {
-  return await apiClient.tasks.getTasksTasksApiTasksUserIdGet(userId);
+  return await (
+    await getApiClient()
+  ).tasks.getTasksTasksApiTasksUserIdGet(userId);
 }
 
 export async function updateTask(
@@ -105,7 +113,9 @@ export async function updateTask(
 ) {
   console.log("Updating Task ..");
   const { username, password } = getLoginCredentials();
-  apiClient.tasks.updateTaskTasksApiTasksTaskIdPatch(taskId.toString(), {
+  await (
+    await getApiClient()
+  ).tasks.updateTaskTasksApiTasksTaskIdPatch(taskId.toString(), {
     username,
     password,
     name,
@@ -119,7 +129,9 @@ export async function updateTask(
 
 export async function deleteTaskAPI(taskId: string) {
   const { username, password } = getLoginCredentials();
-  apiClient.tasks.deleteTaskTasksApiTasksTaskIdDelete(taskId, {
+  await (
+    await getApiClient()
+  ).tasks.deleteTaskTasksApiTasksTaskIdDelete(taskId, {
     username,
     password,
   });
@@ -130,7 +142,9 @@ export async function registerAPI(
   password: string,
   role: string
 ) {
-  return await apiClient.users.registerUsersApiRegisterPost({
+  return await (
+    await getApiClient()
+  ).users.registerUsersApiRegisterPost({
     username,
     password,
     role,
@@ -138,9 +152,11 @@ export async function registerAPI(
 }
 
 export async function getAllUsers() {
-  return await apiClient.users.getUsersUsersApiUsersGet();
+  return await (await getApiClient()).users.getUsersUsersApiUsersGet();
 }
 
 export async function getUser(userId: string) {
-  return await apiClient.users.getUserUsersApiUserUserIdGet(userId);
+  return await (
+    await getApiClient()
+  ).users.getUserUsersApiUserUserIdGet(userId);
 }
