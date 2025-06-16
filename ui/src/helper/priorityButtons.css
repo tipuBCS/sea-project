@@ -1,0 +1,78 @@
+/* priority-buttons.css */
+.priority-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.priority-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 200ms;
+  border: 2px solid transparent;
+}
+
+/* None styles */
+.priority-none {
+  background-color: rgb(243 244 246);
+  color: rgb(75 85 99);
+}
+
+.priority-none:hover {
+  background-color: rgb(229 231 235);
+}
+
+.priority-none.selected {
+  background-color: rgb(229 231 235);
+  border-color: rgb(156 163 175);
+  color: rgb(31 41 55);
+}
+
+/* Low styles */
+.priority-low {
+  background-color: rgb(219 234 254);
+  color: rgb(29 78 216);
+}
+
+.priority-low:hover {
+  background-color: rgb(191 219 254);
+}
+
+.priority-low.selected {
+  background-color: rgb(191 219 254);
+  border-color: rgb(59 130 246);
+  color: rgb(30 58 138);
+}
+
+/* Medium styles */
+.priority-medium {
+  background-color: rgb(254 240 138);
+  color: rgb(161 98 7);
+}
+
+.priority-medium:hover {
+  background-color: rgb(253 224 71);
+}
+
+.priority-medium.selected {
+  background-color: rgb(253 224 71);
+  border-color: rgb(234 179 8);
+  color: rgb(133 77 14);
+}
+
+/* High styles */
+.priority-high {
+  background-color: rgb(254 226 226);
+  color: rgb(185 28 28);
+}
+
+.priority-high:hover {
+  background-color: rgb(254 202 202);
+}
+
+.priority-high.selected {
+  background-color: rgb(254 202 202);
+  border-color: rgb(239 68 68);
+  color: rgb(153 27 27);
+}
