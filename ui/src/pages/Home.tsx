@@ -94,7 +94,7 @@ function Home() {
         }
       } catch (error) {
         console.log("Error occurred trying to fetch all users");
-        console.log(error)
+        console.log(error);
       }
     };
     fetchUserData();
@@ -167,6 +167,10 @@ function Home() {
               task.description,
               task.completed,
               task.assignedTo,
+              task.dueDate,
+              task.minTime,
+              task.maxTime,
+              task.importance,
               containerId
             )
         );

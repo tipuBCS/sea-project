@@ -23,6 +23,7 @@ export type { LoginResponse } from './models/LoginResponse';
 export type { LoginSuccess } from './models/LoginSuccess';
 export type { RegisterRequest } from './models/RegisterRequest';
 export type { RegisterResponse } from './models/RegisterResponse';
+export { TaskImportance } from './models/TaskImportance';
 export type { TaskType } from './models/TaskType';
 export type { UpdateTaskRequest } from './models/UpdateTaskRequest';
 export type { User } from './models/User';

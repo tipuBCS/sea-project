@@ -3,6 +3,7 @@ import { ContainerCollection, TaskType } from "../api/auto-generated-client";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { ContainerType } from "../pages/Home";
 import { createTaskAPI, deleteTaskAPI } from "../api/api";
+import { TaskImportance } from "../api/auto-generated-client/models/TaskImportance";
 
 type Returns = {
   tasks: ContainerCollection;
@@ -79,6 +80,9 @@ export default function useTaskManagement({
         completed: false,
         createdAt: "",
         position: 1000,
+        minTime: -1,
+        maxTime: -1,
+        importance: TaskImportance.NONE,
       };
 
       const taskInCategory = tasks[category] ?? [];

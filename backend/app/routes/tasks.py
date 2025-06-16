@@ -1,3 +1,4 @@
+import enum
 from typing import Dict, List, Union
 from pydantic import BaseModel
 from pynamodb.indexes import GlobalSecondaryIndex, AllProjection
@@ -11,9 +12,11 @@ from pynamodb.attributes import (
 from datetime import datetime
 from pynamodb.pagination import ResultIterator
 from fastapi import APIRouter, HTTPException
+
+from app.util.pynamoEnum import EnumAttribute
 from ..routes import users
 
-TASK_TABLE_NAME = "sea-tasks-4"
+TASK_TABLE_NAME = "sea-tasks-5"
 
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -21,6 +24,13 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 # ========== TASK TABLE DEFINITION  ==========
 # ========== TASK TABLE DEFINITION  ==========
 # ========== TASK TABLE DEFINITION  ==========
+
+
+class TaskImportance(str, enum.Enum):
+    NONE = "NONE"
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
 
 
 class TaskIdIndex(GlobalSecondaryIndex):
@@ -34,21 +44,30 @@ class TaskTableModel(Model):
     class Meta:
         table_name = TASK_TABLE_NAME
 
+    # Keys
     pk = UnicodeAttribute(hash_key=True)
     sk = UnicodeAttribute(range_key=True)
 
+    # Identifiers
     userId = UnicodeAttribute()
     taskId = UnicodeAttribute()
 
+    # Task Attributes
     name = UnicodeAttribute(default="")
     description = UnicodeAttribute(default="")
     completed = BooleanAttribute(default=False)
-    createdAt = UTCDateTimeAttribute(default_for_new=datetime.now())
     assignedTo = UnicodeAttribute(default="")
+    dueDate = UnicodeAttribute(default="")
+    minTime = NumberAttribute(default=-1)
+    maxTime = NumberAttribute(default=-1)
+    importance = EnumAttribute(enum_class=TaskImportance, default=TaskImportance.NONE)
+    createdAt = UTCDateTimeAttribute(default_for_new=datetime.now())
 
+    # Positions
     category = UnicodeAttribute()
     position = NumberAttribute()
 
+    # Secondary Index
     taskId_index = TaskIdIndex()
 
 
@@ -60,6 +79,10 @@ class TaskType(BaseModel):
     createdAt: datetime
     assignedTo: Union[str, None]
     position: int
+    dueDate: Union[str, None]
+    minTime: int
+    maxTime: int
+    importance: TaskImportance
 
 
 class ContainerCollection(BaseModel):
@@ -186,6 +209,10 @@ async def get_tasks(userId: str):
             createdAt=task.createdAt,
             assignedTo=task.assignedTo,
             position=int(task.position),
+            dueDate=task.dueDate,
+            minTime=int(task.minTime),
+            maxTime=int(task.maxTime),
+            importance=task.importance,
         )
         return_tasks[task.category].append(newTask)
     print(f"Returning {count} Tasks ..")
@@ -205,6 +232,11 @@ class UpdateTaskRequest(BaseModel):
     completed: Union[bool, None]
     assignedTo: Union[str, None]
     category: Union[str, None]
+    dueDate: Union[str, None]
+    minTime: Union[int, None]
+    maxTime: Union[int, None]
+    importance: Union[TaskImportance, None]
+
     position: int
 
 
@@ -216,6 +248,10 @@ async def updateTask(
     completed=None,
     assignedTo=None,
     category=None,
+    minTime=None,
+    maxTime=None,
+    dueDate=None,
+    importance=None
 ):
     tasks: ResultIterator[TaskTableModel] = TaskTableModel.taskId_index.query(
         hash_key=taskId, limit=1
@@ -232,6 +268,14 @@ async def updateTask(
             actions.append(TaskTableModel.assignedTo.set(assignedTo))
         if category:
             actions.append(TaskTableModel.category.set(category))
+        if minTime:
+            actions.append(TaskTableModel.minTime.set(minTime))
+        if maxTime:
+            actions.append(TaskTableModel.maxTime.set(maxTime))
+        if dueDate:
+            actions.append(TaskTableModel.dueDate.set(dueDate))
+        if importance:
+            actions.append(TaskTableModel.importance.set(importance))
         actions.append(TaskTableModel.position.set(position))
         task.update(actions)
 
@@ -255,6 +299,10 @@ async def update_task(taskId: str, request: UpdateTaskRequest):
         request.completed,
         request.assignedTo,
         request.category,
+        request.minTime,
+        request.maxTime,
+        request.dueDate,
+        request.importance
     )
 
 
@@ -290,6 +338,9 @@ async def delete_task(taskId: str, request: DeleteTaskRequest):
 # ========== CREATE TABLE ==========
 # ========== CREATE TABLE ==========
 
-
-if not TaskTableModel.exists:
+print("Checking if Table Exists ..")
+if not TaskTableModel.exists():
+    print("Creating table ..")
     TaskTableModel.create_table(billing_mode="PAY_PER_REQUEST")
+else:
+    print("Table already exists")

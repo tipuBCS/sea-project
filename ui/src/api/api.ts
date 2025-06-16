@@ -4,6 +4,7 @@ import {
   type LoginResponse,
   MyApiClient,
   type OpenAPIConfig,
+  TaskImportance,
 } from "./auto-generated-client";
 
 type Config = {
@@ -108,6 +109,10 @@ export async function updateTask(
   description?: string,
   completed?: boolean,
   assignedTo?: string,
+  dueDate?: string,
+  minTime?: number,
+  maxTime?: number,
+  importance?: TaskImportance,
   category?: string
 ) {
   console.log("Updating Task ..");
@@ -122,6 +127,10 @@ export async function updateTask(
     completed,
     assignedTo,
     category,
+    dueDate,
+    minTime,
+    maxTime,
+    importance,
     position,
   });
 }

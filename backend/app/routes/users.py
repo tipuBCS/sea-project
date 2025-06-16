@@ -242,5 +242,5 @@ async def getUser(userId: str):
 # ========== CREATE TABLE ==========
 # ========== CREATE TABLE ==========
 
-if not UserModel.exists:
+if not UserModel.exists():
     UserModel.create_table(billing_mode="PAY_PER_REQUEST")

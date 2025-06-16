@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TaskImportance } from './TaskImportance';
 export type TaskType = {
     id: (string | number);
     name: string;
@@ -10,5 +11,9 @@ export type TaskType = {
     createdAt: string;
     assignedTo?: string;
     position: number;
+    dueDate?: string;
+    minTime: number;
+    maxTime: number;
+    importance: TaskImportance;
 };
 

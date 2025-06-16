@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TaskImportance } from './TaskImportance';
 export type UpdateTaskRequest = {
     username: string;
     password: string;
@@ -10,6 +11,10 @@ export type UpdateTaskRequest = {
     completed?: boolean;
     assignedTo?: string;
     category?: string;
+    dueDate?: string;
+    minTime?: number;
+    maxTime?: number;
+    importance?: TaskImportance;
     position: number;
 };
 

@@ -6,6 +6,7 @@ import {
   Input,
   Textarea,
   ToggleButton,
+  DatePicker,
 } from "@cloudscape-design/components";
 import { JSX } from "react";
 import { TaskType } from "../api/auto-generated-client";
@@ -27,8 +28,8 @@ const TaskEditor = ({
 }: TaskEditorProps): JSX.Element => {
   return (
     <SplitPanel header={"Edit Task"}>
-      <ColumnLayout columns={4}>
-        <form>
+      <form>
+        <ColumnLayout columns={2}>
           <SpaceBetween size="l">
             <FormField
               description="Enter your task heading"
@@ -65,8 +66,18 @@ const TaskEditor = ({
               {getTaskFromId(editTaskId)?.completed ? "Incomplete" : "Complete"}
             </ToggleButton>
           </SpaceBetween>
-        </form>
-      </ColumnLayout>
+
+          <FormField description="Enter your task due date" label="Due Date">
+            <DatePicker
+              value={getTaskFromId(editTaskId)?.dueDate ?? ""}
+              onChange={({ detail }) => {
+                console.log(detail);
+                onChangeTask({ dueDate: detail.value });
+              }}
+            ></DatePicker>
+          </FormField>
+        </ColumnLayout>
+      </form>
     </SplitPanel>
   );
 };
