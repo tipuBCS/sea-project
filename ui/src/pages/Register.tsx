@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { registerAPI } from "../api/api";
 import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
 import "../helper/signIn.css";
+import { toast } from "react-toastify";
 
 function Register() {
   const [firstname, setFirstname] = useState("");
@@ -175,6 +176,7 @@ function Register() {
     }
 
     setIsLoading(true);
+    const loadingToast = toast("Creating your account ..", { type: "success" });
     try {
       const response = await registerAPI(
         firstname,
@@ -184,11 +186,30 @@ function Register() {
         role
       );
       if (response.success) {
+        toast.update(loadingToast, {
+          render: "Registration Successful!",
+          type: "success",
+          isLoading: false,
+          autoClose: 2000,
+        });
+        toast("Registration Successful!", { type: "success" });
         navigate("/login");
       } else {
+        toast.update(loadingToast, {
+          render: "Registration Failed!",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
         setErrorMessage("Server error occurred, please try again!");
       }
     } catch (error) {
+      toast.update(loadingToast, {
+        render: `Registration Failed! Error: ${error}`, // Show first error
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
       console.log("error occurred during register: ", error);
       setErrorMessage("Server error occurred, please try again!");
     }
@@ -224,7 +245,7 @@ function Register() {
             errorText={errorMessage}
             actions={
               <SpaceBetween direction="horizontal" size="xs">
-                {isLoading ? <Spinner /> : null}
+                {isLoading ? <Spinner size={"large"} /> : null}
                 <Button
                   variant="primary"
                   onClick={() => {

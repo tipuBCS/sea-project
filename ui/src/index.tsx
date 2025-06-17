@@ -5,11 +5,13 @@ import "./index.css";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
+import { ToastContainer } from "react-toastify";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <>
       <BrowserRouter>
+        <ToastContainer />
         <Routes>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />

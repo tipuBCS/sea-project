@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { getLoginResponse } from "../api/api";
 import { LoginSuccess } from "../api/auto-generated-client";
 import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayout";
+import { toast } from "react-toastify";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -39,9 +40,11 @@ function Login() {
         localStorage.setItem("username", responseSuccess.username);
         localStorage.setItem("password", password);
         localStorage.setItem("role", responseSuccess.role);
+        toast("Login Successful!");
         navigate(`/home/${responseSuccess.userId}`);
       } else {
         setErrorMessage("Incorrect Username or password!");
+        toast("Login Failed!");
       }
     } catch (error) {
       console.log("error occurred during login: ", error);
