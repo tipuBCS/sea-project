@@ -76,3 +76,24 @@
   border-color: rgb(239 68 68);
   color: rgb(153 27 27);
 }
+
+/* Disabled state styles */
+.priority-button.disabled,
+.priority-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Override hover effects for disabled buttons */
+.priority-none.disabled:hover,
+.priority-low.disabled:hover,
+.priority-medium.disabled:hover,
+.priority-high.disabled:hover {
+  background-color: inherit;
+}
+
+/* Optional: you might want to override the selected state for disabled buttons */
+.priority-button.disabled.selected {
+  border-color: transparent;
+}

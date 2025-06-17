@@ -146,6 +146,8 @@ export async function deleteTaskAPI(taskId: string) {
 }
 
 export async function registerAPI(
+  firstname: string,
+  lastname: string,
   username: string,
   password: string,
   role: string
@@ -153,6 +155,8 @@ export async function registerAPI(
   return await (
     await getApiClient()
   ).users.registerUsersApiRegisterPost({
+    firstname,
+    lastname,
     username,
     password,
     role,

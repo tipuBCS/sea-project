@@ -54,12 +54,13 @@ const TaskEditor = ({
     onChange: function (priority: TaskImportance): void {
       onChangeTask({ importance: priority });
     },
+    canEditBoard,
   };
 
   return (
     <SplitPanel header={"Edit Task"} closeBehavior={"hide"}>
       <SpaceBetween size="l">
-        <Grid gridDefinition={[{ colspan: 5 }, { colspan: 6 }]}>
+        <Grid gridDefinition={[{ colspan: 5 }, { colspan: 2 }, { colspan: 4 }]}>
           <FormField description="Enter your task heading" label="Task Heading">
             <Input
               disabled={!canEditBoard()}
@@ -67,6 +68,24 @@ const TaskEditor = ({
                 onChangeTask({ name: detail.value });
               }}
               value={getTaskFromId(editTaskId)?.name ?? ""}
+            />
+          </FormField>
+
+          <FormField
+            description="Assign a user to the task"
+            label="Assigned User"
+          >
+            <Select
+              disabled={!canEditBoard()}
+              selectedOption={selectedOption}
+              onChange={({ detail }) => {
+                console.log(detail);
+                setSelectedOption(detail.selectedOption);
+                onChangeTask({ assignedTo: detail.selectedOption.value });
+              }}
+              options={allUsers.map((user) => {
+                return { label: user.displayName, value: user.userId };
+              })}
             />
           </FormField>
 
@@ -99,6 +118,7 @@ const TaskEditor = ({
           </FormField>
           <FormField description="Enter your task due date" label="Due Date">
             <DatePicker
+              disabled={!canEditBoard()}
               value={getTaskFromId(editTaskId)?.dueDate ?? ""}
               onChange={({ detail }) => {
                 console.log(detail);
@@ -112,6 +132,7 @@ const TaskEditor = ({
             label="Minimum Time (Hrs)"
           >
             <Input
+              disabled={!canEditBoard()}
               onChange={({ detail }) => {
                 console.log(detail);
                 onChangeTask({ minTime: Number(detail.value) });
@@ -131,6 +152,7 @@ const TaskEditor = ({
             label="Maximum Time (Hrs)"
           >
             <Input
+              disabled={!canEditBoard()}
               onChange={({ detail }) => {
                 console.log(detail);
                 onChangeTask({ maxTime: Number(detail.value) });
@@ -156,25 +178,8 @@ const TaskEditor = ({
             Mark as{" "}
             {getTaskFromId(editTaskId)?.completed ? "Incomplete" : "Complete"}
           </ToggleButton>
-          <Button>Save Changes</Button>
+          <Button disabled={!canEditBoard()}>Save Changes</Button>
         </Grid>
-
-        <FormField
-          description="Assign a user to the task"
-          label="Assigned User"
-        >
-          <Select
-            selectedOption={selectedOption}
-            onChange={({ detail }) => {
-              console.log(detail);
-              setSelectedOption(detail.selectedOption);
-              onChangeTask({ assignedTo: detail.selectedOption.value });
-            }}
-            options={allUsers.map((user) => {
-              return { label: user.displayName, value: user.userId };
-            })}
-          />
-        </FormField>
       </SpaceBetween>
     </SplitPanel>
   );

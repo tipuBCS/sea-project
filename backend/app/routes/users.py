@@ -10,7 +10,7 @@ from pynamodb.attributes import (
 from pynamodb.pagination import ResultIterator
 from fastapi import APIRouter, HTTPException
 
-USER_TABLE_NAME = "sea-users"
+USER_TABLE_NAME = "sea-users-2"
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -42,6 +42,8 @@ class UserModel(Model):
 
     pk = UnicodeAttribute(hash_key=True)
     userId = UnicodeAttribute(null=False)
+    firstname = UnicodeAttribute(null=False)
+    lastname = UnicodeAttribute(null=False)
     username = UnicodeAttribute(null=False)
     displayName = UnicodeAttribute(null=False)
     password = UnicodeAttribute(null=False)
@@ -83,6 +85,8 @@ async def getUserByUsername(username) -> UserModel:
 
 
 class RegisterRequest(BaseModel):
+    firstname: str
+    lastname: str
     username: str
     password: str
     role: str
@@ -90,6 +94,12 @@ class RegisterRequest(BaseModel):
 
 class RegisterResponse(BaseModel):
     success: bool
+
+
+def name_proper_case(name: str) -> str:
+    if not name:
+        return name
+    return " ".join(word.capitalize() for word in name.lower().split())
 
 
 def isUsernameValid(username: str) -> bool:
@@ -123,8 +133,10 @@ async def register(request: RegisterRequest):
         userId = str(uuid.uuid4())
         user = UserModel(f"USER#{userId}")
         user.userId = userId
+        user.firstname = request.firstname
+        user.lastname = request.lastname
         user.username = request.username.lower()
-        user.displayName = request.username
+        user.displayName = name_proper_case(f"{request.firstname} {request.lastname}")
         user.password = request.password
         user.role = request.role
         user.save()

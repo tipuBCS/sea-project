@@ -17,6 +17,10 @@ import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayo
 import "../helper/signIn.css";
 
 function Register() {
+  const [firstname, setFirstname] = useState("");
+  const [firstnameErrorMessage, setFirstnameErrorMessage] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [lastnameErrorMessage, setLastnameErrorMessage] = useState("");
   const [username, setUsername] = useState("");
   const [usernameErrorMessage, setUsernameErrorMessage] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +33,43 @@ function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+  function getNameErrors(
+    text: string,
+    firstOrLast: "First" | "Last"
+  ): string[] {
+    const errorList = [];
+
+    // Check if first name is entered
+    if (text.length === 0) {
+      errorList.push(`${firstOrLast} name cannot be blank!`);
+    }
+
+    // Check Length (assuming reasonable name length limits)
+    if (text.length > 50) {
+      errorList.push(`${firstOrLast} name cannot exceed 50 characters!`);
+    }
+
+    // Check for valid characters (letters, spaces, hyphens, and apostrophes for names like O'Connor or Mary-Jane)
+    const allowedCharsRegex = /^[a-zA-Z\s'-]+$/;
+    if (!allowedCharsRegex.test(text)) {
+      errorList.push(
+        `${firstOrLast} name can only contain letters, spaces, hyphens, and apostrophes`
+      );
+    }
+
+    // Check if first name starts with a letter
+    if (!/^[a-zA-Z]/.test(text)) {
+      errorList.push(`${firstOrLast} name must start with a letter`);
+    }
+
+    // Check for minimum length (assuming 2 characters minimum)
+    if (text.length < 2) {
+      errorList.push(`${firstOrLast} name must be at least 2 characters long`);
+    }
+
+    return errorList;
+  }
 
   function getUsernameErrors(): string[] {
     const errorList = [];
@@ -110,25 +151,38 @@ function Register() {
     }
     return errorList;
   }
+
   async function register() {
+    const firstnameErrors = getNameErrors(firstname, "First");
+    const lastnameErrors = getNameErrors(lastname, "Last");
     const usernameErrors = getUsernameErrors();
     const passwordErrors = getPasswordErrors();
     const password2Errors = getPassword2Errors();
+    setFirstnameErrorMessage(firstnameErrors[0]);
+    setLastnameErrorMessage(lastnameErrors[0]);
     setUsernameErrorMessage(usernameErrors[0]);
     setPasswordErrorMessage(passwordErrors[0]);
     setPassword2ErrorMessage(password2Errors[0]);
     if (
+      firstnameErrors.length > 0 ||
+      lastnameErrors.length > 0 ||
       usernameErrors.length > 0 ||
       passwordErrors.length > 0 ||
       password2Errors.length > 0
     ) {
-      console.log("There was atleast one error");
+      console.log("There was at least one error");
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await registerAPI(username, password, role);
+      const response = await registerAPI(
+        firstname,
+        lastname,
+        username,
+        password,
+        role
+      );
       if (response.success) {
         navigate("/login");
       } else {
@@ -183,6 +237,25 @@ function Register() {
             }
           >
             <SpaceBetween direction="vertical" size="l">
+              <FormField label="First Name" errorText={firstnameErrorMessage}>
+                <Input
+                  value={firstname}
+                  onChange={({ detail }) => {
+                    setFirstname(detail.value);
+                    setFirstnameErrorMessage("");
+                  }}
+                />
+              </FormField>
+              <FormField label="Last Name" errorText={lastnameErrorMessage}>
+                <Input
+                  value={lastname}
+                  onChange={({ detail }) => {
+                    setLastname(detail.value);
+                    setLastnameErrorMessage("");
+                  }}
+                />
+              </FormField>
+
               <FormField label="Username" errorText={usernameErrorMessage}>
                 <Input
                   value={username}

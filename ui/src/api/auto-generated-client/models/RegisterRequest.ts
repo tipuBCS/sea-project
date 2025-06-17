@@ -3,6 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type RegisterRequest = {
+    firstname: string;
+    lastname: string;
     username: string;
     password: string;
     role: string;
