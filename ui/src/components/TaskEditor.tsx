@@ -9,9 +9,11 @@ import {
   DatePicker,
   Grid,
   Button,
+  Select,
+  SelectProps,
 } from "@cloudscape-design/components";
-import { JSX } from "react";
-import { TaskImportance, TaskType } from "../api/auto-generated-client";
+import { JSX, useEffect, useState } from "react";
+import { TaskImportance, TaskType, User } from "../api/auto-generated-client";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import PriorityButtons, { PriorityButtonsProps } from "./PriorityButtons";
 
@@ -21,6 +23,7 @@ type TaskEditorProps = {
   getTaskFromId: (id: UniqueIdentifier) => TaskType | undefined;
   editTaskId: UniqueIdentifier;
   toggleTaskComplete: (taskId: string) => void;
+  allUsers: User[];
 };
 const TaskEditor = ({
   canEditBoard,
@@ -28,7 +31,22 @@ const TaskEditor = ({
   getTaskFromId,
   editTaskId,
   toggleTaskComplete,
+  allUsers,
 }: TaskEditorProps): JSX.Element => {
+  const [selectedOption, setSelectedOption] =
+    useState<SelectProps.Option | null>(null);
+
+  useEffect(() => {
+    if (getTaskFromId(editTaskId)?.assignedTo) {
+      const user: User | undefined = allUsers.find(
+        (user) => user.userId === getTaskFromId(editTaskId)?.assignedTo
+      );
+      if (user) {
+        setSelectedOption({ label: user.displayName, value: user.userId });
+      }
+    }
+  }, []);
+
   const currentTaskImportance =
     getTaskFromId(editTaskId)?.importance ?? TaskImportance.NONE;
   const PriorityButtonProps: PriorityButtonsProps = {
@@ -37,10 +55,11 @@ const TaskEditor = ({
       onChangeTask({ importance: priority });
     },
   };
+
   return (
     <SplitPanel header={"Edit Task"} closeBehavior={"hide"}>
       <SpaceBetween size="l">
-        <Grid gridDefinition={[{ colspan: 5 }, { colspan: 3 }]}>
+        <Grid gridDefinition={[{ colspan: 5 }, { colspan: 6 }]}>
           <FormField description="Enter your task heading" label="Task Heading">
             <Input
               disabled={!canEditBoard()}
@@ -139,6 +158,23 @@ const TaskEditor = ({
           </ToggleButton>
           <Button>Save Changes</Button>
         </Grid>
+
+        <FormField
+          description="Assign a user to the task"
+          label="Assigned User"
+        >
+          <Select
+            selectedOption={selectedOption}
+            onChange={({ detail }) => {
+              console.log(detail);
+              setSelectedOption(detail.selectedOption);
+              onChangeTask({ assignedTo: detail.selectedOption.value });
+            }}
+            options={allUsers.map((user) => {
+              return { label: user.displayName, value: user.userId };
+            })}
+          />
+        </FormField>
       </SpaceBetween>
     </SplitPanel>
   );

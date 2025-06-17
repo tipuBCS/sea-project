@@ -10,6 +10,7 @@ import type {
   ContainerCollection,
   GetUserResponse,
   TaskType,
+  User,
 } from "../api/auto-generated-client";
 import BoardContent from "../components/BoardContent";
 import SideNav from "../components/SideNav";
@@ -55,6 +56,8 @@ function Home() {
   const [displayName, setDisplayName] = useState<string | undefined>(undefined);
   const [userId, setUserId] = useState<string | undefined>(undefined);
   const [role, setRole] = useState<string | undefined>(undefined);
+
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   useEffect(() => {
     const localUserId = localStorage.getItem("userId");
     const localUsername = localStorage.getItem("username");
@@ -72,6 +75,7 @@ function Home() {
       try {
         const response = await getAllUsers();
         if (response.users) {
+          setAllUsers(response.users);
           const sideNavItems: SideNavigationProps.Link[] = response.users.map(
             (boardUser) => {
               return {
@@ -287,6 +291,7 @@ function Home() {
               getTaskFromId={getTaskFromId}
               editTaskId={editTaskId}
               toggleTaskComplete={toggleTaskComplete}
+              allUsers={allUsers}
             />
           ) : undefined
         }
