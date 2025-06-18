@@ -1,7 +1,7 @@
 import type { DraggableSyntheticListeners } from "@dnd-kit/core";
 import type { Transform } from "@dnd-kit/utilities";
 import classNames from "classnames";
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { Remove } from "./components";
 
@@ -14,7 +14,7 @@ export interface Props {
   mode: Mode;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
-  deleteTask: (deleteTaskId: string) => void;
+  setDeleteTaskId: Dispatch<SetStateAction<string | undefined>>;
   startEditingTask: (task: TaskType) => void;
   task: TaskType;
   dragOverlay?: boolean;
@@ -56,7 +56,7 @@ export const Item = React.memo(
         mode,
         canEditBoard,
         toggleTaskComplete,
-        deleteTask,
+        setDeleteTaskId,
         startEditingTask,
         task,
         color,
@@ -189,7 +189,7 @@ export const Item = React.memo(
                     className={styles.Remove}
                     onClick={() => {
                       if (canEditBoard()) {
-                        deleteTask(task.id.toString());
+                        setDeleteTaskId(task.id.toString());
                       }
                     }}
                   />

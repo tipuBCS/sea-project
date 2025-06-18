@@ -145,7 +145,7 @@ interface Props {
   mode: Mode;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
-  deleteTask: (deleteTaskId: string) => void;
+  setDeleteTaskId: Dispatch<SetStateAction<string | undefined>>;
   setTasksChanged: Dispatch<SetStateAction<boolean>>;
   createTask: (category: string) => void;
   containers: ContainerType[];
@@ -186,7 +186,7 @@ export function MultipleContainers({
   mode,
   canEditBoard,
   toggleTaskComplete,
-  deleteTask,
+  setDeleteTaskId,
   setTasksChanged,
   createTask,
   containers,
@@ -571,7 +571,7 @@ export function MultipleContainers({
                         mode={mode}
                         canEditBoard={canEditBoard}
                         toggleTaskComplete={toggleTaskComplete}
-                        deleteTask={deleteTask}
+                        setDeleteTaskId={setDeleteTaskId}
                         startEditingTask={startEditingTask}
                         task={task}
                         disabled={isSortingContainer}
@@ -615,7 +615,7 @@ export function MultipleContainers({
         mode={mode}
         canEditBoard={canEditBoard}
         toggleTaskComplete={toggleTaskComplete}
-        deleteTask={deleteTask}
+        setDeleteTaskId={setDeleteTaskId}
         startEditingTask={startEditingTask}
         task={task}
         value={id}
@@ -653,7 +653,7 @@ export function MultipleContainers({
             mode={mode}
             canEditBoard={canEditBoard}
             toggleTaskComplete={toggleTaskComplete}
-            deleteTask={deleteTask}
+            setDeleteTaskId={setDeleteTaskId}
             startEditingTask={startEditingTask}
             task={task}
             key={task.id}
@@ -731,7 +731,7 @@ interface SortableItemProps {
   mode: Mode;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
-  deleteTask: (deleteTaskId: string) => void;
+  setDeleteTaskId: Dispatch<SetStateAction<string | undefined>>;
   startEditingTask: (task: TaskType) => void;
   task: TaskType;
   containerId: UniqueIdentifier;
@@ -748,7 +748,7 @@ function SortableItem({
   mode,
   canEditBoard,
   toggleTaskComplete,
-  deleteTask,
+  setDeleteTaskId,
   startEditingTask,
   task,
   disabled,
@@ -781,7 +781,7 @@ function SortableItem({
       mode={mode}
       canEditBoard={canEditBoard}
       toggleTaskComplete={toggleTaskComplete}
-      deleteTask={deleteTask}
+      setDeleteTaskId={setDeleteTaskId}
       startEditingTask={startEditingTask}
       ref={disabled ? undefined : setNodeRef}
       value={id}

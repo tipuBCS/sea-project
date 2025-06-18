@@ -7,11 +7,11 @@ import { ContainerCollection, TaskType } from "../api/auto-generated-client";
 import { Mode } from "@cloudscape-design/global-styles";
 
 type BoardContentProps = {
-  mode: Mode,
+  mode: Mode;
   boardUsername: string;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
-  deleteTask: (deleteTaskId: string) => void;
+  setDeleteTaskId: Dispatch<SetStateAction<string | undefined>>;
   setTasksChanged: Dispatch<SetStateAction<boolean>>;
   createTask: (category: string) => void;
   containers: ContainerType[];
@@ -26,7 +26,7 @@ const BoardContent = ({
   boardUsername,
   canEditBoard,
   toggleTaskComplete,
-  deleteTask,
+  setDeleteTaskId,
   setTasksChanged,
   createTask,
   containers,
@@ -54,7 +54,7 @@ const BoardContent = ({
           mode={mode}
           canEditBoard={canEditBoard}
           toggleTaskComplete={toggleTaskComplete}
-          deleteTask={deleteTask}
+          setDeleteTaskId={setDeleteTaskId}
           setTasksChanged={setTasksChanged}
           createTask={createTask}
           containers={containers}

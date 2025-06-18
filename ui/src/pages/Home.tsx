@@ -1,6 +1,8 @@
 import {
   AppLayout,
+  Header,
   HelpPanel,
+  Modal,
   SideNavigationProps,
 } from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
@@ -23,6 +25,7 @@ import TopNav from "../components/TopNav";
 import "../helper/home.css";
 import useTaskManagement from "../hooks/useTaskManagement";
 import InformationPanel from "../components/InformationPanel";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 export type ContainerType = {
   id: UniqueIdentifier;
@@ -35,6 +38,8 @@ function Home() {
   const userIdBoard = params.userId as string;
 
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
+
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const {
     tasks,
@@ -52,6 +57,10 @@ function Home() {
   } = useTaskManagement({ userIdBoard, setSplitPanelOpen });
 
   const [boardUsername, setBoardUsername] = useState("undefined");
+
+  const [deleteTaskId, setDeleteTaskId] = useState<string | undefined>(
+    undefined
+  );
 
   const [displayName, setDisplayName] = useState<string | undefined>(undefined);
   const [userId, setUserId] = useState<string | undefined>(undefined);
@@ -268,6 +277,19 @@ function Home() {
 
   return (
     <>
+      {deleteTaskId && getTaskFromId(deleteTaskId) && (
+        <DeleteConfirmationModal
+          task={getTaskFromId(deleteTaskId) as TaskType}
+          onConfirm={() => {
+            deleteTask(deleteTaskId);
+            setDeleteTaskId(undefined);
+          }}
+          onCancel={() => {
+            setDeleteTaskId(undefined);
+          }}
+        />
+      )}
+
       <TopNav
         displayName={displayName}
         mode={mode}
@@ -306,7 +328,7 @@ function Home() {
             boardUsername={boardUsername}
             canEditBoard={canEditBoard}
             toggleTaskComplete={toggleTaskComplete}
-            deleteTask={deleteTask}
+            setDeleteTaskId={setDeleteTaskId}
             setTasksChanged={setTasksChanged}
             createTask={createTask}
             containers={containers}
