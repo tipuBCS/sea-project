@@ -16,6 +16,8 @@ import { FullPageCenteredBoxLayout } from "../components/FullPageCenteredBoxLayo
 import { toast } from "react-toastify";
 
 function Login() {
+  const AUTOLOGIN_TOAST_ID = "autologin-toast";
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -34,17 +36,28 @@ function Login() {
     setIsLoading(true);
     try {
       const { response } = await getLoginResponse(username, password);
+      const loadingToast = toast("Logging in ..", { type: "info" });
       if (response.isValid) {
+        toast.update(loadingToast, {
+          render: "Login Successful!",
+          type: "success",
+          isLoading: false,
+          autoClose: 2000,
+        });
         const responseSuccess = response as LoginSuccess;
         localStorage.setItem("userId", responseSuccess.userId);
         localStorage.setItem("username", responseSuccess.username);
         localStorage.setItem("password", password);
         localStorage.setItem("role", responseSuccess.role);
-        toast("Login Successful!");
         navigate(`/home/${responseSuccess.userId}`);
       } else {
         setErrorMessage("Incorrect Username or password!");
-        toast("Login Failed!");
+        toast.update(loadingToast, {
+          render: "Login Failed!",
+          type: "error",
+          isLoading: false,
+          autoClose: 2000,
+        });
       }
     } catch (error) {
       console.log("error occurred during login: ", error);
@@ -69,8 +82,15 @@ function Login() {
         localStorage.setItem("password", password);
         localStorage.setItem("role", responseSuccess.role);
         navigate(`/home/${responseSuccess.userId}`);
+        if (!toast.isActive(AUTOLOGIN_TOAST_ID)) {
+          toast("Authentication verified. Redirecting to your workspace...", {
+            type: "success",
+            toastId: AUTOLOGIN_TOAST_ID,
+          });
+        }
       }
     }
+
     autoLogin();
   }, []);
 
