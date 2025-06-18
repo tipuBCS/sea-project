@@ -1,11 +1,13 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import classNames from "classnames";
 
 import { Handle, Remove } from "../Item";
 
 import styles from "./Container.module.scss";
+import { Mode } from "@cloudscape-design/global-styles";
 
 export interface Props {
+  mode: Mode;
   children: React.ReactNode;
   columns?: number;
   label?: string;
@@ -24,6 +26,7 @@ export interface Props {
 export const Container = forwardRef<HTMLDivElement, Props>(
   (
     {
+      mode,
       children,
       columns = 1,
       handleProps,
@@ -42,16 +45,18 @@ export const Container = forwardRef<HTMLDivElement, Props>(
     ref
   ) => {
     const Component = onClick ? "button" : "div";
-
+    useEffect(() => {
+      console.log(`Mode in container: ${mode}`);
+    }, []);
     return (
       <Component
         {...props}
-      // @ts-expect-error
+        // @ts-expect-error
         ref={ref}
         style={
           {
             ...style,
-            "--columns": columns
+            "--columns": columns,
           } as React.CSSProperties
         }
         className={classNames(
@@ -61,7 +66,8 @@ export const Container = forwardRef<HTMLDivElement, Props>(
           hover && styles.hover,
           placeholder && styles.placeholder,
           scrollable && styles.scrollable,
-          shadow && styles.shadow
+          shadow && styles.shadow,
+          mode === Mode.Dark && styles.dark
         )}
         onClick={onClick}
         tabIndex={onClick ? 0 : undefined}

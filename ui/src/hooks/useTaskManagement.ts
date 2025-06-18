@@ -32,12 +32,13 @@ export default function useTaskManagement({
   const [tasks, setTasks] = useState<ContainerCollection>({});
   const [editTaskId, setEditTaskId] = useState<UniqueIdentifier>();
   const [tasksChanged, setTasksChanged] = useState(false);
+  // TO DO: Match the ids to the names, requires reset of all task data?
   const [containers, setContainers] = useState<ContainerType[]>([
-    { id: "Uncategorised", name: "Uncategorised" },
-    { id: "Backlog", name: "Backlog" },
-    { id: "PrioritizedBacklog", name: "Prioritized Backlog" },
-    { id: "Doing", name: "Doing" },
-    { id: "Done", name: "Done" },
+    { id: "Uncategorised", name: "Backlog" },
+    { id: "Backlog", name: "To Do" },
+    { id: "PrioritizedBacklog", name: "In Progress" },
+    { id: "Doing", name: "Review" },
+    { id: "Done", name: "Completed" },
   ]);
 
   function onChangeTask(updates: Partial<TaskType>) {

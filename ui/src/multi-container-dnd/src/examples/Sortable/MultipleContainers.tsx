@@ -52,11 +52,13 @@ import type {
 } from "../../../../api/auto-generated-client";
 import type { ContainerType } from "../../../../pages/Home";
 import "../../styles.css";
+import { Mode } from "@cloudscape-design/global-styles";
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
 function DroppableContainer({
+  mode,
   canEditBoard,
   createTask,
   children,
@@ -67,6 +69,7 @@ function DroppableContainer({
   style,
   ...props
 }: ContainerProps & {
+  mode: Mode;
   canEditBoard: () => boolean;
   createTask: (category: string) => void;
   disabled?: boolean;
@@ -98,6 +101,7 @@ function DroppableContainer({
 
   return (
     <Container
+      mode={mode}
       ref={disabled ? undefined : setNodeRef}
       style={{
         ...style,
@@ -138,6 +142,7 @@ const dropAnimation: DropAnimation = {
 };
 
 interface Props {
+  mode: Mode;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
@@ -178,6 +183,7 @@ const PLACEHOLDER_ID = "placeholder";
 const empty: UniqueIdentifier[] = [];
 
 export function MultipleContainers({
+  mode,
   canEditBoard,
   toggleTaskComplete,
   deleteTask,
@@ -542,6 +548,7 @@ export function MultipleContainers({
         >
           {containers.map((container) => (
             <DroppableContainer
+              mode={mode}
               canEditBoard={canEditBoard}
               createTask={createTask}
               key={container.id}
@@ -561,6 +568,7 @@ export function MultipleContainers({
                   tasks[container.id].map((task, index) => {
                     return (
                       <SortableItem
+                        mode={mode}
                         canEditBoard={canEditBoard}
                         toggleTaskComplete={toggleTaskComplete}
                         deleteTask={deleteTask}
@@ -604,6 +612,7 @@ export function MultipleContainers({
     if (!task) return;
     return (
       <Item
+        mode={mode}
         canEditBoard={canEditBoard}
         toggleTaskComplete={toggleTaskComplete}
         deleteTask={deleteTask}
@@ -630,6 +639,7 @@ export function MultipleContainers({
   function renderContainerDragOverlay(containerId: UniqueIdentifier) {
     return (
       <Container
+        mode={mode}
         label={`Column ${containerId}`}
         columns={columns}
         style={{
@@ -640,6 +650,7 @@ export function MultipleContainers({
       >
         {tasks[containerId].map((task, index) => (
           <Item
+            mode={mode}
             canEditBoard={canEditBoard}
             toggleTaskComplete={toggleTaskComplete}
             deleteTask={deleteTask}
@@ -717,6 +728,7 @@ function Trash({ id }: { id: UniqueIdentifier }) {
 }
 
 interface SortableItemProps {
+  mode: Mode;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
@@ -733,6 +745,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({
+  mode,
   canEditBoard,
   toggleTaskComplete,
   deleteTask,
@@ -765,6 +778,7 @@ function SortableItem({
 
   return (
     <Item
+      mode={mode}
       canEditBoard={canEditBoard}
       toggleTaskComplete={toggleTaskComplete}
       deleteTask={deleteTask}

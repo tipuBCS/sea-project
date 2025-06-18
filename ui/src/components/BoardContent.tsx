@@ -4,8 +4,10 @@ import { MultipleContainers } from "../multi-container-dnd/src/examples/Sortable
 import { Dispatch, SetStateAction } from "react";
 import { ContainerType } from "../pages/Home";
 import { ContainerCollection, TaskType } from "../api/auto-generated-client";
+import { Mode } from "@cloudscape-design/global-styles";
 
 type BoardContentProps = {
+  mode: Mode,
   boardUsername: string;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
@@ -20,6 +22,7 @@ type BoardContentProps = {
 };
 
 const BoardContent = ({
+  mode,
   boardUsername,
   canEditBoard,
   toggleTaskComplete,
@@ -48,6 +51,7 @@ const BoardContent = ({
     >
       <div className="App">
         <MultipleContainers
+          mode={mode}
           canEditBoard={canEditBoard}
           toggleTaskComplete={toggleTaskComplete}
           deleteTask={deleteTask}

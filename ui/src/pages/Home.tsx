@@ -1,8 +1,12 @@
-import { AppLayout, SideNavigationProps } from "@cloudscape-design/components";
+import {
+  AppLayout,
+  HelpPanel,
+  SideNavigationProps,
+} from "@cloudscape-design/components";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import "../helper/mainContainer.css";
-
+import { applyMode, Mode } from "@cloudscape-design/global-styles";
 import { debounce } from "lodash";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAllUsers, getTasks, getUser, updateTask } from "../api/api";
@@ -18,16 +22,12 @@ import TaskEditor from "../components/TaskEditor";
 import TopNav from "../components/TopNav";
 import "../helper/home.css";
 import useTaskManagement from "../hooks/useTaskManagement";
+import InformationPanel from "../components/InformationPanel";
 
 export type ContainerType = {
   id: UniqueIdentifier;
   name: string;
 };
-
-export enum Mode {
-  Light = "light",
-  Dark = "dark",
-}
 
 function Home() {
   const navigate = useNavigate();
@@ -152,6 +152,10 @@ function Home() {
 
   const [mode, setMode] = useState<Mode>(Mode.Light);
 
+  useEffect(() => {
+    applyMode(mode);
+  }, [mode]);
+
   const [sideNavItems, setSideNavItems] = useState<
     Array<SideNavigationProps.Link>
   >([]);
@@ -272,6 +276,7 @@ function Home() {
         logout={logout}
       />
       <AppLayout
+        tools={<InformationPanel />}
         navigation={
           <SideNav
             userId={userId}
@@ -297,6 +302,7 @@ function Home() {
         }
         content={
           <BoardContent
+            mode={mode}
             boardUsername={boardUsername}
             canEditBoard={canEditBoard}
             toggleTaskComplete={toggleTaskComplete}

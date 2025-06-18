@@ -8,8 +8,10 @@ import { Remove } from "./components";
 import { Button } from "@cloudscape-design/components";
 import type { TaskType } from "../../../../api/auto-generated-client";
 import styles from "./Item.module.scss";
+import { Mode } from "@cloudscape-design/global-styles";
 
 export interface Props {
+  mode: Mode;
   canEditBoard: () => boolean;
   toggleTaskComplete: (taskId: string) => void;
   deleteTask: (deleteTaskId: string) => void;
@@ -51,6 +53,7 @@ export const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        mode,
         canEditBoard,
         toggleTaskComplete,
         deleteTask,
@@ -135,7 +138,8 @@ export const Item = React.memo(
               dragOverlay && styles.dragOverlay,
               disabled && styles.disabled,
               color && styles.color,
-              styles[`priority-${task.importance.toLowerCase()}`] // Add this line
+              styles[`priority-${task.importance.toLowerCase()}`],
+              mode === Mode.Dark && styles.dark
             )}
             style={style}
             data-cypress="draggable-item"

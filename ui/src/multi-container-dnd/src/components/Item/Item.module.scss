@@ -1,3 +1,12 @@
+// Dark theme variables
+$dark-background-color: #31404f;
+$dark-text-color: #e0e0e0;
+$dark-border-color: rgba(255, 255, 255, 0.1);
+$dark-handle-color: rgba(255, 255, 255, 0.3);
+$dark-box-shadow-border: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(0, 0, 0, 0.2);
+$dark-box-shadow-common: 0 2px calc(4px / var(--scale-x, 1)) 0 rgba(0, 0, 0, 0.3);
+$dark-box-shadow: $dark-box-shadow-border, $dark-box-shadow-common;
+
 $font-weight: 400;
 $background-color: #ffffff;
 $border-color: #efefef;
@@ -153,6 +162,48 @@ $focused-outline-color: #4c9ffe;
   &:hover {
     .Remove {
       visibility: visible;
+    }
+  }
+
+  &.dark {
+    background-color: $dark-background-color;
+    color: $dark-text-color;
+    box-shadow: $dark-box-shadow;
+
+    // Priority colors adjusted for dark mode
+    &.priority-none {
+      border-left-color: rgb(75, 85, 99);
+    }
+
+    &.priority-low {
+      border-left-color: rgb(59, 130, 246);
+    }
+
+    &.priority-medium {
+      border-left-color: rgb(234, 179, 8);
+    }
+
+    &.priority-high {
+      border-left-color: rgb(239, 68, 68);
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0px 4px 1px rgba(76, 159, 254, 0.5), $dark-box-shadow;
+    }
+
+    &.disabled {
+      color: #8b8b8b;
+      background-color: #2a2a2a;
+
+      &:focus {
+        box-shadow: 0 0px 4px 1px rgba(255, 255, 255, 0.1), $dark-box-shadow;
+      }
+    }
+
+    &.dragOverlay {
+      --box-shadow-picked-up: #{$dark-box-shadow-border},
+      -1px 0 15px 0 rgba(0, 0, 0, 0.2),
+      0px 15px 15px 0 rgba(0, 0, 0, 0.4);
     }
   }
 }

@@ -58,7 +58,11 @@ const TaskEditor = ({
   };
 
   return (
-    <SplitPanel header={"Edit Task"} closeBehavior={"hide"}>
+    <SplitPanel
+      header={"Edit Task"}
+      closeBehavior={"hide"}
+      hidePreferencesButton={true}
+    >
       <SpaceBetween size="l">
         <Grid gridDefinition={[{ colspan: 5 }, { colspan: 2 }, { colspan: 4 }]}>
           <FormField description="Enter your task heading" label="Task Heading">

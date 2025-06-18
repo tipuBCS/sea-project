@@ -2,7 +2,7 @@ import {
   TopNavigation,
   TopNavigationProps,
 } from "@cloudscape-design/components";
-import { Mode } from "../pages/Home";
+import { Mode } from "@cloudscape-design/global-styles";
 
 type TopNavProps = {
   displayName?: string;
