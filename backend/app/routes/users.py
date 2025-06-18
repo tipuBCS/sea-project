@@ -9,6 +9,7 @@ from pynamodb.attributes import (
 )
 from pynamodb.pagination import ResultIterator
 from fastapi import APIRouter, HTTPException
+import re
 
 USER_TABLE_NAME = "sea-users-2"
 
@@ -102,12 +103,72 @@ def name_proper_case(name: str) -> str:
     return " ".join(word.capitalize() for word in name.lower().split())
 
 
-def isUsernameValid(username: str) -> bool:
-    return True
+def is_username_valid(username: str) -> tuple[bool, list[str]]:
+    """
+    Validates a username according to specified rules.
+    Returns a tuple of (is_valid: bool, error_messages: list[str])
+    """
+    error_list = []
+
+    # Check if username is empty
+    if not username:
+        error_list.append("Username cannot be blank!")
+        return False, error_list
+
+    # Check Length
+    if not (3 <= len(username) <= 30):
+        error_list.append("Username must be between 3-30 characters!")
+
+    # Check allowed characters
+    allowed_chars_pattern = r"^[a-zA-Z0-9._-]+$"
+    if not re.match(allowed_chars_pattern, username):
+        error_list.append(
+            "Username can only contain letters, numbers, dots, underscores, and hyphens"
+        )
+
+    # Check if username starts with a letter
+    if not username[0].isalpha():
+        error_list.append("Username must start with a letter")
+
+    return len(error_list) == 0, error_list
 
 
-def isPasswordValid(password: str) -> bool:
-    return True
+def is_password_valid(password: str) -> tuple[bool, list[str]]:
+    """
+    Validates a password according to specified rules.
+    Returns a tuple of (is_valid: bool, error_messages: list[str])
+    """
+    error_list = []
+
+    # Check if password is empty
+    if not password:
+        error_list.append("Password cannot be blank!")
+        return False, error_list
+
+    # Check Length
+    if not (8 <= len(password) <= 30):
+        error_list.append("Password must be between 8-30 characters!")
+
+    # Has one uppercase character
+    if not any(char.isupper() for char in password):
+        error_list.append("Password must have at least one uppercase character")
+
+    # Has one lowercase character
+    if not any(char.islower() for char in password):
+        error_list.append("Password must have at least one lowercase character")
+
+    # Contains number
+    if not any(char.isdigit() for char in password):
+        error_list.append("Password must contain at least one number")
+
+    # Check allowed characters
+    allowed_chars_pattern = r"^[a-zA-Z0-9._-]+$"
+    if not re.match(allowed_chars_pattern, password):
+        error_list.append(
+            "Password can only contain letters, numbers, dots, underscores, and hyphens"
+        )
+
+    return len(error_list) == 0, error_list
 
 
 def isRoleValid(role: str) -> bool:
@@ -123,12 +184,12 @@ async def register(request: RegisterRequest):
     print("Received Register Request ..")
     print(request)
     try:
-        if not isUsernameValid(request.username):
-            raise Exception("Username was invalid")
-        if not isPasswordValid(request.password):
-            raise Exception("Password was invalid")
-        if not isRoleValid(request.role):
-            raise Exception("Role was invalid")
+        username_valid, username_errors = is_username_valid(request.username)
+        password_valid, password_errors = is_password_valid(request.password)
+
+        if not username_valid or not password_valid:
+            all_errors = username_errors + password_errors
+            raise Exception("\n".join(all_errors))
 
         userId = str(uuid.uuid4())
         user = UserModel(f"USER#{userId}")
