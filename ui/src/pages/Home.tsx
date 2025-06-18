@@ -169,13 +169,11 @@ function Home() {
     Array<SideNavigationProps.Link>
   >([]);
 
-  // Create a debounced function to update the backend
-  const updateBackend = debounce(async (currentTasks: ContainerCollection) => {
+  async function saveTaskChanges() {
     try {
       console.log("Updating tasks");
-
-      Object.keys(currentTasks).forEach(async (containerId) => {
-        currentTasks[containerId].forEach(
+      Object.keys(tasks).forEach(async (containerId) => {
+        tasks[containerId].forEach(
           async (task, index) =>
             await updateTask(
               task.id,
@@ -196,13 +194,18 @@ function Home() {
     } catch (error) {
       console.error("Failed to update tasks:", error);
     }
+  }
+
+  // Create a debounced function to update the backend
+  const updateBackend = debounce(async () => {
+    saveTaskChanges();
   }, 2000); // Will only fire after 2 seconds of no changes
 
   // Set up periodic sync if there are changes
   useEffect(() => {
     if (tasksChanged) {
       console.log("Updating backend ...");
-      updateBackend(tasks);
+      updateBackend();
     }
 
     return () => {
@@ -313,6 +316,7 @@ function Home() {
         splitPanel={
           editTaskId ? (
             <TaskEditor
+              saveTaskChanges={saveTaskChanges}
               canEditBoard={canEditBoard}
               onChangeTask={onChangeTask}
               getTaskFromId={getTaskFromId}

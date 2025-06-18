@@ -16,8 +16,10 @@ import { JSX, useEffect, useState } from "react";
 import { TaskImportance, TaskType, User } from "../api/auto-generated-client";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import PriorityButtons, { PriorityButtonsProps } from "./PriorityButtons";
+import { toast } from "react-toastify";
 
 type TaskEditorProps = {
+  saveTaskChanges: () => void;
   canEditBoard: () => boolean;
   onChangeTask: (updates: Partial<TaskType>) => void;
   getTaskFromId: (id: UniqueIdentifier) => TaskType | undefined;
@@ -26,6 +28,7 @@ type TaskEditorProps = {
   allUsers: User[];
 };
 const TaskEditor = ({
+  saveTaskChanges,
   canEditBoard,
   onChangeTask,
   getTaskFromId,
@@ -36,6 +39,8 @@ const TaskEditor = ({
   const [selectedOption, setSelectedOption] =
     useState<SelectProps.Option | null>(null);
 
+  const [saveButtonDisabled, setSaveButtonDisabled] = useState<boolean>(false);
+  
   useEffect(() => {
     if (getTaskFromId(editTaskId)?.assignedTo) {
       const user: User | undefined = allUsers.find(
@@ -56,6 +61,21 @@ const TaskEditor = ({
     },
     canEditBoard,
   };
+
+  function saveTaskChangesAndDisplayToaster() {
+    setSaveButtonDisabled(true)
+    saveTaskChanges();
+    const savingToast = toast("Updating task details ...", { type: "info" });
+    setTimeout(() => {
+      setSaveButtonDisabled(false)
+      toast.update(savingToast, {
+        render: "Task updated successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 4000,
+      });
+    }, 2000);
+  }
 
   return (
     <SplitPanel
@@ -182,7 +202,14 @@ const TaskEditor = ({
             Mark as{" "}
             {getTaskFromId(editTaskId)?.completed ? "Incomplete" : "Complete"}
           </ToggleButton>
-          <Button disabled={!canEditBoard()}>Save Changes</Button>
+          <Button
+            disabled={!canEditBoard() || saveButtonDisabled}
+            onClick={() => {
+              saveTaskChangesAndDisplayToaster();
+            }}
+          >
+            Save Changes
+          </Button>
         </Grid>
       </SpaceBetween>
     </SplitPanel>
