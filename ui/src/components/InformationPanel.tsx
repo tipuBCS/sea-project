@@ -20,8 +20,8 @@ const InformationPanel = () => {
 
         <h3>Managing Workflow</h3>
         <p>
-          Tasks move from left to right: Backlog → Prioritized Backlog → To Do →
-          In Progress → Completed. Use drag-and-drop to move tasks between
+          Tasks move from left to right: Backlog → To Do → In Progress →
+          Review → Completed. Use drag-and-drop to move tasks between
           columns as their status changes.
         </p>
 

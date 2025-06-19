@@ -40,7 +40,7 @@ const TaskEditor = ({
     useState<SelectProps.Option | null>(null);
 
   const [saveButtonDisabled, setSaveButtonDisabled] = useState<boolean>(false);
-  
+
   useEffect(() => {
     if (getTaskFromId(editTaskId)?.assignedTo) {
       const user: User | undefined = allUsers.find(
@@ -63,11 +63,11 @@ const TaskEditor = ({
   };
 
   function saveTaskChangesAndDisplayToaster() {
-    setSaveButtonDisabled(true)
+    setSaveButtonDisabled(true);
     saveTaskChanges();
     const savingToast = toast("Updating task details ...", { type: "info" });
     setTimeout(() => {
-      setSaveButtonDisabled(false)
+      setSaveButtonDisabled(false);
       toast.update(savingToast, {
         render: "Task updated successfully!",
         type: "success",
@@ -84,8 +84,12 @@ const TaskEditor = ({
       hidePreferencesButton={true}
     >
       <SpaceBetween size="l">
-        <Grid gridDefinition={[{ colspan: 5 }, { colspan: 2 }, { colspan: 4 }]}>
-          <FormField description="Enter your task heading" label="Task Heading">
+        <Grid gridDefinition={[{ colspan: 4 }, { colspan: 2 }, { colspan: 4 }]}>
+          <FormField
+            description="Enter your task heading"
+            label="Task Heading"
+            stretch={true}
+          >
             <Input
               disabled={!canEditBoard()}
               onChange={({ detail }) => {
@@ -122,15 +126,16 @@ const TaskEditor = ({
         </Grid>
         <Grid
           gridDefinition={[
-            { colspan: 5 },
+            { colspan: 4 },
             { colspan: 2 },
-            { colspan: 2 },
+            { colspan: 2},
             { colspan: 2 },
           ]}
         >
           <FormField
             description="Enter your task description"
             label="Task Description"
+            stretch={true}
           >
             <Textarea
               disabled={!canEditBoard()}
