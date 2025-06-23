@@ -192,7 +192,6 @@ function Register() {
           isLoading: false,
           autoClose: 2000,
         });
-        toast("Registration Successful!", { type: "success" });
         navigate("/login");
       } else {
         toast.update(loadingToast, {
@@ -258,7 +257,11 @@ function Register() {
             }
           >
             <SpaceBetween direction="vertical" size="l">
-              <FormField label="First Name" errorText={firstnameErrorMessage}>
+              <FormField
+                label="First Name"
+                errorText={firstnameErrorMessage}
+                description="First Name must be 2-50 characters long and can contain letters, spaces, hyphens, and apostrophes."
+              >
                 <Input
                   value={firstname}
                   onChange={({ detail }) => {
@@ -267,7 +270,11 @@ function Register() {
                   }}
                 />
               </FormField>
-              <FormField label="Last Name" errorText={lastnameErrorMessage}>
+              <FormField
+                label="Last Name"
+                errorText={lastnameErrorMessage}
+                description="Last Name must be 2-50 characters long and can contain letters, spaces, hyphens, and apostrophes."
+              >
                 <Input
                   value={lastname}
                   onChange={({ detail }) => {
@@ -277,7 +284,11 @@ function Register() {
                 />
               </FormField>
 
-              <FormField label="Username" errorText={usernameErrorMessage}>
+              <FormField
+                label="Username"
+                errorText={usernameErrorMessage}
+                description="Username must be 3-30 characters long and can only contain letters, numbers, dots, underscores, and hyphens."
+              >
                 <Input
                   value={username}
                   onChange={({ detail }) => {
@@ -286,7 +297,23 @@ function Register() {
                   }}
                 />
               </FormField>
-              <FormField label="Password" errorText={passwordErrorMessage}>
+              <FormField
+                label="Password"
+                errorText={passwordErrorMessage}
+                description={
+                  <div>
+                    Password requirements:
+                    <br />
+                    • 8-30 characters long
+                    <br />
+                    • At least one uppercase letter <br />
+                    • At least one lowercase letter
+                    <br />
+                    • At least one number <br />• Only allows letters, numbers,
+                    dots (.), underscores (_), and hyphens (-)
+                  </div>
+                }
+              >
                 <Grid gridDefinition={[{ colspan: 11 }, { colspan: 1 }]}>
                   <Input
                     value={password}
@@ -314,6 +341,9 @@ function Register() {
               <FormField
                 label="Re-enter your Password"
                 errorText={password2ErrorMessage}
+                description={
+                  "Please re-enter your password exactly as entered above to confirm."
+                }
               >
                 <Grid gridDefinition={[{ colspan: 11 }, { colspan: 1 }]}>
                   <Input

@@ -23,11 +23,13 @@ type Returns = {
 type useTaskManagementProps = {
   userIdBoard?: string;
   setSplitPanelOpen: React.Dispatch<SetStateAction<boolean>>;
+  startEditingTask: (task: TaskType) => void;
 };
 
 export default function useTaskManagement({
   userIdBoard,
   setSplitPanelOpen,
+  startEditingTask,
 }: useTaskManagementProps): Returns {
   const [tasks, setTasks] = useState<ContainerCollection>({});
   const [editTaskId, setEditTaskId] = useState<UniqueIdentifier>();
@@ -87,10 +89,9 @@ export default function useTaskManagement({
       };
 
       const taskInCategory = tasks[category] ?? [];
-
+      startEditingTask(newTask);
       return { ...tasks, [category]: [...taskInCategory, newTask] };
     });
-    setEditTaskId(newId);
   }
 
   function deleteTask(deleteTaskId: string) {

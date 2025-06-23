@@ -115,17 +115,20 @@ function DroppableContainer({
     >
       {children}
       <div className="add-task-container">
-        <Button
-          variant={"link"}
-          fullWidth={false}
-          onClick={() => {
-            if (canEditBoard()) {
-              createTask(id.toString());
-            }
-          }}
-        >
-          Add Task
-        </Button>
+        {canEditBoard() && (
+          <Button
+            variant={"link"}
+            fullWidth={false}
+            onClick={() => {
+              if (canEditBoard()) {
+                createTask(id.toString());
+                
+              }
+            }}
+          >
+            Add Task
+          </Button>
+        )}
       </div>
     </Container>
   );

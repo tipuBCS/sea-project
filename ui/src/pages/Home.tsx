@@ -38,8 +38,12 @@ function Home() {
   const userIdBoard = params.userId as string;
 
   const [splitPanelOpen, setSplitPanelOpen] = useState(false);
-
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+
+  function startEditingTask(task: TaskType) {
+    setEditTaskId(task.id);
+    setSplitPanelOpen(true);
+  }
 
   const {
     tasks,
@@ -54,7 +58,7 @@ function Home() {
     setTasksChanged,
     tasksChanged,
     setEditTaskId,
-  } = useTaskManagement({ userIdBoard, setSplitPanelOpen });
+  } = useTaskManagement({ userIdBoard, setSplitPanelOpen, startEditingTask });
 
   const [boardUsername, setBoardUsername] = useState("undefined");
 
@@ -213,11 +217,6 @@ function Home() {
       updateBackend.cancel();
     };
   }, [tasks, setTasksChanged]);
-
-  function startEditingTask(task: TaskType) {
-    setEditTaskId(task.id);
-    setSplitPanelOpen(true);
-  }
 
   // Function to sort tasks by position
   const sortTasksByPosition = (tasks: TaskType[]): TaskType[] => {

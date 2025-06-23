@@ -91,6 +91,7 @@ const TaskEditor = ({
             stretch={true}
           >
             <Input
+              autoFocus
               disabled={!canEditBoard()}
               onChange={({ detail }) => {
                 onChangeTask({ name: detail.value });
@@ -128,7 +129,7 @@ const TaskEditor = ({
           gridDefinition={[
             { colspan: 4 },
             { colspan: 2 },
-            { colspan: 2},
+            { colspan: 2 },
             { colspan: 2 },
           ]}
         >

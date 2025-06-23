@@ -184,7 +184,7 @@ export const Item = React.memo(
                 >
                   {canEditBoard() ? "Edit" : "View"}
                 </Button>
-                {
+                {canEditBoard() && (
                   <Remove
                     className={styles.Remove}
                     onClick={() => {
@@ -193,7 +193,7 @@ export const Item = React.memo(
                       }
                     }}
                   />
-                }
+                )}
               </span>
             ) : null}
           </div>
